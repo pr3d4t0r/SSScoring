@@ -122,6 +122,7 @@ venv.bak/
 **/scoring/_jupyter/jupyter_notebook_config.json
 **/scoring/_jupyter/lab/*
 **/scoring/_jupyter/migrated*
+**/scoring/bartelle/*
 **/scoring/pr3d4t0r/*
 
 
