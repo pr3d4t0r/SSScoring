@@ -111,9 +111,19 @@ venv.bak/
 
 
 # Notebook credential/configuration
-_jupyter/
-**/scoring/pr3d4t0r/*
+# _jupyter/
+
+# *** IMPORTANT ***
+# _jupyter/.vcs-flag MUST be present in the _jupyter directory.  The _jupyter
+# directory MUST be set to chmod 777 to grant it access from inside the
+# container.  The Jupyter instance in the container (Lab, Notebook) won't
+# persist state without these settings.
 **/scoring/*zip
+**/scoring/_jupyter/jupyter_notebook_config.json
+**/scoring/_jupyter/lab/*
+**/scoring/_jupyter/migrated*
+**/scoring/pr3d4t0r/*
+
 
 
 # FlySafe exclusions
@@ -121,4 +131,3 @@ _jupyter/
 **FlySafe_Windows.bat
 **/scoring/README.txt
 **exit_example.txt
-
