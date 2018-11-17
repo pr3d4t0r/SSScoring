@@ -102,3 +102,23 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+
+# *** Speed Skydiving analysis files ***
+
+# Vim
+**swp
+
+
+# Notebook credential/configuration
+_jupyter/
+**/scoring/pr3d4t0r/*
+**/scoring/*zip
+
+
+# FlySafe exclusions
+**FlySafe.jar
+**FlySafe_Windows.bat
+**/scoring/README.txt
+**exit_example.txt
+
