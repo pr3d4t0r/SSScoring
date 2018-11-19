@@ -1,4 +1,4 @@
-# vim: utf-8
+# vim: set fileencoding=utf-8:
 
 
 import math
