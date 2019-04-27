@@ -132,3 +132,8 @@ venv.bak/
 **FlySafe_Windows.bat
 **/scoring/README.txt
 **exit_example.txt
+
+
+# SSScoring exclusions:
+**FlySight-test-file.*
+

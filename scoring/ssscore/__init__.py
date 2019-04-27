@@ -41,6 +41,7 @@ import shutil
 BREAKOFF_ALTITUDE = 1700.0
 COURSE_END        = BREAKOFF_ALTITUDE  # 2019 FAI rules
 DEG_IN_RAD        = math.pi/180.0
+RESOURCE_PATH     = 'resources'
 VALID_MSL         = 100.0 # STD
 
 
@@ -70,7 +71,12 @@ def updateFlySightDataSource(dataLakePath, dataSourcePath):
         _, fileName  = os.path.split(source)
         destination = os.path.join(dataSourcePath, fileName)
         
-        shutil.move(source, destination)
+        if RESOURCE_PATH not in source:
+            shutil.move(source, destination)
+        else:
+            # Test code, data should not be moved.
+            shutil.copy(source, destination)
+
         print('moved %s --> %s' % (source, destination))
     
     print('moved %d CSV files from data lake [%s] to data source [%s]' % (len(flightFilesList), dataLakePath, dataSourcePath))
