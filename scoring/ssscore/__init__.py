@@ -38,11 +38,12 @@ import shutil
 
 # *** constants ***
 
-BREAKOFF_ALTITUDE = 1700.0
-COURSE_END        = BREAKOFF_ALTITUDE  # 2019 FAI rules
-DEG_IN_RAD        = math.pi/180.0
-RESOURCE_PATH     = 'resources'
-VALID_MSL         = 100.0 # STD
+BREAKOFF_ALTITUDE    = 1700.0
+COURSE_END           = BREAKOFF_ALTITUDE  # 2019 FAI rules
+DEG_IN_RAD           = math.pi/180.0
+FLYSIGHT_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+RESOURCE_PATH        = 'resources'
+VALID_MSL            = 100.0 # STD
 
 
 # *** functions ***
