@@ -41,8 +41,10 @@ import shutil
 BREAKOFF_ALTITUDE    = 1700.0
 COURSE_END           = BREAKOFF_ALTITUDE  # 2019 FAI rules
 DEG_IN_RAD           = math.pi/180.0
+FLYSIGHT_SAMPLE_TIME = 20  # secs/100
 FLYSIGHT_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 RESOURCE_PATH        = 'resources'
+SPEED_INTERVAL       = 300 # secs/100
 VALID_MSL            = 100.0 # STD
 
 
