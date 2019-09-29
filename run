@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# vim: set fileencoding=utf-8:
+
+# BSD 3-Clause License -- see ../../LICENSE for details.
+
+
+# *** functions ***
+
+function die {
+    echo "$1"
+    exit "$2"
+} # die
+
+
+function checkDockerIsAvailable {
+    which docker-compose > /dev/null || die "docker-compose unavailable or not in path" 1
+} # checkDockerIsAvailable
+
+
+function checkDockerComposeFileExists {
+    [[ -e "./docker-compose.yaml" ]] || die "docker-compose.yaml is not present in pwd == $(pwd)" 2
+} # checkDockerComposeFileExists
+
+
+function runJupyterScienceLab {
+   docker-compose up --remove-orphans || docker-compose rm -f 
+} # runJupyterScienceLab
+
+
+# *** main ***
+
+checkDockerIsAvailable
+checkDockerComposeFileExists
+runJupyterScienceLab
+

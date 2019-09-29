@@ -124,5 +124,5 @@ When done, kill the process with Ctrl-C or turn off the computer.  That's it!
 # License and copyright
 
 The code and sample data are released under the BSD 3-clause license.  All the
-code is &copy; 2018 by GitHub users pr3d4t0r and project contributors.
+code is &copy; 2018-2019 by GitHub users pr3d4t0r and project contributors.
 

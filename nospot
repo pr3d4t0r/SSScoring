@@ -1,0 +1,94 @@
+#!/bin/bash 
+
+# vim: set fileencoding=utf-8:
+# BSD 3-Clause License -- see LICENSE for details.
+# https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE
+#
+# https://github.com/pr3d4t0r/SSScoring for full project.
+
+
+# *** constants ***
+
+FLYSIGHT_SIG_FILE="CONFIG.TXT"
+MOUNT_POINT="/Volumes"
+OS="Darwin"
+
+
+# *** functions ***
+
+function die {
+    echo "$1"
+    exit "$2"
+} #die
+
+
+function assertMacOS {
+    [[ $(uname) == "$OS" ]] || die "this tool is intended for MacOS/Spotlight" 1
+} # assertMacOS
+
+
+function resolveFlySightMount {
+    local flagFile
+    local mountPoint
+    local mountPoints=("$MOUNT_POINT"/*)
+    local result=""
+
+    for mountPoint in "${mountPoints[@]}"
+    do
+        flagFile="$mountPoint/$FLYSIGHT_SIG_FILE"
+
+        if [[ -e "$flagFile" ]]
+        then
+            result="$mountPoint"
+            break
+        fi
+    done
+
+    echo "$result"
+} # resolveFlySightMount
+
+
+function assertFlySightDirExists {
+    local directory="$1"
+
+    [[ -n "$directory" ]] || die "no valid FlySight mount or directory found" 2
+    [[ -d "$directory" ]] || die "$directory does not exist; try again" 3
+}
+
+
+function notifyUserWorkWith {
+    printf "\nFlySight - disabling Spotlight scans in FlySight mount %s\n" "$1"
+    printf "This operation may take a severa minutes\n\n"
+} # notifyUserWorkWith
+
+
+function disableSpotlightIn {
+    local workDir="$1"
+
+    # Via FlySight / Michael Cooper recommendation:
+    # https://apple.stackexchange.com/a/7135
+
+    mdutil -i off "$workDir" || die "mdutil failed, ABEND" 4
+
+    pushd "$workDir" > /dev/null
+    rm -rf .fseventsd .Spotlight-V* .Trashes ._.Trashes
+    mkdir .fseventsd
+    touch .fseventsd/no_log .metadata_never_index .Trashes
+    popd > /dev/null
+
+    printf "Spotlight disabled for $workDir\n\n"
+}
+
+
+# *** main ***
+
+set -e
+
+assertMacOS
+workDirectory=$(resolveFlySightMount)
+assertFlySightDirExists "$workDirectory"
+notifyUserWorkWith "$workDirectory"
+disableSpotlightIn "$workDirectory"
+
+exit 0
+
