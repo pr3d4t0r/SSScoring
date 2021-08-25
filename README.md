@@ -2,8 +2,8 @@
 
 
 The setup includes a Jupyter Lab dockerized implementation with local data
-storage and single user access credentials.  This is a zero-install setup as long as
-Docker is already available in the target system.
+storage and single user access credentials.  This is a zero-install setup as
+long as Docker is already available in the target system.
 
 
 ### Requirements
@@ -42,7 +42,8 @@ To generate the first time password and start the Jupyter Lab, open a terminal
 shell in the `SSScoring` directory, then execute:
 
 ```bash
-docker-compose up --remove-orphans || docker-compose rm -f
+./run
+```
 ```
 
 This is a good time for the user to get some coffee ☕️ if they have a slow
@@ -71,7 +72,8 @@ The web browser displays the Jupyter Lab main view and launcher:
 
 ![Jupyter Lab sample screen](https://raw.githubusercontent.com/pr3d4t0r/SSScoring/master/images/lab-first-run.png) 
 
-End the Jupyter Lab container by exiting the Jupyter Lab and terminating the process:
+End the Jupyter Lab container by exiting the Jupyter Lab and terminating the
+process:
 
 1. Go to **http://localhost:8888/tree**
 1. Click on the _Logout_ button at the top right corner
@@ -96,7 +98,7 @@ The process is super simple now:
 To start:
 
 ```bash
-docker-compose up --remove-orphans ; docker-compose rm -f
+./run
 ```
 
 When done, kill the process with Ctrl-C or turn off the computer.  That's it!
@@ -115,10 +117,10 @@ When done, kill the process with Ctrl-C or turn off the computer.  That's it!
    chmod 777 -Rfv ./scoring/_jupyter
    ```
 
-1. **Does SSScoring support Windows?** - Sort of.  All the tools used for analyzing the
-   competition data are supposed to work under Windows, but the developers
-   don't have Windows systems to test.  Fork the project or ask to join if you'd
-   like to help!
+1. **Does SSScoring support Windows?** - Sort of.  All the tools used for
+   analyzing the competition data are supposed to work under Windows, but the
+   developers don't have Windows systems to test.  Fork the project or ask to
+   join if you'd like to help!
 
 
 # License and copyright

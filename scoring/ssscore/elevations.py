@@ -17,7 +17,6 @@ class DZElevations(Enum):
     SKYDIVE_ALGARVE              =    2.00
     SKYDIVE_ARIZONA              =  460.60
     SKYDIVE_BUZZ                 =  256.00
-    SKYDIVE_BUZZ                 = 253.00
     SKYDIVE_FANO                 =   54.00
     SKYDIVE_FLANDERS_ZWARTBERG   =   85.00
     SKYDIVE_SAULGAU              =  581.00
