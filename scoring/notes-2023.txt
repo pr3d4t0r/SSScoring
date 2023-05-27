@@ -1,0 +1,39 @@
+On a timeseries, use pandas to group the rows in a dataset by increasing or
+decreasing values, in two or more sets, using the cumsum() function without
+altering the original order of the series.
+
+If you want to group the rows in a pandas DataFrame by increasing or decreasing
+values using the cumsum() function while preserving the original order of the
+series, you can accomplish that by creating a separate column to track the
+increasing or decreasing trend. Here's an example:
+
+import pandas as pd
+
+# Create a sample DataFrame
+data = {'Date': pd.date_range(start='2023-01-01', periods=10),
+        'Value': [10, 5, 8, 3, 2, 7, 6, 9, 4, 1]}
+df = pd.DataFrame(data)
+
+# Create a column to track the increasing or decreasing trend
+df['Trend'] = df['Value'].diff().fillna(0).ge(0).astype(int)
+
+# Calculate the cumulative sum within each trend group
+df['Cumulative Sum'] = df.groupby('Trend')['Value'].cumsum()
+
+# Group the rows based on the trend
+groups = df.groupby('Trend')
+
+# Print the groups
+for trend, group in groups:
+    print(f'Trend: {"Increasing" if trend == 1 else "Decreasing"}')
+    print(group)
+    print()
+
+In this example, the 'Trend' column is created by calculating the differences
+between consecutive values using diff(), filling any missing values with 0, and
+then checking if the difference is greater than or equal to 0 (ge(0)). The
+'Cumulative Sum' column is calculated using cumsum() within each trend group.
+Finally, the DataFrame is grouped based on the 'Trend' column, and each group
+is printed separately, with the trend identified as "Increasing" or
+"Decreasing" accordingly.
+
