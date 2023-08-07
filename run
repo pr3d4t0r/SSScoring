@@ -24,7 +24,7 @@ function checkDockerComposeFileExists {
 
 
 function runJupyterScienceLab {
-   docker-compose up --remove-orphans || docker-compose rm -f 
+   docker-compose up --remove-orphans || docker-compose rm -f
 } # runJupyterScienceLab
 
 
