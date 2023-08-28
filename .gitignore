@@ -123,11 +123,13 @@ venv.bak/
 **/.bash_profile
 **/.bash_rc
 **/.bashrc
+**/.config/pudb/saved-breakpoints*
 **/.ipython
 **/.jupyter
 **/.local
 **/.profile
 **/.viminfo
+**/data/*
 **/lucy
 **/lucyfer-compose.yaml
 **/scoring/*zip
