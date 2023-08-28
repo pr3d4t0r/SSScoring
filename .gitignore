@@ -123,7 +123,7 @@ venv.bak/
 **/.bash_profile
 **/.bash_rc
 **/.bashrc
-**/.config/pudb/saved-breakpoints*
+**/.config
 **/.ipython
 **/.jupyter
 **/.local
