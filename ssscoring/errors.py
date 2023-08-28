@@ -1,4 +1,4 @@
-# See: https://github.com/pr3d4t0r/SSSCoring/blob/master/LICENSE.txt
+# See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 
 import json
@@ -6,7 +6,7 @@ import json
 
 # +++ classes +++
 
-class SSSCoringError(Exception):
+class SSScoringError(Exception):
     """
     Abstract class that defines all exceptions and errors and has a dictionary
     representation of itself, for cleaner structured logging.
@@ -24,7 +24,7 @@ class SSSCoringError(Exception):
 
 
     def __str__(self):
-        e = {  'SSSCoringError': self._info, 'errno': self._errno, }
+        e = {  'SSScoringError': self._info, 'errno': self._errno, }
 
         return json.dumps(e)
 

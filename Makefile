@@ -105,7 +105,7 @@ test: ALWAYS
 	@echo "Version = $(VERSION)"
 	pip install -r requirements.txt
 	pip install -e .
-	pytest --show-capture=no -v ./tests/test_ssscoring.py
+	pytest --show-capture=no -v ./tests/*
 	pip uninstall -y $(PACKAGE)==$(VERSION) || true
 	rm -Rfv $$(find ssscoring/ | awk '/__pycache__$$/')
 	rm -Rfv $$(find tests | awk '/__pycache__$$/')

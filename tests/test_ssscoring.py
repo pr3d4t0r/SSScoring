@@ -1,4 +1,4 @@
-# See: https://github.com/pr3d4t0r/SSSCoring/blob/master/LICENSE.txt
+# See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 
 from ssscoring import convertFlySight2SSScoring
@@ -6,7 +6,7 @@ from ssscoring import dropNonSkydiveDataFrom
 from ssscoring import getSpeedSkydiveFrom
 from ssscoring import isValidJump
 from ssscoring import jumpAnalysisTable
-from ssscoring.errors import SSSCoringError
+from ssscoring.errors import SSScoringError
 
 import pytest
 
@@ -36,10 +36,10 @@ def test_convertFlySight2SSScoring():
     assert 'vKMh' in _data.columns
 
 
-    with pytest.raises(SSSCoringError):
+    with pytest.raises(SSScoringError):
         convertFlySight2SSScoring(None)
 
-    with pytest.raises(SSSCoringError):
+    with pytest.raises(SSScoringError):
         convertFlySight2SSScoring(TEST_FLYSIGHT_DATA)
 
 
@@ -77,13 +77,7 @@ def test_jumpAnalysisTable():
     maxSpeed, table = jumpAnalysisTable(_data)
 
     assert maxSpeed > 400.0
-    assert 'time' in table.index
-    assert 'vKMh' in table.index
-    assert 'heightFt' in table.index
-
-
-# test_convertFlySight2SSScoring()
-# test_dropNonSkydiveDataFrom()
-# test_getSpeedSkydiveFrom()
-# test_isValidJump()
+    assert 'time' in table.columns
+    assert 'vKMh' in table.columns
+    assert 'altitude (ft)' in table.columns
 

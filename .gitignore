@@ -137,6 +137,7 @@ venv.bak/
 **/scoring/_jupyter/migrated*
 **/scoring/data-lake/*zip
 **/scoring/data-sources/*
+**/.config/pudb/saved-breakpoints*
 
 
 # FlySafe exclusions

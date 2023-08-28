@@ -1,4 +1,4 @@
-# See: https://github.com/pr3d4t0r/SSSCoring/blob/master/LICENSE.txt
+# See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 
 __VERSION__ = '1.2.0'
@@ -6,7 +6,7 @@ __VERSION__ = '1.2.0'
 
 from collections import namedtuple
 
-from ssscoring.errors import SSSCoringError
+from ssscoring.errors import SSScoringError
 
 import pandas as pd
 
@@ -15,7 +15,7 @@ import pandas as pd
 
 # All measurements expressed in meters unless noted
 BREAKOFF_ALTITUDE = 1707.0
-EXIT_SPEED = 9.81/2
+EXIT_SPEED = 9.0
 MAX_SPEED_ACCURACY = 3.0
 PERFORMANCE_WINDOW_LENGTH = 2256.0
 VALIDATION_WINDOW_LENGTH = 1006.0
@@ -31,7 +31,7 @@ PerformanceWindow = namedtuple("PerformanceWindow", "start end validationStart")
 def convertFlySight2SSScoring(rawData: pd.DataFrame):
     """
     Converts a raw dataframe initialized from a FlySight CSV file into the
-    SSSCoring file format.  The SSSCoring format uses more descriptive column
+    SSScoring file format.  The SSScoring format uses more descriptive column
     headers, adds the altitude in feet, and uses UNIX time instead of an ISO
     string.
 
@@ -52,7 +52,7 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame):
     - speedAccuracy
     """
     if not isinstance(rawData, pd.DataFrame):
-        raise SSSCoringError('convertFlySight2SSScoring input must be a FlySight CSV dataframe')
+        raise SSScoringError('convertFlySight2SSScoring input must be a FlySight CSV dataframe')
 
     data = rawData.copy()
 
@@ -78,7 +78,7 @@ def dropNonSkydiveDataFrom(data: pd.DataFrame) -> pd.DataFrame:
     Arguments
     ---------
         data : pd.DataFrame
-    Jump data in SSSCoring format (headers differ from FlySight format)
+    Jump data in SSScoring format (headers differ from FlySight format)
 
     Returns
     -------
@@ -111,7 +111,7 @@ def getSpeedSkydiveFrom(data: pd.DataFrame) -> tuple:
     Arguments
     ---------
         data : pd.DataFrame
-    Jump data in SSSCoring format
+    Jump data in SSScoring format
 
     Returns
     -------
@@ -203,7 +203,10 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
         else:
             table = tranche
 
-    table = pd.DataFrame([ table.time, table.vKMh, table.heightFt, ])
+    table = pd.DataFrame({
+                'time': table.time,
+                'vKMh': table.vKMh,
+                'altitude (ft)': table.heightFt, })
 
     return (data.vKMh.max(), table)
 
