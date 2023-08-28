@@ -123,6 +123,7 @@ venv.bak/
 **/.bash_profile
 **/.bash_rc
 **/.bashrc
+**/.config/pudb/saved-breakpoints*
 **/.ipython
 **/.jupyter
 **/.local
@@ -137,7 +138,6 @@ venv.bak/
 **/scoring/_jupyter/migrated*
 **/scoring/data-lake/*zip
 **/scoring/data-sources/*
-**/.config/pudb/saved-breakpoints*
 
 
 # FlySafe exclusions
