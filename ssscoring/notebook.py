@@ -53,6 +53,8 @@ def processJump(data: pd.DataFrame):
     window, data = getSpeedSkydiveFrom(data)
     validJump = isValidJump(data, window)
     score = 0.0
+    scores = dict()
+    table = None
 
     if validJump:
         maxSpeed, table = jumpAnalysisTable(data)
@@ -61,7 +63,6 @@ def processJump(data: pd.DataFrame):
         baseTime = data.iloc[0].timeUnix
         data['plotTime'] = data.timeUnix-baseTime
 
-        scores = dict()
         for spot in data.plotTime:
             r0 = data[data.plotTime == spot]
             r1 = data[data.plotTime == spot+3.0]
@@ -72,6 +73,8 @@ def processJump(data: pd.DataFrame):
 
     else:
         color = '#f00'
+        maxSpeed = -1
+        score = -1
         result = '🔴 invalid'
 
     return JumpResults(score, maxSpeed, scores, data, window, table, color, result)

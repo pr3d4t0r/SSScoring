@@ -58,12 +58,12 @@ def test_getSpeedSkydiveFrom():
 
     _window, _data = getSpeedSkydiveFrom(_data)
 
-    assert '{0:,.2f}'.format(_window.start) == '4,189.55'
+    assert '{0:,.2f}'.format(_window.start) == '4,185.09'
     # assert '{0:,.2f}'.format(_window.start) == '4,194.12'
     # assert '{0:,.2f}'.format(_window.end) == '1,938.12'
-    assert '{0:,.2f}'.format(_window.end) == '1,933.55'
+    assert '{0:,.2f}'.format(_window.end) == '1,929.09'
     # assert '{0:,.2f}'.format(_window.validationStart) == '2,944.12'
-    assert '{0:,.2f}'.format(_window.validationStart) == '2,939.55'
+    assert '{0:,.2f}'.format(_window.validationStart) == '2,935.09'
     assert _data.iloc[-1].heightMSL >= _window.end
 
 

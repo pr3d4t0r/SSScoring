@@ -138,6 +138,7 @@ venv.bak/
 **/scoring/_jupyter/migrated*
 **/scoring/data-lake/*zip
 **/scoring/data-sources/*
+**/tmp/*
 
 
 # FlySafe exclusions

@@ -1,7 +1,7 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 
-__VERSION__ = '1.2.0'
+__VERSION__ = '1.2.1'
 
 
 from collections import namedtuple
@@ -125,11 +125,12 @@ def getSpeedSkydiveFrom(data: pd.DataFrame) -> tuple:
 
     freeFallGroup = -1
     dataPoints = -1
+    MIN_DATA_POINTS = 100 # heuristic
+    MIN_MAX_SPEED = 200 # km/h, heuristic; slower ::= no free fall
     for group in range(groups):
         subset = data[data.group == group]
-        if len(subset) > dataPoints:
+        if len(subset) >= MIN_DATA_POINTS and subset.vKMh.max() >= MIN_MAX_SPEED:
             freeFallGroup = group
-            dataPoints = len(subset)
 
     data = data[data.group == freeFallGroup]
     data = data.drop('group', axis = 1).drop('positive', axis = 1)
@@ -209,6 +210,4 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
                 'altitude (ft)': table.heightFt, })
 
     return (data.vKMh.max(), table)
-
-
 
