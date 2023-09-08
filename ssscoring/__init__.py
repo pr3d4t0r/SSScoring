@@ -1,12 +1,15 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 
-__VERSION__ = '1.2.1'
+__VERSION__ = '1.2.2'
 
 
 from collections import namedtuple
 
 from ssscoring.errors import SSScoringError
+
+import csv
+import os
 
 import pandas as pd
 
@@ -16,8 +19,13 @@ import pandas as pd
 # All measurements expressed in meters unless noted
 BREAKOFF_ALTITUDE = 1707.0
 EXIT_SPEED = 9.0
+FLYSIGHT_HEADER = set([ 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 'hAcc', 'vAcc', 'sAcc', 'heading', 'cAcc', 'gpsFix', 'numSV', ])
+IGNORE_LIST = [ '.ipynb_checkpoints', ]
+LAST_TIME_TRANCHE = 25.0
 MAX_SPEED_ACCURACY = 3.0
+MIN_JUMP_FILE_SIZE = 1024*512
 PERFORMANCE_WINDOW_LENGTH = 2256.0
+SPEED_COLORS = colors = ('blue', 'limegreen', 'tomato', 'turquoise', 'deepskyblue', 'forestgreen', 'coral', 'darkcyan',)
 VALIDATION_WINDOW_LENGTH = 1006.0
 
 
@@ -27,6 +35,76 @@ PerformanceWindow = namedtuple("PerformanceWindow", "start end validationStart")
 
 
 # +++ functions +++
+
+def validFlySightHeaderIn(fileCSV: str) -> bool:
+    """
+    Checks if a file is a CSV in FlySight format.  The checks include:
+
+    - Whether the file is a CSV, using a comma delimiter
+    - Checks for the presence of all the documented FlySight headers
+    - Checks that the maximum altitude is above the minimum altitude of
+      `BREAKOFF_ALTITUDE+PERFORMANCE_WINDOW_LENGTH`
+
+    Arguments
+    ---------
+        fileCSV
+    A file name to verify as a valid FlySight file
+
+    Returns
+    -------
+    `True` if `fileCSV` is a FlySight CSV file, otherwise `False`.
+    """
+    delimiters =  [',', ]
+    hasAllHeaders = False
+    minAltitude = BREAKOFF_ALTITUDE+PERFORMANCE_WINDOW_LENGTH
+    with open(fileCSV, 'r') as inputFile:
+        try:
+            dialect = csv.Sniffer().sniff(inputFile.readline(), delimiters = delimiters)
+        except:
+            return False
+        if dialect.delimiter in delimiters:
+            inputFile.seek(0)
+            header = next(csv.reader(inputFile))
+        else:
+            return False
+        hasAllHeaders = FLYSIGHT_HEADER.issubset(header)
+        if hasAllHeaders:
+            d = pd.read_csv(fileCSV, skiprows = (1,1))
+            if d.hMSL.max() < minAltitude:
+                return False
+    return hasAllHeaders
+
+
+def getAllSpeedJumpFilesFrom(dataLake: str) -> list:
+    """
+    Get a list of all the speed jump files from a data lake, where data lake is
+    defined as a reachable path that contains one or more FlySight CSV files.
+    This function tests each file to ensure that it's a speed skydive FlySight
+    file in a valid format and length.
+
+    Arguments
+    ---------
+        dataLake: str
+    A valid (absolute or relative) path name to the top level directory where
+    the data lake starts.
+
+    Returns
+    -------
+    A list of speed jump file names for later SSScoring processing.
+    """
+    jumpFiles = list()
+    for root, dirs, files in os.walk(dataLake):
+        if any(name in root for name in IGNORE_LIST):
+            continue
+        for fileName in files:
+            if 'CSV' in fileName:
+                jumpFileName = os.path.join(root, fileName)
+                stat = os.stat(jumpFileName)
+                if stat.st_size >= MIN_JUMP_FILE_SIZE and validFlySightHeaderIn(jumpFileName):
+                    jumpFiles.append(jumpFileName)
+
+    return jumpFiles
+
 
 def convertFlySight2SSScoring(rawData: pd.DataFrame):
     """
@@ -124,7 +202,6 @@ def getSpeedSkydiveFrom(data: pd.DataFrame) -> tuple:
     groups = data.group.max()+1
 
     freeFallGroup = -1
-    dataPoints = -1
     MIN_DATA_POINTS = 100 # heuristic
     MIN_MAX_SPEED = 200 # km/h, heuristic; slower ::= no free fall
     for group in range(groups):
