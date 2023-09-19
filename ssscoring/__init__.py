@@ -18,8 +18,9 @@ import pandas as pd
 
 # All measurements expressed in meters unless noted
 BREAKOFF_ALTITUDE = 1707.0
-EXIT_SPEED = 9.0
+EXIT_SPEED = 2*9.81
 FLYSIGHT_HEADER = set([ 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 'hAcc', 'vAcc', 'sAcc', 'heading', 'cAcc', 'gpsFix', 'numSV', ])
+FT_IN_M = 3.2808
 IGNORE_LIST = [ '.ipynb_checkpoints', ]
 LAST_TIME_TRANCHE = 25.0
 MAX_SPEED_ACCURACY = 3.0
@@ -27,6 +28,9 @@ MIN_JUMP_FILE_SIZE = 1024*512
 PERFORMANCE_WINDOW_LENGTH = 2256.0
 SPEED_COLORS = colors = ('blue', 'limegreen', 'tomato', 'turquoise', 'deepskyblue', 'forestgreen', 'coral', 'darkcyan',)
 VALIDATION_WINDOW_LENGTH = 1006.0
+
+# Drop zones altitude (meters)
+ALTITUDE_SKYDIVE_PARACLETE_XP = 93
 
 
 # +++ type definitions +++
@@ -106,41 +110,71 @@ def getAllSpeedJumpFilesFrom(dataLake: str) -> list:
     return jumpFiles
 
 
-def convertFlySight2SSScoring(rawData: pd.DataFrame):
+def convertFlySight2SSScoring(rawData: pd.DataFrame,
+                              altitudeDZMeters = 0.0,
+                              altitudeDZFt = 0.0):
     """
     Converts a raw dataframe initialized from a FlySight CSV file into the
     SSScoring file format.  The SSScoring format uses more descriptive column
     headers, adds the altitude in feet, and uses UNIX time instead of an ISO
     string.
 
+    If both `altitudeDZMeters` and `altitudeDZFt` are zero then hMSL is used.
+    Otherwise, this function adjusts the effective altitude with the value.  If
+    both meters and feet values are set this throws an error.
+
     Arguments
     ---------
         rawData : pd.DataFrame
     FlySight CSV input as a dataframe
+
+        altitudeDZMeters : float
+    Drop zone height above MSL
+
+        altitudeDZFt
+    Drop zone altitudde above MSL
 
     Returns
     -------
     A dataframe in SSScoring format, featuring these columns:
 
     - timeUnix
-    - heightMSL
-    - heightFt
+    - altitudeMSL
+    - altitudeASL
+    - altitudeMSLFt
+    - altitudeASLFt
     - vMetersPerSecond
     - vKMh (km/h)
     - speedAccuracy
+
+    Errors
+    ------
+    `SSScoringError` if the DZ altitude is set in both meters and feet.
     """
     if not isinstance(rawData, pd.DataFrame):
         raise SSScoringError('convertFlySight2SSScoring input must be a FlySight CSV dataframe')
 
+    if altitudeDZMeters and altitudeDZFt:
+        raise SSScoringError('Cannot set altitude in meters and feet; pick one')
+
+    if altitudeDZMeters:
+        altitudeDZFt = FT_IN_M*altitudeDZMeters
+    if altitudeDZFt:
+        altitudeDZMeters = altitudeDZFt/FT_IN_M
+
     data = rawData.copy()
 
-    data['heightFt'] = data['hMSL'].apply(lambda h: 3.2808*h)
+    data['altitudeMSLFt'] = data['hMSL'].apply(lambda h: FT_IN_M*h)
+    data['altitudeASL'] = data.hMSL-altitudeDZMeters
+    data['altitudeASLFt'] = data.altitudeMSLFt-altitudeDZFt
     data['timeUnix'] = data['time'].apply(lambda t: pd.Timestamp(t).timestamp())
 
     data = pd.DataFrame(data = {
         'timeUnix': data.timeUnix,
-        'heightMSL': data.hMSL,
-        'heightFt': data.heightFt,
+        'altitudeMSL': data.hMSL,
+        'altitudeASL': data.altitudeASL,
+        'altitudeMSLFt': data.altitudeMSLFt,
+        'altitudeASLFt': data.altitudeASLFt,
         'vMetersPerSecond': data.velD,
         'vKMh': data.velD*3.6,
         'speedAccuracy': data.sAcc, })
@@ -162,10 +196,10 @@ def dropNonSkydiveDataFrom(data: pd.DataFrame) -> pd.DataFrame:
     -------
     The jump data for the skydive
     """
-    timeMaxAlt = data[data.heightMSL == data.heightMSL.max()].timeUnix.iloc[0]
+    timeMaxAlt = data[data.altitudeASL == data.altitudeASL.max()].timeUnix.iloc[0]
     data = data[data.timeUnix > timeMaxAlt]
 
-    data = data[data.heightMSL > 0]
+    data = data[data.altitudeASL > 0]
 
     return data
 
@@ -212,16 +246,20 @@ def getSpeedSkydiveFrom(data: pd.DataFrame) -> tuple:
     data = data[data.group == freeFallGroup]
     data = data.drop('group', axis = 1).drop('positive', axis = 1)
 
-    data = data[data.vMetersPerSecond > EXIT_SPEED]
-    data = data[data.heightMSL >= BREAKOFF_ALTITUDE]
+    # Speed ~= 9.81 m/s; subtract 1 second for actual exit.
+    exitTime = data[data.vMetersPerSecond > EXIT_SPEED].head(1).timeUnix.iat[0]-2.0
+    # TODO:  Delete this as the upper bounds the next time you see this note.
+    # data = data[data.vMetersPerSecond > EXIT_SPEED]
+    data = data[data.timeUnix >= exitTime]
+    data = data[data.altitudeASL >= BREAKOFF_ALTITUDE]
 
-    windowStart = data.iloc[0].heightMSL
+    windowStart = data.iloc[0].altitudeASL
     windowEnd = windowStart-PERFORMANCE_WINDOW_LENGTH
     if windowEnd < BREAKOFF_ALTITUDE:
         windowEnd = BREAKOFF_ALTITUDE
 
     validationWindowStart = windowEnd+VALIDATION_WINDOW_LENGTH
-    data = data[data.heightMSL >= windowEnd]
+    data = data[data.altitudeASL >= windowEnd]
 
     return PerformanceWindow(windowStart, windowEnd, validationWindowStart), data
 
@@ -244,7 +282,7 @@ def isValidJump(data: pd.DataFrame,
     -------
     `True` if the jump is valid according to ISC/FAI/USPA rules.
     """
-    accuracy = data[data.heightMSL < window.validationStart].speedAccuracy.max()
+    accuracy = data[data.altitudeASL < window.validationStart].speedAccuracy.max()
     return accuracy < MAX_SPEED_ACCURACY
 
 
@@ -284,7 +322,7 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
     table = pd.DataFrame({
                 'time': table.time,
                 'vKMh': table.vKMh,
-                'altitude (ft)': table.heightFt, })
+                'altitude (ft)': table.altitudeASLFt, })
 
     return (data.vKMh.max(), table)
 
