@@ -35,7 +35,22 @@ ALTITUDE_SKYDIVE_PARACLETE_XP = 93
 # +++ type definitions +++
 
 JumpResults = namedtuple("JumpResults", "score maxSpeed scores data window table color result")
+"""
+A named tuple containing the score, maximum speed, scores throught the
+performance window, the results table for a jump, the output color for the
+result, and the result information string.
 
+Attributes
+----------
+- `score`
+- `maxSpeed`
+- `scores`
+- `data`
+- `window`
+- `table`
+- `color`
+- `result`
+"""
 PerformanceWindow = namedtuple("PerformanceWindow", "start end validationStart")
 
 
@@ -439,7 +454,6 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
 
     The dataframe rows are identified by the human readable jump file name.
     """
-    ref = 0
     speeds = pd.DataFrame()
     for jumpResultIndex in jumpResults.keys():
         jumpResult = jumpResults[jumpResultIndex]
@@ -478,13 +492,14 @@ def totalResultsFrom(aggregate: pd.DataFrame) -> pd.DataFrame:
 
     - totalSpeed ::= the sum of all speeds in the aggregated results
     - meanSpeed ::= the mean of all speeds
+    - maxScore ::= the max score among all the speed scores
 
     Raises
     ------
     `AttributeError` if aggregate is an empty dataframe or `None`, or if the
     `aggregate` dataframe doesn't conform to the output of `ssscoring.aggregateResults`.
     """
-    totals = pd.DataFrame({ 'totalSpeed': [ aggregate.score.sum(), ], 'meanSpeed': [ aggregate.score.mean(), ], }, index = [ 'totalSpeed'],)
+    totals = pd.DataFrame({ 'totalSpeed': [ aggregate.score.sum(), ], 'meanSpeed': [ aggregate.score.mean(), ], 'maxScore': [ aggregate.score.max(), ], }, index = [ 'totalSpeed'],)
 
     return totals
 
