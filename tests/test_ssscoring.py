@@ -4,17 +4,22 @@
 from ssscoring import ALTITUDE_SKYDIVE_PARACLETE_XP
 from ssscoring import BREAKOFF_ALTITUDE
 from ssscoring import FT_IN_M
+from ssscoring import aggregateResults
 from ssscoring import convertFlySight2SSScoring
 from ssscoring import dropNonSkydiveDataFrom
 from ssscoring import getAllSpeedJumpFilesFrom
 from ssscoring import getSpeedSkydiveFrom
 from ssscoring import isValidJump
 from ssscoring import jumpAnalysisTable
+from ssscoring import processAllJumpFiles
+from ssscoring import processJump
+from ssscoring import totalResultsFrom
 from ssscoring import validFlySightHeaderIn
 from ssscoring.errors import SSScoringError
 
 import os
 import pytest
+import tempfile
 
 import pandas as pd
 
@@ -28,7 +33,9 @@ TEST_FLYSIGHT_DATA = os.path.join(TEST_FLYSIGHG_DATA_LAKE, 'test-data.csv')
 # +++ globals +++
 
 _data = None
+_jumpResults = None
 _window = None
+_speeds = None
 
 
 # +++ tests +++
@@ -134,5 +141,53 @@ def test_jumpAnalysisTable():
     assert 'altitude (ft)' in table.columns
 
 
-test_convertFlySight2SSScoring()
+def test_processJump():
+    data = convertFlySight2SSScoring(pd.read_csv(TEST_FLYSIGHT_DATA, skiprows = (1,1)))
+
+    jumpResults = processJump(data)
+
+    assert '{0:,.2f}'.format(jumpResults.score) == '443.07'
+    assert jumpResults.maxSpeed == 448.524
+    assert 'valid' in jumpResults.result
+
+
+def test_processAllJumpFiles():
+    global _jumpResults
+    jumpFiles = getAllSpeedJumpFilesFrom(TEST_FLYSIGHG_DATA_LAKE)
+    _jumpResults = processAllJumpFiles(jumpFiles)
+    assert _jumpResults
+    assert 'test-data' in list(_jumpResults.keys())[0] # first item
+
+    bogusDataLake = tempfile.mkdtemp()
+    jumpFiles = getAllSpeedJumpFilesFrom(bogusDataLake)
+    jumpResults = processAllJumpFiles(jumpFiles)
+    assert not jumpResults
+
+
+def test_aggregateResults():
+    global _speeds
+
+    _speeds = aggregateResults(_jumpResults)
+    assert len(_speeds)
+    assert _speeds.iloc[0].score
+    assert 'maxSpeed' in _speeds.columns
+
+    speeds = aggregateResults(dict())
+    assert not len(speeds)
+
+
+def test_totalResultsFrom():
+    totals = totalResultsFrom(_speeds)
+    assert len(totals)
+    assert totals.iloc[0].totalSpeed
+
+    with pytest.raises(AttributeError):
+        totalResultsFrom(pd.DataFrame())
+
+    with pytest.raises(AttributeError):
+        totalResultsFrom(None)
+
+    bogus = pd.DataFrame({ 'a': [ 42, 69, ], 'b': [ 99, 41, ] })
+    with pytest.raises(AttributeError):
+        totalResultsFrom(bogus)
 
