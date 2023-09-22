@@ -128,6 +128,9 @@ venv.bak/
 **/.jupyter
 **/.local
 **/.profile
+**/.python_history
+**/.ssh/*
+**/.vim/*
 **/.viminfo
 **/data/*
 **/lucy
@@ -139,6 +142,7 @@ venv.bak/
 **/scoring/data-lake/*zip
 **/scoring/data-sources/*
 **/tmp/*
+**/.gitconfig*
 
 
 # FlySafe exclusions
