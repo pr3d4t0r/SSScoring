@@ -124,6 +124,7 @@ venv.bak/
 **/.bash_rc
 **/.bashrc
 **/.config
+**/.gitconfig*
 **/.ipython
 **/.jupyter
 **/.local
@@ -141,8 +142,8 @@ venv.bak/
 **/scoring/_jupyter/migrated*
 **/scoring/data-lake/*zip
 **/scoring/data-sources/*
+**/test.json
 **/tmp/*
-**/.gitconfig*
 
 
 # FlySafe exclusions

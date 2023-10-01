@@ -4,9 +4,8 @@
 """
 
 
+import bokeh.io as bi
 import bokeh.plotting as bp
-import ipywidgets as widgets
-import pandas as pd
 
 # *** constants ***
 DATA_LAKE_ROOT = './data' # Lucyfer default
@@ -16,6 +15,8 @@ SPEED_COLORS = colors = ('blue', 'limegreen', 'tomato', 'turquoise', 'deepskyblu
 # *** global initialization ***
 
 bp.output_notebook(hide_banner = True)
+# TODO: make this configurable:
+bi.curdoc().theme = 'dark_minimal'
 
 
 # *** functions ***
