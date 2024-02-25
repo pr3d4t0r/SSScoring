@@ -206,3 +206,9 @@ def test_totalResultsFrom():
     with pytest.raises(AttributeError):
         totalResultsFrom(bogus)
 
+
+test_convertFlySight2SSScoring()
+test_dropNonSkydiveDataFrom()
+test_getSpeedSkydiveFrom()
+test_jumpAnalysisTable()
+

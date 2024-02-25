@@ -1,27 +1,30 @@
 " .vimrc - nothing special here.
 syntax on
 set ai
-set nu
-set ruler
-set sts=4
+set background=light
 set bs=2
+set expandtab
+set fo-=c
+set fo-=o
+set fo-=r
+set history=500
+set hlsearch
 set noic
 set nowrap
-set sw=4
-set expandtab
-set tabstop=4
-set background=light
-set history=500
+set nu
+set rnu
+set cursorline
+set ruler
 set splitright
-set hlsearch
-set fo-=o
-set fo-=c
-set fo-=r
+set sts=4
+set sw=4
+set tabstop=4
 color blue
 highlight Directory ctermfg=lightcyan
 
 highlight LineNr ctermfg=lightgreen
 highlight LineNr ctermbg=black
+highlight CursorLine ctermbg=blue ctermfg=white
 
 " Pathogen support:
 " execute pathogen#infect()
