@@ -1,7 +1,7 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 
-__VERSION__ = '1.2.4'
+__VERSION__ = '1.2.5'
 
 
 from collections import namedtuple
@@ -22,7 +22,7 @@ EXIT_SPEED = 2*9.81
 FLYSIGHT_HEADER = set([ 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 'hAcc', 'vAcc', 'sAcc', 'heading', 'cAcc', 'gpsFix', 'numSV', ])
 FT_IN_M = 3.2808
 IGNORE_LIST = [ '.ipynb_checkpoints', ]
-LAST_TIME_TRANCHE = 30.0
+LAST_TIME_TRANCHE = 25.0
 MAX_SPEED_ACCURACY = 3.0
 MIN_JUMP_FILE_SIZE = 1024*512
 PERFORMANCE_WINDOW_LENGTH = 2256.0
