@@ -403,7 +403,7 @@ def processJump(data: pd.DataFrame):
 
 
 
-def processAllJumpFiles(jumpFiles: list) -> dict:
+def processAllJumpFiles(jumpFiles: list, altitudeDZMeters = 0.0) -> dict:
     """
     Process all jump files in a list of valid FlySight files.  Returns a
     dictionary of jump results with a human-readable version of the file name.
@@ -415,6 +415,9 @@ def processAllJumpFiles(jumpFiles: list) -> dict:
         jumpFiles
     A list of relative or absolute path names to individual FlySight CSV files.
 
+        altitudeDZMeters : float
+    Drop zone height above MSL
+
         dict
     A dictionary of jump results.  The key is a human-readable version of a
     `jumpFile` name with the extension, path, and extraneous spaces eliminated
@@ -425,7 +428,7 @@ def processAllJumpFiles(jumpFiles: list) -> dict:
     for jumpFile in jumpFiles:
         jumpResult = processJump(
             convertFlySight2SSScoring(pd.read_csv(jumpFile, skiprows = (1, 1)),
-            altitudeDZMeters = ALTITUDE_SKYDIVE_PARACLETE_XP))
+            altitudeDZMeters = altitudeDZMeters))
         tag = jumpFile.replace('CSV', '').replace('.', '').replace('/data', '').replace('/', ' ').strip()
         if 'valid' in jumpResult.result:
             jumpResults[tag] = jumpResult
