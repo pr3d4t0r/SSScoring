@@ -1,7 +1,7 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 
-__VERSION__ = '1.2.2'
+__VERSION__ = '1.2.4'
 
 
 from collections import namedtuple
@@ -22,7 +22,7 @@ EXIT_SPEED = 2*9.81
 FLYSIGHT_HEADER = set([ 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 'hAcc', 'vAcc', 'sAcc', 'heading', 'cAcc', 'gpsFix', 'numSV', ])
 FT_IN_M = 3.2808
 IGNORE_LIST = [ '.ipynb_checkpoints', ]
-LAST_TIME_TRANCHE = 25.0
+LAST_TIME_TRANCHE = 30.0
 MAX_SPEED_ACCURACY = 3.0
 MIN_JUMP_FILE_SIZE = 1024*512
 PERFORMANCE_WINDOW_LENGTH = 2256.0
@@ -477,6 +477,41 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
             else:
                 speeds = pd.concat([ speeds, d, ])
     return speeds
+
+
+def roundedAggregateResults(jumpResults):
+    """
+    Aggregate all the results in a table fashioned after Marco Hepp's and Nklas
+    Daniel's score tracking data.  All speed results are rounded at `n > x.5`
+    for any value.
+
+    Arguments
+    ---------
+        jumpResults: dict
+    A dictionary of jump results, in which each result corresponds to a FlySight
+    file name.  See `ssscoring.processAllJumpFiles` for details.
+
+    Returns
+    -------
+    A dataframe featuring the **rounded values** for these columns:
+
+    - Score
+    - Speeds at 5, 10, 15, 20, and 25 second tranches
+    - Max speed
+
+    The `finalTime` column is ignored.
+
+    The dataframe rows are identified by the human readable jump file name.
+
+    This is a less precise version of the `ssscoring.aggregateResults`
+    dataframe, useful during training to keep rounded results available for
+    review.
+    """
+    aggregate = aggregateResults(jumpResults)
+    for column in [col for col in aggregate.columns if 'Time' not in str(col)]:
+        aggregate[column] = aggregate[column].apply(round)
+
+    return aggregate
 
 
 def totalResultsFrom(aggregate: pd.DataFrame) -> pd.DataFrame:

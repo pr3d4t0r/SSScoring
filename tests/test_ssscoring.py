@@ -1,7 +1,9 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 
-from ssscoring import ALTITUDE_SKYDIVE_PARACLETE_XP
+# TODO: Is this for comparing the results from more than one DZ?  Figure out
+#       why it's here.
+# from ssscoring import ALTITUDE_SKYDIVE_PARACLETE_XP
 from ssscoring import BREAKOFF_ALTITUDE
 from ssscoring import FT_IN_M
 from ssscoring import aggregateResults
@@ -13,6 +15,7 @@ from ssscoring import isValidJump
 from ssscoring import jumpAnalysisTable
 from ssscoring import processAllJumpFiles
 from ssscoring import processJump
+from ssscoring import roundedAggregateResults
 from ssscoring import totalResultsFrom
 from ssscoring import validFlySightHeaderIn
 from ssscoring.errors import SSScoringError
@@ -173,6 +176,18 @@ def test_aggregateResults():
     assert 'maxSpeed' in _speeds.columns
 
     speeds = aggregateResults(dict())
+    assert not len(speeds)
+
+
+def test_roundedAggregateResults():
+    global _speeds
+
+    _speeds = roundedAggregateResults(_jumpResults)
+    assert len(_speeds)
+    assert _speeds.iloc[0].score
+    assert 'maxSpeed' in _speeds.columns
+
+    speeds = roundedAggregateResults(dict())
     assert not len(speeds)
 
 
