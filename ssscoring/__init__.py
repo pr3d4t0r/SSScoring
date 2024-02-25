@@ -1,7 +1,7 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 
-__VERSION__ = '1.2.2'
+__VERSION__ = '1.2.4'
 
 
 from collections import namedtuple
@@ -22,7 +22,7 @@ EXIT_SPEED = 2*9.81
 FLYSIGHT_HEADER = set([ 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 'hAcc', 'vAcc', 'sAcc', 'heading', 'cAcc', 'gpsFix', 'numSV', ])
 FT_IN_M = 3.2808
 IGNORE_LIST = [ '.ipynb_checkpoints', ]
-LAST_TIME_TRANCHE = 25.0
+LAST_TIME_TRANCHE = 30.0
 MAX_SPEED_ACCURACY = 3.0
 MIN_JUMP_FILE_SIZE = 1024*512
 PERFORMANCE_WINDOW_LENGTH = 2256.0
@@ -403,7 +403,7 @@ def processJump(data: pd.DataFrame):
 
 
 
-def processAllJumpFiles(jumpFiles: list) -> dict:
+def processAllJumpFiles(jumpFiles: list, altitudeDZMeters = 0.0) -> dict:
     """
     Process all jump files in a list of valid FlySight files.  Returns a
     dictionary of jump results with a human-readable version of the file name.
@@ -415,6 +415,9 @@ def processAllJumpFiles(jumpFiles: list) -> dict:
         jumpFiles
     A list of relative or absolute path names to individual FlySight CSV files.
 
+        altitudeDZMeters : float
+    Drop zone height above MSL
+
         dict
     A dictionary of jump results.  The key is a human-readable version of a
     `jumpFile` name with the extension, path, and extraneous spaces eliminated
@@ -425,7 +428,7 @@ def processAllJumpFiles(jumpFiles: list) -> dict:
     for jumpFile in jumpFiles:
         jumpResult = processJump(
             convertFlySight2SSScoring(pd.read_csv(jumpFile, skiprows = (1, 1)),
-            altitudeDZMeters = ALTITUDE_SKYDIVE_PARACLETE_XP))
+            altitudeDZMeters = altitudeDZMeters))
         tag = jumpFile.replace('CSV', '').replace('.', '').replace('/data', '').replace('/', ' ').strip()
         if 'valid' in jumpResult.result:
             jumpResults[tag] = jumpResult
@@ -465,7 +468,7 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
             t.drop(['altitude (ft)'], inplace = True)
             d = pd.DataFrame([ jumpResult.score, ], index = [ jumpResultIndex, ], columns = [ 'score', ], dtype = object)
             for column in t.columns:
-                d[column] = t[column][0]
+                d[column] = t[column].iloc[0]
             d['finalTime'] = [ finalTime, ]
             d['maxSpeed'] = jumpResult.maxSpeed
 
@@ -474,6 +477,41 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
             else:
                 speeds = pd.concat([ speeds, d, ])
     return speeds
+
+
+def roundedAggregateResults(jumpResults):
+    """
+    Aggregate all the results in a table fashioned after Marco Hepp's and Nklas
+    Daniel's score tracking data.  All speed results are rounded at `n > x.5`
+    for any value.
+
+    Arguments
+    ---------
+        jumpResults: dict
+    A dictionary of jump results, in which each result corresponds to a FlySight
+    file name.  See `ssscoring.processAllJumpFiles` for details.
+
+    Returns
+    -------
+    A dataframe featuring the **rounded values** for these columns:
+
+    - Score
+    - Speeds at 5, 10, 15, 20, and 25 second tranches
+    - Max speed
+
+    The `finalTime` column is ignored.
+
+    The dataframe rows are identified by the human readable jump file name.
+
+    This is a less precise version of the `ssscoring.aggregateResults`
+    dataframe, useful during training to keep rounded results available for
+    review.
+    """
+    aggregate = aggregateResults(jumpResults)
+    for column in [col for col in aggregate.columns if 'Time' not in str(col)]:
+        aggregate[column] = aggregate[column].apply(round)
+
+    return aggregate
 
 
 def totalResultsFrom(aggregate: pd.DataFrame) -> pd.DataFrame:

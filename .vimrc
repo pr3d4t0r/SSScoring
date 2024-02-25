@@ -20,6 +20,9 @@ set fo-=r
 color blue
 highlight Directory ctermfg=lightcyan
 
+highlight LineNr ctermfg=lightgreen
+highlight LineNr ctermbg=black
+
 " Pathogen support:
 " execute pathogen#infect()
 
