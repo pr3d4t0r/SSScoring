@@ -1,7 +1,10 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 
-__VERSION__ = '1.2.5'
+import importlib.metadata
+
+
+__VERSION__ = importlib.metadata.version('ssscoring')
 
 
 from collections import namedtuple
@@ -159,6 +162,8 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
     - altitudeASL
     - altitudeMSLFt
     - altitudeASLFt
+    - hMetersPerSecond
+    - hKMh (km/h)
     - vMetersPerSecond
     - vKMh (km/h)
     - speedAccuracy
@@ -184,6 +189,7 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
     data['altitudeASL'] = data.hMSL-altitudeDZMeters
     data['altitudeASLFt'] = data.altitudeMSLFt-altitudeDZFt
     data['timeUnix'] = data['time'].apply(lambda t: pd.Timestamp(t).timestamp())
+    data['hMetersPerSecond'] = (data.velE**2.0+data.velN**2.0)**0.5
 
     data = pd.DataFrame(data = {
         'timeUnix': data.timeUnix,
@@ -191,8 +197,10 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
         'altitudeASL': data.altitudeASL,
         'altitudeMSLFt': data.altitudeMSLFt,
         'altitudeASLFt': data.altitudeASLFt,
+        'hMetersPerSecond': data.hMetersPerSecond,
+        'hKMh': 3.6*data.hMetersPerSecond,
         'vMetersPerSecond': data.velD,
-        'vKMh': data.velD*3.6,
+        'vKMh': 3.6*data.velD,
         'speedAccuracy': data.sAcc, })
 
     return data
@@ -338,6 +346,7 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
     table = pd.DataFrame({
                 'time': table.time,
                 'vKMh': table.vKMh,
+                'hKMh': table.hKMh,
                 'altitude (ft)': table.altitudeASLFt, })
 
     return (data.vKMh.max(), table)

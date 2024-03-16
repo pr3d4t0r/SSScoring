@@ -106,6 +106,8 @@ def test_convertFlySight2SSScoring():
     assert 'vKMh' in _data.columns
     assert 'altitudeASL' in _data.columns
     assert 'altitudeASLFt' in _data.columns
+    assert 'hMetersPerSecond' in _data.columns
+    assert 'hKMh' in _data.columns
     assert _data.altitudeASL.iloc[0] == rawData.hMSL.iloc[0]-altDZ
     assert _data.altitudeASLFt.iloc[0] == FT_IN_M*rawData.hMSL.iloc[0]-altDZFt
 
@@ -207,8 +209,8 @@ def test_totalResultsFrom():
         totalResultsFrom(bogus)
 
 
-test_convertFlySight2SSScoring()
-test_dropNonSkydiveDataFrom()
-test_getSpeedSkydiveFrom()
-test_jumpAnalysisTable()
+# test_convertFlySight2SSScoring()
+# test_dropNonSkydiveDataFrom()
+# test_getSpeedSkydiveFrom()
+# test_jumpAnalysisTable()
 
