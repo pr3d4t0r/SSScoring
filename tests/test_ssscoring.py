@@ -108,6 +108,7 @@ def test_convertFlySight2SSScoring():
     assert 'altitudeASLFt' in _data.columns
     assert 'hMetersPerSecond' in _data.columns
     assert 'hKMh' in _data.columns
+    assert 'speedAngle' in _data.columns
     assert _data.altitudeASL.iloc[0] == rawData.hMSL.iloc[0]-altDZ
     assert _data.altitudeASLFt.iloc[0] == FT_IN_M*rawData.hMSL.iloc[0]-altDZFt
 
@@ -144,6 +145,7 @@ def test_jumpAnalysisTable():
     assert 'time' in table.columns
     assert 'vKMh' in table.columns
     assert 'altitude (ft)' in table.columns
+    assert 'speedAngle' in table.columns
 
 
 def test_processJump():

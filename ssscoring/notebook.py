@@ -126,6 +126,7 @@ def graphJumpResult(plot,
     plot.line(data.plotTime, data.vKMh, legend_label = legend, line_width = 2, line_color = lineColor)
 
     if showIt:
+        plot.line(data.plotTime, data.hKMh, legend_label = 'H-speed', line_width = 2, line_color = 'red')
         _graphSegment(plot, scores[score], 0.0, scores[score], score, 3, 'green')
         _graphSegment(plot, scores[score]+1.5, 0.0, scores[score]+1.5, score, 1, 'darkseagreen')
         _graphSegment(plot, scores[score]-1.5, 0.0, scores[score]-1.5, score, 1, 'darkseagreen')

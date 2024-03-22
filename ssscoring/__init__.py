@@ -12,6 +12,7 @@ from collections import namedtuple
 from ssscoring.errors import SSScoringError
 
 import csv
+import math
 import os
 
 import pandas as pd
@@ -20,7 +21,8 @@ import pandas as pd
 # +++ constants +++
 
 # All measurements expressed in meters unless noted
-BREAKOFF_ALTITUDE = 1707.0
+BREAKOFF_ALTITUDE = 1707.0  # m
+DEG_IN_RADIANS = math.pi/180.0
 EXIT_SPEED = 2*9.81
 FLYSIGHT_HEADER = set([ 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 'hAcc', 'vAcc', 'sAcc', 'heading', 'cAcc', 'gpsFix', 'numSV', ])
 FT_IN_M = 3.2808
@@ -166,6 +168,7 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
     - hKMh (km/h)
     - vMetersPerSecond
     - vKMh (km/h)
+    - angle
     - speedAccuracy
 
     Errors
@@ -189,7 +192,10 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
     data['altitudeASL'] = data.hMSL-altitudeDZMeters
     data['altitudeASLFt'] = data.altitudeMSLFt-altitudeDZFt
     data['timeUnix'] = data['time'].apply(lambda t: pd.Timestamp(t).timestamp())
+    # TODO: atan() angle calc here.
     data['hMetersPerSecond'] = (data.velE**2.0+data.velN**2.0)**0.5
+    speedAngle = abs(data['hMetersPerSecond']/data['velD'])
+    speedAngle = round(90.0-speedAngle.apply(math.atan)/DEG_IN_RADIANS, 1)
 
     data = pd.DataFrame(data = {
         'timeUnix': data.timeUnix,
@@ -201,6 +207,7 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
         'hKMh': 3.6*data.hMetersPerSecond,
         'vMetersPerSecond': data.velD,
         'vKMh': 3.6*data.velD,
+        'speedAngle': speedAngle,
         'speedAccuracy': data.sAcc, })
 
     return data
@@ -347,6 +354,7 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
                 'time': table.time,
                 'vKMh': table.vKMh,
                 'hKMh': table.hKMh,
+                'speedAngle': table.speedAngle,
                 'altitude (ft)': table.altitudeASLFt, })
 
     return (data.vKMh.max(), table)
