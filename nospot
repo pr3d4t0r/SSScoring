@@ -70,9 +70,11 @@ function disableSpotlightIn {
     mdutil -i off "$workDir" || die "mdutil failed, ABEND" 4
 
     pushd "$workDir" > /dev/null
-    rm -rf .fseventsd .Spotlight-V* .Trashes ._.Trashes
+    # TODO: extended attributes or some other issue?
+    rm -rf .fseventsd .Spotlight-V* .Trashes/* ._.Trashes
     mkdir .fseventsd
     touch .fseventsd/no_log .metadata_never_index .Trashes
+    # TODO:  Erase all weird ._* files
     popd > /dev/null
 
     printf "Spotlight disabled for $workDir\n\n"
@@ -84,6 +86,7 @@ function disableSpotlightIn {
 set -e
 
 assertMacOS
+
 workDirectory=$(resolveFlySightMount)
 assertFlySightDirExists "$workDirectory"
 notifyUserWorkWith "$workDirectory"
