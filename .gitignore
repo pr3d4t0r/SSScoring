@@ -144,6 +144,10 @@ venv.bak/
 **/scoring/data-sources/*
 **/test.json
 **/tmp/*
+**/.pydistutils.cfg
+**/devpi-*
+**/.buildout
+**/.devpi/*
 
 
 # FlySafe exclusions

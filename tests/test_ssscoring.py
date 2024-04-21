@@ -216,3 +216,6 @@ def test_totalResultsFrom():
 # test_getSpeedSkydiveFrom()
 # test_jumpAnalysisTable()
 
+# test_processAllJumpFiles()
+# test_aggregateResults()
+

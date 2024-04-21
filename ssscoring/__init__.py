@@ -485,7 +485,7 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
             t.drop(['altitude (ft)'], inplace = True)
             d = pd.DataFrame([ jumpResult.score, ], index = [ jumpResultIndex, ], columns = [ 'score', ], dtype = object)
             for column in t.columns:
-                d[column] = t[column].iloc[0]
+                d[column] = t[column].iloc[2]
             d['finalTime'] = [ finalTime, ]
             d['maxSpeed'] = jumpResult.maxSpeed
 
@@ -493,7 +493,7 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
                 speeds = d.copy()
             else:
                 speeds = pd.concat([ speeds, d, ])
-    return speeds
+    return speeds.sort_index()
 
 
 def roundedAggregateResults(jumpResults):

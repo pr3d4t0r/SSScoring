@@ -9,7 +9,7 @@ import bokeh.plotting as bp
 
 # *** constants ***
 DATA_LAKE_ROOT = './data' # Lucyfer default
-SPEED_COLORS = colors = ('blue', 'limegreen', 'tomato', 'turquoise', 'deepskyblue', 'forestgreen', 'coral', 'darkcyan',)
+SPEED_COLORS = colors = ('limegreen', 'blue', 'tomato', 'turquoise', 'deepskyblue', 'forestgreen', 'coral', 'darkcyan',)
 
 
 # *** global initialization ***
@@ -127,13 +127,9 @@ def graphJumpResult(plot,
 
     if showIt:
         plot.line(data.plotTime, data.hKMh, legend_label = 'H-speed', line_width = 2, line_color = 'red')
-        _graphSegment(plot, scores[score], 0.0, scores[score], score, 3, 'green')
+        _graphSegment(plot, scores[score], 0.0, scores[score], score, 3, 'lightblue')
         _graphSegment(plot, scores[score]+1.5, 0.0, scores[score]+1.5, score, 1, 'darkseagreen')
         _graphSegment(plot, scores[score]-1.5, 0.0, scores[score]-1.5, score, 1, 'darkseagreen')
-        plot.square_cross(x = [ scores[score], ], y = [ score, ], size = [ 20, ], line_color = 'green', fill_color = None, line_width = 3)
-        # TODO:  Decide whether to use any of these to show the scoring point in
-        #        the plot.  They all have advantages and drawbacks.
-        # plot.triangle_dot(x = [ scores[score], ], y = [ score, ], size = [ 20, ], line_color = 'green', fill_color = None, line_width = 3)
-        # plot.y(x = [ scores[score], ], y = [ score, ], size = [ 20, ], line_color = 'green', line_width = 3)
+        plot.scatter(x = [ scores[score], ], y = [ score, ], marker = 'square_cross', size = [ 20, ], line_color = 'lightblue', fill_color = None, line_width = 3)
         bp.show(plot)
 
