@@ -1,7 +1,10 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 
-__VERSION__ = '1.2.5'
+import importlib.metadata
+
+
+__VERSION__ = importlib.metadata.version('ssscoring')
 
 
 from collections import namedtuple
@@ -9,6 +12,7 @@ from collections import namedtuple
 from ssscoring.errors import SSScoringError
 
 import csv
+import math
 import os
 
 import pandas as pd
@@ -17,7 +21,8 @@ import pandas as pd
 # +++ constants +++
 
 # All measurements expressed in meters unless noted
-BREAKOFF_ALTITUDE = 1707.0
+BREAKOFF_ALTITUDE = 1707.0  # m
+DEG_IN_RADIANS = math.pi/180.0
 EXIT_SPEED = 2*9.81
 FLYSIGHT_HEADER = set([ 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 'hAcc', 'vAcc', 'sAcc', 'heading', 'cAcc', 'gpsFix', 'numSV', ])
 FT_IN_M = 3.2808
@@ -159,8 +164,11 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
     - altitudeASL
     - altitudeMSLFt
     - altitudeASLFt
+    - hMetersPerSecond
+    - hKMh (km/h)
     - vMetersPerSecond
     - vKMh (km/h)
+    - angle
     - speedAccuracy
 
     Errors
@@ -184,6 +192,9 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
     data['altitudeASL'] = data.hMSL-altitudeDZMeters
     data['altitudeASLFt'] = data.altitudeMSLFt-altitudeDZFt
     data['timeUnix'] = data['time'].apply(lambda t: pd.Timestamp(t).timestamp())
+    data['hMetersPerSecond'] = (data.velE**2.0+data.velN**2.0)**0.5
+    speedAngle = abs(data['hMetersPerSecond']/data['velD'])
+    speedAngle = round(90.0-speedAngle.apply(math.atan)/DEG_IN_RADIANS, 1)
 
     data = pd.DataFrame(data = {
         'timeUnix': data.timeUnix,
@@ -191,8 +202,11 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
         'altitudeASL': data.altitudeASL,
         'altitudeMSLFt': data.altitudeMSLFt,
         'altitudeASLFt': data.altitudeASLFt,
+        'hMetersPerSecond': data.hMetersPerSecond,
+        'hKMh': 3.6*data.hMetersPerSecond,
         'vMetersPerSecond': data.velD,
-        'vKMh': data.velD*3.6,
+        'vKMh': 3.6*data.velD,
+        'speedAngle': speedAngle,
         'speedAccuracy': data.sAcc, })
 
     return data
@@ -324,7 +338,15 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
     for column in pd.Series([ 5.0, 10.0, 15.0, 20.0, 25.0, ]):
         timeOffset = data.iloc[0].timeUnix+column
         tranche = data.query('timeUnix == %f' % timeOffset).copy()
+        # TODO:  Fix here!  The FlySight missed the entry for this time tranche.
+        #        This results in a blank row altogether and a bad table that
+        #        cannot be processed.
+        #        Decide whether to find the closest valid time or zero it out.
         tranche['time'] = [ column, ]
+        if tranche.isnull().any().any():
+            for trancheColumn in tranche.columns:
+                if trancheColumn != 'time':
+                    tranche[trancheColumn] = [ 0.0, ]
 
         if pd.isna(tranche.iloc[-1].vKMh):
             tranche = data.tail(1).copy()
@@ -338,6 +360,8 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
     table = pd.DataFrame({
                 'time': table.time,
                 'vKMh': table.vKMh,
+                'hKMh': table.hKMh,
+                'speedAngle': table.speedAngle,
                 'altitude (ft)': table.altitudeASLFt, })
 
     return (data.vKMh.max(), table)
@@ -458,7 +482,7 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
     The dataframe rows are identified by the human readable jump file name.
     """
     speeds = pd.DataFrame()
-    for jumpResultIndex in jumpResults.keys():
+    for jumpResultIndex in sorted(list(jumpResults.keys())):
         jumpResult = jumpResults[jumpResultIndex]
         if jumpResult.score > 0.0:
             t = jumpResult.table
@@ -468,7 +492,7 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
             t.drop(['altitude (ft)'], inplace = True)
             d = pd.DataFrame([ jumpResult.score, ], index = [ jumpResultIndex, ], columns = [ 'score', ], dtype = object)
             for column in t.columns:
-                d[column] = t[column].iloc[0]
+                d[column] = t[column].iloc[2]
             d['finalTime'] = [ finalTime, ]
             d['maxSpeed'] = jumpResult.maxSpeed
 
@@ -476,10 +500,10 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
                 speeds = d.copy()
             else:
                 speeds = pd.concat([ speeds, d, ])
-    return speeds
+    return speeds.sort_index()
 
 
-def roundedAggregateResults(jumpResults):
+def roundedAggregateResults(jumpResults: dict) -> pd.DataFrame:
     """
     Aggregate all the results in a table fashioned after Marco Hepp's and Nklas
     Daniel's score tracking data.  All speed results are rounded at `n > x.5`

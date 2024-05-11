@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 # BSD 3-Clause License -- see LICENSE for details.
 # https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE
@@ -15,18 +15,18 @@ OS="Darwin"
 
 # *** functions ***
 
-function die {
+die() {
     echo "$1"
     exit "$2"
 } #die
 
 
-function assertMacOS {
+assertMacOS() {
     [[ $(uname) == "$OS" ]] || die "this tool is intended for MacOS/Spotlight" 1
 } # assertMacOS
 
 
-function resolveFlySightMount {
+resolveFlySightMount() {
     local flagFile
     local mountPoint
     local mountPoints=("$MOUNT_POINT"/*)
@@ -47,7 +47,7 @@ function resolveFlySightMount {
 } # resolveFlySightMount
 
 
-function assertFlySightDirExists {
+assertFlySightDirExists() {
     local directory="$1"
 
     [[ -n "$directory" ]] || die "no valid FlySight mount or directory found" 2
@@ -56,29 +56,25 @@ function assertFlySightDirExists {
 
 
 function notifyUserWorkWith {
-    printf "\nFlySight - disabling Spotlight scans in FlySight mount %s\n" "$1"
-    printf "This operation may take a severa minutes\n\n"
+    printf "\nFlySight - eject FlySight mount %s\n" "$1"
+    printf "This operation may take a while\n\n"
 } # notifyUserWorkWith
 
 
-function disableSpotlightIn {
-    local workDir="$1"
+ejectFlySight() {
+    local mountPoint="$1"
 
-    # Via FlySight / Michael Cooper recommendation:
-    # https://apple.stackexchange.com/a/7135
+    local device
 
-    mdutil -i off "$workDir" || die "mdutil failed, ABEND" 4
+    device=$(mount | awk -v "m=$mountPoint"  '$0 ~ m { print($1); }')
+    diskutil unmountDisk "$device"
+    device=$(mount | awk -v "m=$mountPoint"  '$0 ~ m { print($1); }')
 
-    pushd "$workDir" > /dev/null
-    # TODO: extended attributes or some other issue?
-    rm -rf .fseventsd .Spotlight-V* .Trashes/* ._.Trashes
-    mkdir .fseventsd
-    touch .fseventsd/no_log .metadata_never_index .Trashes
-    # TODO:  Erase all weird ._* files
-    popd > /dev/null
-
-    printf "Spotlight disabled for $workDir\n\n"
-}
+    if [[ -z "$device" ]]
+    then
+        echo "device on $mountPoint unmounted"
+    fi
+} # ejectFlySight
 
 
 # *** main ***
@@ -90,7 +86,6 @@ assertMacOS
 workDirectory=$(resolveFlySightMount)
 assertFlySightDirExists "$workDirectory"
 notifyUserWorkWith "$workDirectory"
-disableSpotlightIn "$workDirectory"
-
+ejectFlySight "$workDirectory"
 exit 0
 
