@@ -30,7 +30,8 @@ import pandas as pd
 # +++ constants ***
 
 TEST_FLYSIGHG_DATA_LAKE = './resources'
-TEST_FLYSIGHT_DATA = os.path.join(TEST_FLYSIGHG_DATA_LAKE, 'test-data.csv')
+TEST_FLYSIGHT_DATA = os.path.join(TEST_FLYSIGHG_DATA_LAKE, 'test-data-00.csv')
+TEST_FLYSIGHT_DATA_XX = os.path.join(TEST_FLYSIGHG_DATA_LAKE, 'test-data-02.csv')
 
 
 # +++ globals +++
@@ -149,12 +150,12 @@ def test_jumpAnalysisTable():
 
 
 def test_processJump():
-    data = convertFlySight2SSScoring(pd.read_csv(TEST_FLYSIGHT_DATA, skiprows = (1,1)))
+    data = convertFlySight2SSScoring(pd.read_csv(TEST_FLYSIGHT_DATA_XX, skiprows = (1,1)))
 
     jumpResults = processJump(data)
 
-    assert '{0:,.2f}'.format(jumpResults.score) == '443.07'
-    assert jumpResults.maxSpeed == 448.524
+    assert '{0:,.2f}'.format(jumpResults.score) == '450.88'
+    assert jumpResults.maxSpeed == 452.664
     assert 'valid' in jumpResults.result
 
 
@@ -211,11 +212,13 @@ def test_totalResultsFrom():
         totalResultsFrom(bogus)
 
 
-# test_convertFlySight2SSScoring()
-# test_dropNonSkydiveDataFrom()
-# test_getSpeedSkydiveFrom()
-# test_jumpAnalysisTable()
+test_convertFlySight2SSScoring()
+test_dropNonSkydiveDataFrom()
+test_getSpeedSkydiveFrom()
+test_jumpAnalysisTable()
 
+test_processJump()
 # test_processAllJumpFiles()
 # test_aggregateResults()
+# test_roundedAggregateResults()
 

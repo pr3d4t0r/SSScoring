@@ -338,7 +338,15 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
     for column in pd.Series([ 5.0, 10.0, 15.0, 20.0, 25.0, ]):
         timeOffset = data.iloc[0].timeUnix+column
         tranche = data.query('timeUnix == %f' % timeOffset).copy()
+        # TODO:  Fix here!  The FlySight missed the entry for this time tranche.
+        #        This results in a blank row altogether and a bad table that
+        #        cannot be processed.
+        #        Decide whether to find the closest valid time or zero it out.
         tranche['time'] = [ column, ]
+        if tranche.isnull().any().any():
+            for trancheColumn in tranche.columns:
+                if trancheColumn != 'time':
+                    tranche[trancheColumn] = [ 0.0, ]
 
         if pd.isna(tranche.iloc[-1].vKMh):
             tranche = data.tail(1).copy()
@@ -474,7 +482,7 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
     The dataframe rows are identified by the human readable jump file name.
     """
     speeds = pd.DataFrame()
-    for jumpResultIndex in jumpResults.keys():
+    for jumpResultIndex in sorted(list(jumpResults.keys())):
         jumpResult = jumpResults[jumpResultIndex]
         if jumpResult.score > 0.0:
             t = jumpResult.table
@@ -495,7 +503,7 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
     return speeds.sort_index()
 
 
-def roundedAggregateResults(jumpResults):
+def roundedAggregateResults(jumpResults: dict) -> pd.DataFrame:
     """
     Aggregate all the results in a table fashioned after Marco Hepp's and Nklas
     Daniel's score tracking data.  All speed results are rounded at `n > x.5`
