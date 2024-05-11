@@ -148,6 +148,7 @@ venv.bak/
 **/devpi-*
 **/.buildout
 **/.devpi/*
+**/data/*
 
 
 # FlySafe exclusions

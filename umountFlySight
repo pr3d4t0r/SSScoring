@@ -1,0 +1,91 @@
+#!/bin/bash
+
+# BSD 3-Clause License -- see LICENSE for details.
+# https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE
+#
+# https://github.com/pr3d4t0r/SSScoring for full project.
+
+
+# *** constants ***
+
+FLYSIGHT_SIG_FILE="CONFIG.TXT"
+MOUNT_POINT="/Volumes"
+OS="Darwin"
+
+
+# *** functions ***
+
+die() {
+    echo "$1"
+    exit "$2"
+} #die
+
+
+assertMacOS() {
+    [[ $(uname) == "$OS" ]] || die "this tool is intended for MacOS/Spotlight" 1
+} # assertMacOS
+
+
+resolveFlySightMount() {
+    local flagFile
+    local mountPoint
+    local mountPoints=("$MOUNT_POINT"/*)
+    local result=""
+
+    for mountPoint in "${mountPoints[@]}"
+    do
+        flagFile="$mountPoint/$FLYSIGHT_SIG_FILE"
+
+        if [[ -e "$flagFile" ]]
+        then
+            result="$mountPoint"
+            break
+        fi
+    done
+
+    echo "$result"
+} # resolveFlySightMount
+
+
+assertFlySightDirExists() {
+    local directory="$1"
+
+    [[ -n "$directory" ]] || die "no valid FlySight mount or directory found" 2
+    [[ -d "$directory" ]] || die "$directory does not exist; try again" 3
+}
+
+
+function notifyUserWorkWith {
+    printf "\nFlySight - eject FlySight mount %s\n" "$1"
+    printf "This operation may take a while\n\n"
+} # notifyUserWorkWith
+
+
+ejectFlySight() {
+    local mountPoint="$1"
+
+    local device
+
+    device=$(mount | awk -v "m=$mountPoint"  '$0 ~ m { print($1); }')
+    diskutil unmountDisk "$device"
+    device=$(mount | awk -v "m=$mountPoint"  '$0 ~ m { print($1); }')
+
+    if [[ -z "$device" ]]
+    then
+        echo "device on $mountPoint unmounted"
+    fi
+} # ejectFlySight
+
+
+# *** main ***
+
+set -e
+
+assertMacOS
+
+workDirectory=$(resolveFlySightMount)
+assertFlySightDirExists "$workDirectory"
+notifyUserWorkWith "$workDirectory"
+ejectFlySight "$workDirectory"
+exit 0
+

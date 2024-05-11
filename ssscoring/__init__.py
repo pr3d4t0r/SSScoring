@@ -192,7 +192,6 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
     data['altitudeASL'] = data.hMSL-altitudeDZMeters
     data['altitudeASLFt'] = data.altitudeMSLFt-altitudeDZFt
     data['timeUnix'] = data['time'].apply(lambda t: pd.Timestamp(t).timestamp())
-    # TODO: atan() angle calc here.
     data['hMetersPerSecond'] = (data.velE**2.0+data.velN**2.0)**0.5
     speedAngle = abs(data['hMetersPerSecond']/data['velD'])
     speedAngle = round(90.0-speedAngle.apply(math.atan)/DEG_IN_RADIANS, 1)
