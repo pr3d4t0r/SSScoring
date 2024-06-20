@@ -147,6 +147,7 @@ def test_jumpAnalysisTable():
     assert 'vKMh' in table.columns
     assert 'altitude (ft)' in table.columns
     assert 'speedAngle' in table.columns
+    assert 'netVectorKMh' in table.columns
 
 
 def test_processJump():
@@ -212,12 +213,12 @@ def test_totalResultsFrom():
         totalResultsFrom(bogus)
 
 
-test_convertFlySight2SSScoring()
-test_dropNonSkydiveDataFrom()
-test_getSpeedSkydiveFrom()
-test_jumpAnalysisTable()
+# test_convertFlySight2SSScoring()
+# test_dropNonSkydiveDataFrom()
+# test_getSpeedSkydiveFrom()
+# test_jumpAnalysisTable()
 
-test_processJump()
+# test_processJump()
 # test_processAllJumpFiles()
 # test_aggregateResults()
 # test_roundedAggregateResults()

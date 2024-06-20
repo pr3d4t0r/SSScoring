@@ -202,12 +202,13 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
         'altitudeASL': data.altitudeASL,
         'altitudeMSLFt': data.altitudeMSLFt,
         'altitudeASLFt': data.altitudeASLFt,
-        'hMetersPerSecond': data.hMetersPerSecond,
-        'hKMh': 3.6*data.hMetersPerSecond,
         'vMetersPerSecond': data.velD,
         'vKMh': 3.6*data.velD,
         'speedAngle': speedAngle,
-        'speedAccuracy': data.sAcc, })
+        'speedAccuracy': data.sAcc,
+        'hMetersPerSecond': data.hMetersPerSecond,
+        'hKMh': 3.6*data.hMetersPerSecond,
+    })
 
     return data
 
@@ -362,6 +363,7 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
                 'vKMh': table.vKMh,
                 'hKMh': table.hKMh,
                 'speedAngle': table.speedAngle,
+                'netVectorKMh': (table.vKMh**2+table.hKMh**2)**0.5,
                 'altitude (ft)': table.altitudeASLFt, })
 
     return (data.vKMh.max(), table)
@@ -492,7 +494,7 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
             t.drop(['altitude (ft)'], inplace = True)
             d = pd.DataFrame([ jumpResult.score, ], index = [ jumpResultIndex, ], columns = [ 'score', ], dtype = object)
             for column in t.columns:
-                d[column] = t[column].iloc[2]
+                d[column] = t[column].iloc[3]
             d['finalTime'] = [ finalTime, ]
             d['maxSpeed'] = jumpResult.maxSpeed
 

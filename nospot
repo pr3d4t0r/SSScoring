@@ -75,6 +75,8 @@ function disableSpotlightIn {
     mkdir .fseventsd
     touch .fseventsd/no_log .metadata_never_index .Trashes
     # TODO:  Erase all weird ._* files
+
+    touch .metadata_never_index
     popd > /dev/null
 
     printf "Spotlight disabled for $workDir\n\n"
