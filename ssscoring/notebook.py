@@ -4,8 +4,14 @@
 """
 
 
+from bokeh.models import LinearAxis
+from bokeh.models import Range1d
+
+from ssscoring import MAX_ALTITUDE_FT
+
 import bokeh.io as bi
 import bokeh.plotting as bp
+
 
 # *** constants ***
 DATA_LAKE_ROOT = './data' # Lucyfer default
@@ -26,7 +32,9 @@ def initializePlot(jumpTitle: str,
                    width = 900,
                    xLabel = 'seconds from exit',
                    yLabel = 'km/h',
-                   xMax = 40.0,
+                   # TODO: roll back to 40.0?
+                   # xMax = 40.0,
+                   xMax = 35.0,
                    yMax = 550.0):
     """
     Initiialize a plotting area for notebook output.
@@ -76,6 +84,34 @@ def _graphSegment(plot,
                  y1 = [ y1, ],
                  line_width = lineWidth,
                  color = color)
+
+
+def initializeExtraYRanges(plot,
+                           startY: float = 0.0,
+                           endY: float = MAX_ALTITUDE_FT):
+    """
+    Initialize an extra Y range for reporting other data trend (e.g. altitude)
+    in the plot.
+
+    Arguments
+    ---------
+        plot
+    A valid instance of `bp.figure` with an existing plot defined for it
+
+        startY: float
+    The Y range starting value
+
+        endY: float
+    The Y range ending value
+
+    Returns
+    -------
+    An instance of `bp.figure` updated to report an additional Y axis.
+    """
+    plot.extra_y_ranges = { 'altitudeFt': Range1d(start = startY, end = endY), }
+    plot.add_layout(LinearAxis(y_range_name = 'altitudeFt', axis_label = 'Alt (ft)'), 'left')
+
+    return plot
 
 
 def graphJumpResult(plot,
@@ -132,4 +168,39 @@ def graphJumpResult(plot,
         _graphSegment(plot, scores[score]-1.5, 0.0, scores[score]-1.5, score, 1, 'darkseagreen')
         plot.scatter(x = [ scores[score], ], y = [ score, ], marker = 'square_cross', size = [ 20, ], line_color = 'lightblue', fill_color = None, line_width = 3)
         bp.show(plot)
+
+
+def graphAltitude(plot,
+                  jumpResult,
+                  label = 'Alt (ft)',
+                  lineColor = 'palegoldenrod',
+                  rangeName = 'altitudeFt'):
+    """
+    Graph a vertical axis with additional data, often used for altitude in ft
+    ASL.
+
+    Arguments
+    ---------
+        plot: pb.figure
+    A Bokeh figure where to render the plot.
+
+        jumpResult: ssscoring.JumpResults
+    A jump results named tuple with score, max speed, scores, data, etc.
+
+        label: str
+    The legend label for the new Y axis.
+
+        lineColor: str
+    A color name from the Bokeh palette.
+
+        rangeName: str
+    The range name to associate the `LinearAxis` layout with the data for
+    plotting.
+
+    Returns
+    -------
+    `None`.
+    """
+    data = jumpResult.data
+    plot.line(data.plotTime, data.altitudeASLFt, legend_label = label, line_width = 2, line_color = lineColor, y_range_name = rangeName)
 

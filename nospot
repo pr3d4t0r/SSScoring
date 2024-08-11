@@ -57,7 +57,7 @@ function assertFlySightDirExists {
 
 function notifyUserWorkWith {
     printf "\nFlySight - disabling Spotlight scans in FlySight mount %s\n" "$1"
-    printf "This operation may take a severa minutes\n\n"
+    printf "This operation may take several minutes\n\n"
 } # notifyUserWorkWith
 
 
