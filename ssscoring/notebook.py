@@ -108,8 +108,12 @@ def initializeExtraYRanges(plot,
     -------
     An instance of `bp.figure` updated to report an additional Y axis.
     """
-    plot.extra_y_ranges = { 'altitudeFt': Range1d(start = startY, end = endY), }
+    plot.extra_y_ranges = {
+        'altitudeFt': Range1d(start = startY, end = endY), 
+        'angle': Range1d(start = 0.0, end = 90.0),
+    }
     plot.add_layout(LinearAxis(y_range_name = 'altitudeFt', axis_label = 'Alt (ft)'), 'left')
+    plot.add_layout(LinearAxis(y_range_name = 'angle', axis_label = 'angle'), 'left')
 
     return plot
 
@@ -203,4 +207,38 @@ def graphAltitude(plot,
     """
     data = jumpResult.data
     plot.line(data.plotTime, data.altitudeASLFt, legend_label = label, line_width = 2, line_color = lineColor, y_range_name = rangeName)
+
+
+def graphAngle(plot,
+               jumpResult,
+               label = 'angle',
+               lineColor = 'deepskyblue',
+               rangeName = 'angle'):
+    """
+    Graph the flight angle
+
+    Arguments
+    ---------
+        plot: pb.figure
+    A Bokeh figure where to render the plot.
+
+        jumpResult: ssscoring.JumpResults
+    A jump results named tuple with score, max speed, scores, data, etc.
+
+        label: str
+    The legend label for the new Y axis.
+
+        lineColor: str
+    A color name from the Bokeh palette.
+
+        rangeName: str
+    The range name to associate the `LinearAxis` layout with the data for
+    plotting.
+
+    Returns
+    -------
+    `None`.
+    """
+    data = jumpResult.data
+    plot.line(data.plotTime, data.speedAngle, legend_label = label, line_width = 2, line_color = lineColor, y_range_name = rangeName)
 
