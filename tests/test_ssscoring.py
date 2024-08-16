@@ -213,10 +213,10 @@ def test_totalResultsFrom():
         totalResultsFrom(bogus)
 
 
-# test_convertFlySight2SSScoring()
-# test_dropNonSkydiveDataFrom()
-# test_getSpeedSkydiveFrom()
-# test_jumpAnalysisTable()
+test_convertFlySight2SSScoring()
+test_dropNonSkydiveDataFrom()
+test_getSpeedSkydiveFrom()
+test_jumpAnalysisTable()
 
 # test_processJump()
 # test_processAllJumpFiles()
