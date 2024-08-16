@@ -195,7 +195,7 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
     data['altitudeASLFt'] = data.altitudeMSLFt-altitudeDZFt
     data['timeUnix'] = data['time'].apply(lambda t: pd.Timestamp(t).timestamp())
     data['hMetersPerSecond'] = (data.velE**2.0+data.velN**2.0)**0.5
-    speedAngle = abs(data['hMetersPerSecond']/data['velD'])
+    speedAngle = data['hMetersPerSecond']/data['velD']
     speedAngle = round(90.0-speedAngle.apply(math.atan)/DEG_IN_RADIANS, 1)
 
     data = pd.DataFrame(data = {
@@ -339,17 +339,15 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
     table = None
 
     for column in pd.Series([ 5.0, 10.0, 15.0, 20.0, 25.0, ]):
-        timeOffset = data.iloc[0].timeUnix+column
-        tranche = data.query('timeUnix == %f' % timeOffset).copy()
-        # TODO:  Fix here!  The FlySight missed the entry for this time tranche.
-        #        This results in a blank row altogether and a bad table that
-        #        cannot be processed.
-        #        Decide whether to find the closest valid time or zero it out.
-        tranche['time'] = [ column, ]
-        if tranche.isnull().any().any():
-            for trancheColumn in tranche.columns:
-                if trancheColumn != 'time':
-                    tranche[trancheColumn] = [ 0.0, ]
+        for interval in range(int(column)*10, 10*(int(column)+1)):
+            # Use the next 0.1 sec interval if the current interval tranche has
+            # NaN values.
+            columnRef = interval/10.0
+            timeOffset = data.iloc[0].timeUnix+columnRef
+            tranche = data.query('timeUnix == %f' % timeOffset).copy()
+            tranche['time'] = [ column, ]
+            if not tranche.isnull().any().any():
+                break
 
         if pd.isna(tranche.iloc[-1].vKMh):
             tranche = data.tail(1).copy()
