@@ -12,6 +12,7 @@ from ssscoring import dropNonSkydiveDataFrom
 from ssscoring import getAllSpeedJumpFilesFrom
 from ssscoring import getSpeedSkydiveFrom
 from ssscoring import isValidJump
+from ssscoring import isValidMinimumAltitude
 from ssscoring import jumpAnalysisTable
 from ssscoring import processAllJumpFiles
 from ssscoring import processJump
@@ -77,7 +78,14 @@ def test_validFlySightHeaderIn(_badDelimitersCSV, _missingColumnInCSV, _invalidM
     assert validFlySightHeaderIn(TEST_FLYSIGHT_DATA)
     assert not validFlySightHeaderIn(_badDelimitersCSV)
     assert not validFlySightHeaderIn(_missingColumnInCSV)
-    assert not validFlySightHeaderIn(_invalidMaxAltitude)
+    assert validFlySightHeaderIn(_invalidMaxAltitude)
+
+
+def test_isValidMinimumAltitude(_invalidMaxAltitude):
+    d = pd.read_csv(_invalidMaxAltitude, skiprows = (1, 1))
+    assert not isValidMinimumAltitude(d.hMSL.max())
+    d = pd.read_csv(TEST_FLYSIGHT_DATA, skiprows = (1, 1))
+    assert isValidMinimumAltitude(d.hMSL.max())
 
 
 def test_getAllSpeedJumpFilesFrom():
@@ -217,6 +225,7 @@ test_convertFlySight2SSScoring()
 test_dropNonSkydiveDataFrom()
 test_getSpeedSkydiveFrom()
 test_jumpAnalysisTable()
+# test_isValidMinimumAltitude(_invalidAltFileName)
 
 # test_processJump()
 # test_processAllJumpFiles()

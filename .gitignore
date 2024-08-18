@@ -123,17 +123,22 @@ venv.bak/
 **/.bash_profile
 **/.bash_rc
 **/.bashrc
+**/.buildout
 **/.config
+**/.devpi/*
 **/.gitconfig*
 **/.ipython
 **/.jupyter
 **/.local
 **/.profile
+**/.pydistutils.cfg
 **/.python_history
 **/.ssh/*
 **/.vim/*
 **/.viminfo
 **/data/*
+**/data/*
+**/devpi-*
 **/lucy
 **/lucyfer-compose.yaml
 **/scoring/*zip
@@ -142,13 +147,9 @@ venv.bak/
 **/scoring/_jupyter/migrated*
 **/scoring/data-lake/*zip
 **/scoring/data-sources/*
+**/test.py
 **/test.json
 **/tmp/*
-**/.pydistutils.cfg
-**/devpi-*
-**/.buildout
-**/.devpi/*
-**/data/*
 
 
 # FlySafe exclusions
