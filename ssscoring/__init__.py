@@ -41,7 +41,7 @@ ALTITUDE_SKYDIVE_PARACLETE_XP = 93
 
 # +++ type definitions +++
 
-JumpResults = namedtuple("JumpResults", "score maxSpeed scores data window table color result")
+JumpResults = namedtuple('JumpResults', 'score maxSpeed scores data window table color result')
 """
 A named tuple containing the score, maximum speed, scores throught the
 performance window, the results table for a jump, the output color for the
@@ -58,7 +58,7 @@ Attributes
 - `color`
 - `result`
 """
-PerformanceWindow = namedtuple("PerformanceWindow", "start end validationStart")
+PerformanceWindow = namedtuple('PerformanceWindow', 'start end validationStart')
 
 
 # +++ functions +++
@@ -83,7 +83,6 @@ def validFlySightHeaderIn(fileCSV: str) -> bool:
     """
     delimiters =  [',', ]
     hasAllHeaders = False
-    minAltitude = BREAKOFF_ALTITUDE+PERFORMANCE_WINDOW_LENGTH
     with open(fileCSV, 'r') as inputFile:
         try:
             dialect = csv.Sniffer().sniff(inputFile.readline(), delimiters = delimiters)
@@ -95,11 +94,28 @@ def validFlySightHeaderIn(fileCSV: str) -> bool:
         else:
             return False
         hasAllHeaders = FLYSIGHT_HEADER.issubset(header)
-        if hasAllHeaders:
-            d = pd.read_csv(fileCSV, skiprows = (1,1))
-            if d.hMSL.max() < minAltitude:
-                return False
     return hasAllHeaders
+
+
+def isValidMinimumAltitude(altitude: float) -> bool:
+    """
+    Reports whether an `altitude` is within the IPC and USPA valid parameters,
+    or within `BREAKOFF_ALTITUDE` and `PERFORMACE_WINDOW_LENGTH`.  In invalid
+    altitude doesn't invalidate a FlySight data file.  This function can be used
+    for generating warnings.  The stock FlySightViewer scores a speed jump even
+    if the exit was below the minimum altitude.
+
+    Arguments
+    ---------
+        altitude
+    An altitude in meters, often calculated as data.hMSL - DZ altitude.
+
+    Returns
+    -------
+    `True` if the altitude is valid.
+    """
+    minAltitude = BREAKOFF_ALTITUDE+PERFORMANCE_WINDOW_LENGTH
+    return altitude >= minAltitude
 
 
 def getAllSpeedJumpFilesFrom(dataLake: str) -> list:
