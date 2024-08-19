@@ -3,6 +3,7 @@
 
 SHELL=/bin/bash
 
+API_DOC_DIR="./docs"
 BUILD=./build
 DEVPI_HOST=$(shell cat devpi-hostname.txt)
 DEVPI_PASSWORD=$(shell cat ./devpi-password.txt)
@@ -13,7 +14,7 @@ MANPAGES=./manpages
 PACKAGE=$(shell cat package.txt)
 PACKAGES_UPDATE=/tmp/packages-update.txt
 REQUIREMENTS=requirements.txt
-VERSION=$(shell echo "from ssscoring import __VERSION__; print(__VERSION__)" | python)
+VERSION=$(shell echo "from $(PACKAGE) import __VERSION__; print(__VERSION__)" | python)
 
 
 # Targets:
@@ -24,15 +25,16 @@ all: ALWAYS
 	make manpage
 
 
-# TODO: Use rm -Rfv $$(find $(PACKAGE) | awk '/__pycache__$$/') after the ssscoring
-#       package is claimed to this project by PyPI.
 clean:
 	rm -Rf $(BUILD)/*
 	rm -Rf $(DIST)/*
 	rm -Rf $(MANPAGES)/*
-	rm -Rfv $$(find ssscoring/ | awk '/__pycache__$$/')
+	rm -Rfv $$(find $(PACKAGE)/ | awk '/__pycache__$$/')
 	rm -Rfv $$(find tests | awk '/__pycache__$$/')
 	rm -Rfv $$(find . | awk '/.ipynb_checkpoints/')
+	rm -Rfv ./.pytest_cache
+	rm -Rf $(API_DOC_DIR)/*
+	mkdir -p ./dist
 	pushd ./dist ; pip uninstall -y $(PACKAGE)==$(VERSION) || true ; popd
 
 
@@ -42,6 +44,13 @@ devpi:
 	devpi use $(DEVPI_USER)/dev
 	devpi -v use --set-cfg $(DEVPI_USER)/dev
 	@[[ -e "pip.conf-bak" ]] && rm -f "pip.conf-bak"
+
+
+# [[ -e ".env" ]] && mv ".env" "_env"
+# [[ -e "_env" ]] && mv "_env" ".env"
+docs: ALWAYS
+	mkdir -p $(API_DOC_DIR)
+	VERSION="$(VERSION)" PDOC_ALLOW_EXEC=1 pdoc --logo="https://images2.imgbox.com/57/94/AsI1WSfy_o.png" --favicon="https://cime.net/upload_area/favicon.ico" -n -o $(API_DOC_DIR) -t ./resources $(PACKAGE)
 
 
 install:
@@ -99,15 +108,12 @@ targets:
 	@cat Makefile| awk '/:/ && !/^#/ && !/targets/ && !/Makefile/ { gsub("ALWAYS", ""); gsub(":", ""); print; } /^ALWAYS/ { next; }'
 
 
-# TODO: Use rm -Rfv $$(find $(PACKAGE) | awk '/__pycache__$$/') after the ssscoring
-#       package is claimed to this project by PyPI.
 test: ALWAYS
 	@echo "Version = $(VERSION)"
-	pip install -r requirements.txt
-	pip install -e .
-	pytest --show-capture=no -v ./tests/*
+	@make local
+	pytest -ra -v ./tests/*.py
 	pip uninstall -y $(PACKAGE)==$(VERSION) || true
-	rm -Rfv $$(find ssscoring/ | awk '/__pycache__$$/')
+	rm -Rfv $$(find $(PACKAGE)/ | awk '/__pycache__$$/')
 	rm -Rfv $$(find tests | awk '/__pycache__$$/')
 
 

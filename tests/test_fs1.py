@@ -3,23 +3,22 @@
 
 # TODO: Is this for comparing the results from more than one DZ?  Figure out
 #       why it's here.
-# from ssscoring import ALTITUDE_SKYDIVE_PARACLETE_XP
-from ssscoring import BREAKOFF_ALTITUDE
-from ssscoring import FT_IN_M
-from ssscoring import aggregateResults
-from ssscoring import convertFlySight2SSScoring
-from ssscoring import dropNonSkydiveDataFrom
-from ssscoring import getAllSpeedJumpFilesFrom
-from ssscoring import getSpeedSkydiveFrom
-from ssscoring import isValidJump
-from ssscoring import isValidMinimumAltitude
-from ssscoring import jumpAnalysisTable
-from ssscoring import processAllJumpFiles
-from ssscoring import processJump
-from ssscoring import roundedAggregateResults
-from ssscoring import totalResultsFrom
-from ssscoring import validFlySightHeaderIn
+from ssscoring.constants import BREAKOFF_ALTITUDE
+from ssscoring.constants import FT_IN_M
 from ssscoring.errors import SSScoringError
+from ssscoring.fs1 import aggregateResults
+from ssscoring.fs1 import convertFlySight2SSScoring
+from ssscoring.fs1 import dropNonSkydiveDataFrom
+from ssscoring.fs1 import getAllSpeedJumpFilesFrom
+from ssscoring.fs1 import getSpeedSkydiveFrom
+from ssscoring.fs1 import isValidJump
+from ssscoring.fs1 import isValidMinimumAltitude
+from ssscoring.fs1 import jumpAnalysisTable
+from ssscoring.fs1 import processAllJumpFiles
+from ssscoring.fs1 import processJump
+from ssscoring.fs1 import roundedAggregateResults
+from ssscoring.fs1 import totalResultsFrom
+from ssscoring.fs1 import validFlySightHeaderIn
 
 import os
 import pytest
@@ -221,10 +220,10 @@ def test_totalResultsFrom():
         totalResultsFrom(bogus)
 
 
-test_convertFlySight2SSScoring()
-test_dropNonSkydiveDataFrom()
-test_getSpeedSkydiveFrom()
-test_jumpAnalysisTable()
+# test_convertFlySight2SSScoring()
+# test_dropNonSkydiveDataFrom()
+# test_getSpeedSkydiveFrom()
+# test_jumpAnalysisTable()
 # test_isValidMinimumAltitude(_invalidAltFileName)
 
 # test_processJump()

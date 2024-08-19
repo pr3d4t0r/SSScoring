@@ -7,7 +7,7 @@
 from bokeh.models import LinearAxis
 from bokeh.models import Range1d
 
-from ssscoring import MAX_ALTITUDE_FT
+from ssscoring.constants import MAX_ALTITUDE_FT
 
 import bokeh.io as bi
 import bokeh.plotting as bp
@@ -109,7 +109,7 @@ def initializeExtraYRanges(plot,
     An instance of `bp.figure` updated to report an additional Y axis.
     """
     plot.extra_y_ranges = {
-        'altitudeFt': Range1d(start = startY, end = endY), 
+        'altitudeFt': Range1d(start = startY, end = endY),
         'angle': Range1d(start = 0.0, end = 90.0),
     }
     plot.add_layout(LinearAxis(y_range_name = 'altitudeFt', axis_label = 'Alt (ft)'), 'left')
