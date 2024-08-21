@@ -132,6 +132,7 @@ venv.bak/
 **/.local
 **/.profile
 **/.pydistutils.cfg
+**/.pypirc*
 **/.python_history
 **/.ssh/*
 **/.vim/*
@@ -147,8 +148,8 @@ venv.bak/
 **/scoring/_jupyter/migrated*
 **/scoring/data-lake/*zip
 **/scoring/data-sources/*
-**/test.py
 **/test.json
+**/test.py
 **/tmp/*
 
 

@@ -46,7 +46,6 @@ testpaths = [
 include-package-data = true
 packages = [
     "ssscoring",
-    # "tests", # because test modules import objects from other test modules
 ]
 
 

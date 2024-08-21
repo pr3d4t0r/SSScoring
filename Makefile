@@ -21,8 +21,9 @@ VERSION=$(shell echo "from $(PACKAGE) import __VERSION__; print(__VERSION__)" | 
 
 all: ALWAYS
 	make test
-	make package
 	make manpage
+	make docs
+	make package
 
 
 clean:
@@ -50,7 +51,7 @@ devpi:
 # [[ -e "_env" ]] && mv "_env" ".env"
 docs: ALWAYS
 	mkdir -p $(API_DOC_DIR)
-	VERSION="$(VERSION)" PDOC_ALLOW_EXEC=1 pdoc --logo="https://images2.imgbox.com/57/94/AsI1WSfy_o.png" --favicon="https://cime.net/upload_area/favicon.ico" -n -o $(API_DOC_DIR) -t ./resources $(PACKAGE)
+	VERSION="$(VERSION)" PDOC_ALLOW_EXEC=1 pdoc --logo="https://github.com/pr3d4t0r/SSScoring/blob/master/assets/ssscoring-logo.png?raw=true" --favicon="https://cime.net/upload_area/favicon.ico" -n -o $(API_DOC_DIR) -t ./resources $(PACKAGE)
 
 
 install:
