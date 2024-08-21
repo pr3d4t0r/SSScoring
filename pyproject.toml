@@ -28,7 +28,7 @@ license = { text = 'BSD-3-Clause' }
 name = "ssscoring"  # $(PACKAGE) and package.txt
 readme = "README.md"
 requires-python = ">=3.9.9"
-version = '1.4.0'
+version = '1.5.0'
 
 
 [project.scripts]
@@ -46,7 +46,6 @@ testpaths = [
 include-package-data = true
 packages = [
     "ssscoring",
-    # "tests", # because test modules import objects from other test modules
 ]
 
 
