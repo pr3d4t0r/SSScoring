@@ -30,7 +30,25 @@ Attributes
 - `table` - summary table of results of the speed run
 - `window` - the scoring window data, an instance of `PerformanceWindow`
 """
-PerformanceWindow = namedtuple('PerformanceWindow', 'start end validationStart')
 
+
+PerformanceWindow = namedtuple('PerformanceWindow', 'start end validationStart')
+"""
+An object to handle the performance window (as defined in competition rules) as
+a single object with all the properties necessary to interpret it and manipulate
+it across different function or method calls.
+
+Attributes
+----------
+- `start` - beginning or start of the performance window, or exit from the
+            aircraft
+- `end` - end of the performance window, or `start-PERFORMANCE_WINDOW_LENGTH`
+- `validationStart` - end of the performance window - the `VALIDATION_WINDOW_END`
+
+See
+---
+    ssscoring.constants.PERFORMANCE_WINDOW_LENGTH
+    ssscoring.constants.VALIDATION_WINDOW_END
+"""
 
 

@@ -1,6 +1,5 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
-
 """
 Functions and logic for detecting, validating, analyzing, and manipulating
 FlySight 1 CSV files, including detection in the file system.  The functions in
@@ -12,7 +11,7 @@ local or cloud-based).
 from ssscoring.constants import BREAKOFF_ALTITUDE
 from ssscoring.constants import DEG_IN_RADIANS
 from ssscoring.constants import EXIT_SPEED
-from ssscoring.constants import FLYSIGHT_HEADER
+from ssscoring.constants import FLYSIGHT_1_HEADER
 from ssscoring.constants import FT_IN_M
 from ssscoring.constants import IGNORE_LIST
 from ssscoring.constants import LAST_TIME_TRANCHE
@@ -61,7 +60,7 @@ def validFlySightHeaderIn(fileCSV: str) -> bool:
             header = next(csv.reader(inputFile))
         else:
             return False
-        hasAllHeaders = FLYSIGHT_HEADER.issubset(header)
+        hasAllHeaders = FLYSIGHT_1_HEADER.issubset(header)
     return hasAllHeaders
 
 
@@ -409,7 +408,7 @@ def processJump(data: pd.DataFrame):
         score = 0
         result = '🔴 invalid'
 
-    return JumpResults(score, maxSpeed, scores, data, window, table, color, result)
+    return JumpResults(color, data, maxSpeed, result, score, scores, table, window)
 
 
 

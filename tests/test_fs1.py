@@ -1,8 +1,6 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 
-# TODO: Is this for comparing the results from more than one DZ?  Figure out
-#       why it's here.
 from ssscoring.constants import BREAKOFF_ALTITUDE
 from ssscoring.constants import FT_IN_M
 from ssscoring.errors import SSScoringError
