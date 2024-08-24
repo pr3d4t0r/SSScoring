@@ -207,7 +207,7 @@ def graphAltitude(plot,
     `None`.
     """
     data = jumpResult.data
-    plot.line(data.plotTime, data.altitudeASLFt, legend_label = label, line_width = 2, line_color = lineColor, y_range_name = rangeName)
+    plot.line(data.plotTime, data.altitudeAGLFt, legend_label = label, line_width = 2, line_color = lineColor, y_range_name = rangeName)
 
 
 def graphAngle(plot,
