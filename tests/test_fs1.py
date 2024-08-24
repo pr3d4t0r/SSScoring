@@ -110,13 +110,13 @@ def test_convertFlySight2SSScoring():
     _data = convertFlySight2SSScoring(rawData, altDZ)
     assert 'timeUnix' in _data.columns
     assert 'vKMh' in _data.columns
-    assert 'altitudeASL' in _data.columns
-    assert 'altitudeASLFt' in _data.columns
+    assert 'altitudeAGL' in _data.columns
+    assert 'altitudeAGLFt' in _data.columns
     assert 'hMetersPerSecond' in _data.columns
     assert 'hKMh' in _data.columns
     assert 'speedAngle' in _data.columns
-    assert _data.altitudeASL.iloc[0] == rawData.hMSL.iloc[0]-altDZ
-    assert _data.altitudeASLFt.iloc[0] == FT_IN_M*rawData.hMSL.iloc[0]-altDZFt
+    assert _data.altitudeAGL.iloc[0] == rawData.hMSL.iloc[0]-altDZ
+    assert _data.altitudeAGLFt.iloc[0] == FT_IN_M*rawData.hMSL.iloc[0]-altDZFt
 
 
 def test_dropNonSkydiveDataFrom():
@@ -135,11 +135,11 @@ def test_getSpeedSkydiveFrom():
     assert '{0:,.2f}'.format(_window.start) == '4,149.65'
     assert '{0:,.2f}'.format(_window.end) == '1,893.65'
     assert '{0:,.2f}'.format(_window.validationStart) == '2,899.65'
-    assert _data.iloc[-1].altitudeASL >= _window.end
+    assert _data.iloc[-1].altitudeAGL >= _window.end
 
 
 def test_isValidJump():
-    bogus = pd.DataFrame( { 'altitudeASL': (2800, ), 'speedAccuracy': (42.0, ), } )
+    bogus = pd.DataFrame( { 'altitudeAGL': (2800, ), 'speedAccuracy': (42.0, ), } )
     assert isValidJump(_data, _window)
     assert not isValidJump(bogus, _window)
 

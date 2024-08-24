@@ -110,9 +110,9 @@ def getAllSpeedJumpFilesFrom(dataLake: str) -> list:
             if 'CSV' in fileName:
                 jumpFileName = os.path.join(root, fileName)
                 stat = os.stat(jumpFileName)
-                if stat.st_size >= MIN_JUMP_FILE_SIZE and validFlySightHeaderIn(jumpFileName):
+                data = pd.read_csv(jumpFileName, skiprows = (1, 1))
+                if stat.st_size >= MIN_JUMP_FILE_SIZE and validFlySightHeaderIn(jumpFileName) and isValidMinimumAltitude(data.hMSL.max()):
                     jumpFiles.append(jumpFileName)
-
     return jumpFiles
 
 
@@ -146,9 +146,9 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
 
     - timeUnix
     - altitudeMSL
-    - altitudeASL
+    - altitudeAGL
     - altitudeMSLFt
-    - altitudeASLFt
+    - altitudeAGLFt
     - hMetersPerSecond
     - hKMh (km/h)
     - vMetersPerSecond
@@ -174,8 +174,8 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
     data = rawData.copy()
 
     data['altitudeMSLFt'] = data['hMSL'].apply(lambda h: FT_IN_M*h)
-    data['altitudeASL'] = data.hMSL-altitudeDZMeters
-    data['altitudeASLFt'] = data.altitudeMSLFt-altitudeDZFt
+    data['altitudeAGL'] = data.hMSL-altitudeDZMeters
+    data['altitudeAGLFt'] = data.altitudeMSLFt-altitudeDZFt
     data['timeUnix'] = data['time'].apply(lambda t: pd.Timestamp(t).timestamp())
     data['hMetersPerSecond'] = (data.velE**2.0+data.velN**2.0)**0.5
     speedAngle = data['hMetersPerSecond']/data['velD']
@@ -184,9 +184,9 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
     data = pd.DataFrame(data = {
         'timeUnix': data.timeUnix,
         'altitudeMSL': data.hMSL,
-        'altitudeASL': data.altitudeASL,
+        'altitudeAGL': data.altitudeAGL,
         'altitudeMSLFt': data.altitudeMSLFt,
-        'altitudeASLFt': data.altitudeASLFt,
+        'altitudeAGLFt': data.altitudeAGLFt,
         'vMetersPerSecond': data.velD,
         'vKMh': 3.6*data.velD,
         'speedAngle': speedAngle,
@@ -212,10 +212,10 @@ def dropNonSkydiveDataFrom(data: pd.DataFrame) -> pd.DataFrame:
     -------
     The jump data for the skydive
     """
-    timeMaxAlt = data[data.altitudeASL == data.altitudeASL.max()].timeUnix.iloc[0]
+    timeMaxAlt = data[data.altitudeAGL == data.altitudeAGL.max()].timeUnix.iloc[0]
     data = data[data.timeUnix > timeMaxAlt]
 
-    data = data[data.altitudeASL > 0]
+    data = data[data.altitudeAGL > 0]
 
     return data
 
@@ -267,15 +267,15 @@ def getSpeedSkydiveFrom(data: pd.DataFrame) -> tuple:
     # TODO:  Delete this as the upper bounds the next time you see this note.
     # data = data[data.vMetersPerSecond > EXIT_SPEED]
     data = data[data.timeUnix >= exitTime]
-    data = data[data.altitudeASL >= BREAKOFF_ALTITUDE]
+    data = data[data.altitudeAGL >= BREAKOFF_ALTITUDE]
 
-    windowStart = data.iloc[0].altitudeASL
+    windowStart = data.iloc[0].altitudeAGL
     windowEnd = windowStart-PERFORMANCE_WINDOW_LENGTH
     if windowEnd < BREAKOFF_ALTITUDE:
         windowEnd = BREAKOFF_ALTITUDE
 
     validationWindowStart = windowEnd+VALIDATION_WINDOW_LENGTH
-    data = data[data.altitudeASL >= windowEnd]
+    data = data[data.altitudeAGL >= windowEnd]
 
     return PerformanceWindow(windowStart, windowEnd, validationWindowStart), data
 
@@ -298,7 +298,7 @@ def isValidJump(data: pd.DataFrame,
     -------
     `True` if the jump is valid according to ISC/FAI/USPA rules.
     """
-    accuracy = data[data.altitudeASL < window.validationStart].speedAccuracy.max()
+    accuracy = data[data.altitudeAGL < window.validationStart].speedAccuracy.max()
     return accuracy < MAX_SPEED_ACCURACY
 
 
@@ -347,7 +347,7 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
                 'hKMh': table.hKMh,
                 'speedAngle': table.speedAngle,
                 'netVectorKMh': (table.vKMh**2+table.hKMh**2)**0.5,
-                'altitude (ft)': table.altitudeASLFt, })
+                'altitude (ft)': table.altitudeAGLFt, })
 
     return (data.vKMh.max(), table)
 
