@@ -394,12 +394,9 @@ def processJump(data: pd.DataFrame):
         baseTime = data.iloc[0].timeUnix
         data['plotTime'] = data.timeUnix-baseTime
 
-        for spot in data.plotTime:
-            r0 = data[data.plotTime == spot]
-            r1 = data[data.plotTime == spot+3.0]
-
-            if not r1.empty:
-                scores[0.5*(float(r0.vKMh.iloc[0])+float(r1.vKMh.iloc[0]))] = spot
+        for spot in data.plotTime[::1]:
+            subset = data[(data.plotTime <= spot) & (data.plotTime >= (spot-3.0))]
+            scores[subset.vKMh.mean()] = spot
         score = max(scores)
 
     else:
