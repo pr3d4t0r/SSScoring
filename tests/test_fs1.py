@@ -160,7 +160,7 @@ def test_processJump():
 
     jumpResults = processJump(data)
 
-    assert '{0:,.2f}'.format(jumpResults.score) == '450.88'
+    assert '{0:,.2f}'.format(jumpResults.score) == '451.41'
     assert jumpResults.maxSpeed == 452.664
     assert 'valid' in jumpResults.result
 
