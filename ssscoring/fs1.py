@@ -264,8 +264,6 @@ def getSpeedSkydiveFrom(data: pd.DataFrame) -> tuple:
 
     # Speed ~= 9.81 m/s; subtract 1 second for actual exit.
     exitTime = data[data.vMetersPerSecond > EXIT_SPEED].head(1).timeUnix.iat[0]-2.0
-    # TODO:  Delete this as the upper bounds the next time you see this note.
-    # data = data[data.vMetersPerSecond > EXIT_SPEED]
     data = data[data.timeUnix >= exitTime]
     data = data[data.altitudeAGL >= BREAKOFF_ALTITUDE]
 
