@@ -193,6 +193,8 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
         'speedAccuracy': data.sAcc,
         'hMetersPerSecond': data.hMetersPerSecond,
         'hKMh': 3.6*data.hMetersPerSecond,
+        'latitude': data.lat,
+        'longitude': data.lon,
     })
 
     return data
