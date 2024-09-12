@@ -302,6 +302,25 @@ def isValidJump(data: pd.DataFrame,
     return accuracy < MAX_SPEED_ACCURACY
 
 
+def calculateDistance(start: tuple, end: tuple) -> float:
+    """
+    Calculate the distance between two terrestrial coordinates points.
+
+    Arguments
+    ---------
+        start
+    A latitude, longitude tuple of floating point numbers.
+
+        end
+    A latitude, longitude tuple of floating point numbers.
+
+    Returns
+    -------
+    The distance, in meters, between both points.
+    """
+    return haversine(start, end, unit = Unit.METERS)
+
+
 def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
     """
     Generates the HCD jump analysis table, with speed data at 5-second intervals

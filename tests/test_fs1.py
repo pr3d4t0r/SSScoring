@@ -5,6 +5,7 @@ from ssscoring.constants import BREAKOFF_ALTITUDE
 from ssscoring.constants import FT_IN_M
 from ssscoring.errors import SSScoringError
 from ssscoring.fs1 import aggregateResults
+from ssscoring.fs1 import calculateDistance
 from ssscoring.fs1 import convertFlySight2SSScoring
 from ssscoring.fs1 import dropNonSkydiveDataFrom
 from ssscoring.fs1 import getAllSpeedJumpFilesFrom
@@ -142,6 +143,11 @@ def test_isValidJump():
     bogus = pd.DataFrame( { 'altitudeAGL': (2800, ), 'speedAccuracy': (42.0, ), } )
     assert isValidJump(_data, _window)
     assert not isValidJump(bogus, _window)
+
+
+def test_calculateDistance():
+    # TODO: Finish the implementation using the values in the current notebook.
+    assert False
 
 
 def test_jumpAnalysisTable():
