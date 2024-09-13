@@ -8,6 +8,9 @@ local or cloud-based).
 """
 
 
+from haversine import haversine
+from haversine import Unit
+
 from ssscoring.constants import BREAKOFF_ALTITUDE
 from ssscoring.constants import DEG_IN_RADIANS
 from ssscoring.constants import EXIT_SPEED
@@ -340,6 +343,7 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
     """
     table = None
 
+    distanceStart = (data.iloc[0].latitude, data.iloc[0].longitude)
     for column in pd.Series([ 5.0, 10.0, 15.0, 20.0, 25.0, ]):
         for interval in range(int(column)*10, 10*(int(column)+1)):
             # Use the next 0.1 sec interval if the current interval tranche has
@@ -348,12 +352,16 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
             timeOffset = data.iloc[0].timeUnix+columnRef
             tranche = data.query('timeUnix == %f' % timeOffset).copy()
             tranche['time'] = [ column, ]
+            currentPosition = (tranche.iloc[0].latitude, tranche.iloc[0].longitude)
+            tranche['distanceFromExit'] = [ calculateDistance(distanceStart, currentPosition), ]
             if not tranche.isnull().any().any():
                 break
 
         if pd.isna(tranche.iloc[-1].vKMh):
             tranche = data.tail(1).copy()
+            currentPosition = (tranche.iloc[0].latitude, tranche.iloc[0].longitude)
             tranche['time'] = tranche.timeUnix-data.iloc[0].timeUnix
+            tranche['distanceFromExit'] = [ calculateDistance(distanceStart, currentPosition), ]
 
         if table is not None:
             table = pd.concat([ table, tranche, ])
@@ -365,8 +373,10 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
                 'vKMh': table.vKMh,
                 'hKMh': table.hKMh,
                 'speedAngle': table.speedAngle,
+                'distanceFromExit': tranche.distanceFromExit,
+                'altitude (ft)': table.altitudeAGLFt,
                 'netVectorKMh': (table.vKMh**2+table.hKMh**2)**0.5,
-                'altitude (ft)': table.altitudeAGLFt, })
+            })
 
     return (data.vKMh.max(), table)
 
@@ -493,7 +503,7 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
             t.drop(['altitude (ft)'], inplace = True)
             d = pd.DataFrame([ jumpResult.score, ], index = [ jumpResultIndex, ], columns = [ 'score', ], dtype = object)
             for column in t.columns:
-                d[column] = t[column].iloc[3]
+                d[column] = t[column].iloc[2]
             d['finalTime'] = [ finalTime, ]
             d['maxSpeed'] = jumpResult.maxSpeed
 

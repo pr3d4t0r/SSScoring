@@ -146,8 +146,11 @@ def test_isValidJump():
 
 
 def test_calculateDistance():
-    # TODO: Finish the implementation using the values in the current notebook.
-    assert False
+    start = (37.8329426, -121.64040112)
+    end = (37.8285883, -121.6356015)
+
+    result = '%3.4f' % calculateDistance(start, end)
+    assert result == '641.9585'
 
 
 def test_jumpAnalysisTable():
