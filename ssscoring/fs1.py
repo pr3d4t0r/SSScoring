@@ -353,7 +353,7 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
             tranche = data.query('timeUnix == %f' % timeOffset).copy()
             tranche['time'] = [ column, ]
             currentPosition = (tranche.iloc[0].latitude, tranche.iloc[0].longitude)
-            tranche['distanceFromExit'] = [ calculateDistance(distanceStart, currentPosition), ]
+            tranche['distanceFromExit'] = [ round(calculateDistance(distanceStart, currentPosition), 1), ]
             if not tranche.isnull().any().any():
                 break
 
@@ -373,7 +373,7 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
                 'vKMh': table.vKMh,
                 'hKMh': table.hKMh,
                 'speedAngle': table.speedAngle,
-                'distanceFromExit': tranche.distanceFromExit,
+                'distanceFromExit': table.distanceFromExit,
                 'altitude (ft)': table.altitudeAGLFt,
                 'netVectorKMh': (table.vKMh**2+table.hKMh**2)**0.5,
             })
