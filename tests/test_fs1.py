@@ -202,12 +202,12 @@ def test_aggregateResults():
 def test_roundedAggregateResults():
     global _speeds
 
-    _speeds = roundedAggregateResults(_jumpResults)
+    _speeds = roundedAggregateResults(aggregateResults(_jumpResults))
     assert len(_speeds)
     assert _speeds.iloc[0].score
     assert 'maxSpeed' in _speeds.columns
 
-    speeds = roundedAggregateResults(dict())
+    speeds = roundedAggregateResults(pd.DataFrame())
     assert not len(speeds)
 
 
@@ -227,14 +227,14 @@ def test_totalResultsFrom():
         totalResultsFrom(bogus)
 
 
-# test_convertFlySight2SSScoring()
-# test_dropNonSkydiveDataFrom()
-# test_getSpeedSkydiveFrom()
-# test_jumpAnalysisTable()
+test_convertFlySight2SSScoring()
+test_dropNonSkydiveDataFrom()
+test_getSpeedSkydiveFrom()
+test_jumpAnalysisTable()
 # test_isValidMinimumAltitude(_invalidAltFileName)
 
-# test_processJump()
-# test_processAllJumpFiles()
-# test_aggregateResults()
-# test_roundedAggregateResults()
+test_processJump()
+test_processAllJumpFiles()
+test_aggregateResults()
+test_roundedAggregateResults()
 

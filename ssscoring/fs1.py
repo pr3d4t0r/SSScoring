@@ -503,7 +503,8 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
             t.drop(['altitude (ft)'], inplace = True)
             d = pd.DataFrame([ jumpResult.score, ], index = [ jumpResultIndex, ], columns = [ 'score', ], dtype = object)
             for column in t.columns:
-                d[column] = t[column].iloc[2]
+                # d[column] = t[column].iloc[2]
+                d[column] = t[column].vKMh
             d['finalTime'] = [ finalTime, ]
             d['maxSpeed'] = jumpResult.maxSpeed
 
@@ -514,7 +515,7 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
     return speeds.sort_index()
 
 
-def roundedAggregateResults(jumpResults: dict) -> pd.DataFrame:
+def roundedAggregateResults(aggregate: pd.DataFrame) -> pd.DataFrame:
     """
     Aggregate all the results in a table fashioned after Marco Hepp's and Nklas
     Daniel's score tracking data.  All speed results are rounded at `n > x.5`
@@ -522,9 +523,8 @@ def roundedAggregateResults(jumpResults: dict) -> pd.DataFrame:
 
     Arguments
     ---------
-        jumpResults: dict
-    A dictionary of jump results, in which each result corresponds to a FlySight
-    file name.  See `ssscoring.processAllJumpFiles` for details.
+        aggregate: pd.DataFrame
+    A dataframe output of `ssscoring.fs1.aggregateResults`.
 
     Returns
     -------
@@ -542,7 +542,6 @@ def roundedAggregateResults(jumpResults: dict) -> pd.DataFrame:
     dataframe, useful during training to keep rounded results available for
     review.
     """
-    aggregate = aggregateResults(jumpResults)
     for column in [col for col in aggregate.columns if 'Time' not in str(col)]:
         aggregate[column] = aggregate[column].apply(round)
 
@@ -575,5 +574,4 @@ def totalResultsFrom(aggregate: pd.DataFrame) -> pd.DataFrame:
     totals = pd.DataFrame({ 'totalSpeed': [ aggregate.score.sum(), ], 'meanSpeed': [ aggregate.score.mean(), ], 'maxScore': [ aggregate.score.max(), ], }, index = [ 'totalSpeed'],)
 
     return totals
-
 
