@@ -1,23 +1,22 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 
+from ssscoring.calc import aggregateResults
+from ssscoring.calc import calculateDistance
+from ssscoring.calc import convertFlySight2SSScoring
+from ssscoring.calc import dropNonSkydiveDataFrom
+from ssscoring.calc import getSpeedSkydiveFrom
+from ssscoring.calc import isValidJump
+from ssscoring.calc import isValidMinimumAltitude
+from ssscoring.calc import jumpAnalysisTable
+from ssscoring.calc import processAllJumpFiles
+from ssscoring.calc import processJump
+from ssscoring.calc import roundedAggregateResults
+from ssscoring.calc import totalResultsFrom
 from ssscoring.constants import BREAKOFF_ALTITUDE
 from ssscoring.constants import FT_IN_M
 from ssscoring.errors import SSScoringError
-from ssscoring.fs1 import aggregateResults
-from ssscoring.fs1 import calculateDistance
-from ssscoring.fs1 import convertFlySight2SSScoring
-from ssscoring.fs1 import dropNonSkydiveDataFrom
 from ssscoring.fs1 import getAllSpeedJumpFilesFrom
-from ssscoring.fs1 import getSpeedSkydiveFrom
-from ssscoring.fs1 import isValidJump
-from ssscoring.fs1 import isValidMinimumAltitude
-from ssscoring.fs1 import jumpAnalysisTable
-from ssscoring.fs1 import processAllJumpFiles
-from ssscoring.fs1 import processJump
-from ssscoring.fs1 import roundedAggregateResults
-from ssscoring.fs1 import totalResultsFrom
-from ssscoring.fs1 import validFlySightHeaderIn
 
 import os
 import pytest
@@ -44,25 +43,6 @@ _speeds = None
 # +++ tests +++
 
 @pytest.fixture
-def _badDelimitersCSV(tmp_path_factory):
-    fileName = tmp_path_factory.mktemp('data')/'bogus.CSV'
-    data = pd.read_csv(TEST_FLYSIGHT_DATA)
-    data.to_csv(fileName, sep = '\t')
-    yield fileName
-    os.unlink(fileName.as_posix())
-
-
-@pytest.fixture
-def _missingColumnInCSV(tmp_path_factory):
-    fileName = tmp_path_factory.mktemp('data')/'bogus.CSV'
-    data = pd.read_csv(TEST_FLYSIGHT_DATA)
-    data = data.drop('velD', axis = 1)
-    data.to_csv(fileName, sep = ',')
-    yield fileName.as_posix()
-    os.unlink(fileName.as_posix())
-
-
-@pytest.fixture
 def _invalidMaxAltitude(tmp_path_factory):
     fileName = tmp_path_factory.mktemp('data')/'bogus.CSV'
     data = pd.read_csv(TEST_FLYSIGHT_DATA)
@@ -72,23 +52,11 @@ def _invalidMaxAltitude(tmp_path_factory):
     os.unlink(fileName.as_posix())
 
 
-def test_validFlySightHeaderIn(_badDelimitersCSV, _missingColumnInCSV, _invalidMaxAltitude):
-    assert validFlySightHeaderIn(TEST_FLYSIGHT_DATA)
-    assert not validFlySightHeaderIn(_badDelimitersCSV)
-    assert not validFlySightHeaderIn(_missingColumnInCSV)
-    assert validFlySightHeaderIn(_invalidMaxAltitude)
-
-
 def test_isValidMinimumAltitude(_invalidMaxAltitude):
     d = pd.read_csv(_invalidMaxAltitude, skiprows = (1, 1))
     assert not isValidMinimumAltitude(d.hMSL.max())
     d = pd.read_csv(TEST_FLYSIGHT_DATA, skiprows = (1, 1))
     assert isValidMinimumAltitude(d.hMSL.max())
-
-
-def test_getAllSpeedJumpFilesFrom():
-    assert len(getAllSpeedJumpFilesFrom(TEST_FLYSIGHG_DATA_LAKE)) >= 1
-    assert not len(getAllSpeedJumpFilesFrom('./bogus'))
 
 
 def test_convertFlySight2SSScoring():
@@ -227,14 +195,14 @@ def test_totalResultsFrom():
         totalResultsFrom(bogus)
 
 
-test_convertFlySight2SSScoring()
-test_dropNonSkydiveDataFrom()
-test_getSpeedSkydiveFrom()
-test_jumpAnalysisTable()
+# test_convertFlySight2SSScoring()
+# test_dropNonSkydiveDataFrom()
+# test_getSpeedSkydiveFrom()
+# test_jumpAnalysisTable()
 # test_isValidMinimumAltitude(_invalidAltFileName)
 
-test_processJump()
-test_processAllJumpFiles()
-test_aggregateResults()
-test_roundedAggregateResults()
+# test_processJump()
+# test_processAllJumpFiles()
+# test_aggregateResults()
+# test_roundedAggregateResults()
 

@@ -1,7 +1,7 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 """
-Functions and logic for detecting, validating, analyzing, and manipulating
+Functions and logic for detecting, validating and manipulating
 FlySight 1 CSV files, including detection in the file system.  The functions in
 this module assume that a data lake exists somewhere in the file system (whether
 local or cloud-based).
