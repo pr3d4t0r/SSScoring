@@ -5,6 +5,7 @@ from ssscoring.constants import BREAKOFF_ALTITUDE
 from ssscoring.constants import FT_IN_M
 from ssscoring.errors import SSScoringError
 from ssscoring.fs1 import aggregateResults
+from ssscoring.fs1 import calculateDistance
 from ssscoring.fs1 import convertFlySight2SSScoring
 from ssscoring.fs1 import dropNonSkydiveDataFrom
 from ssscoring.fs1 import getAllSpeedJumpFilesFrom
@@ -144,6 +145,14 @@ def test_isValidJump():
     assert not isValidJump(bogus, _window)
 
 
+def test_calculateDistance():
+    start = (37.8329426, -121.64040112)
+    end = (37.8285883, -121.6356015)
+
+    result = '%3.4f' % calculateDistance(start, end)
+    assert result == '641.9585'
+
+
 def test_jumpAnalysisTable():
     maxSpeed, table = jumpAnalysisTable(_data)
 
@@ -193,12 +202,12 @@ def test_aggregateResults():
 def test_roundedAggregateResults():
     global _speeds
 
-    _speeds = roundedAggregateResults(_jumpResults)
+    _speeds = roundedAggregateResults(aggregateResults(_jumpResults))
     assert len(_speeds)
     assert _speeds.iloc[0].score
     assert 'maxSpeed' in _speeds.columns
 
-    speeds = roundedAggregateResults(dict())
+    speeds = roundedAggregateResults(pd.DataFrame())
     assert not len(speeds)
 
 
@@ -218,14 +227,14 @@ def test_totalResultsFrom():
         totalResultsFrom(bogus)
 
 
-# test_convertFlySight2SSScoring()
-# test_dropNonSkydiveDataFrom()
-# test_getSpeedSkydiveFrom()
-# test_jumpAnalysisTable()
+test_convertFlySight2SSScoring()
+test_dropNonSkydiveDataFrom()
+test_getSpeedSkydiveFrom()
+test_jumpAnalysisTable()
 # test_isValidMinimumAltitude(_invalidAltFileName)
 
-# test_processJump()
-# test_processAllJumpFiles()
-# test_aggregateResults()
-# test_roundedAggregateResults()
+test_processJump()
+test_processAllJumpFiles()
+test_aggregateResults()
+test_roundedAggregateResults()
 
