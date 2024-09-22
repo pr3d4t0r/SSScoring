@@ -22,8 +22,8 @@ from ssscoring.calc import totalResultsFrom
 from ssscoring.constants import BREAKOFF_ALTITUDE
 from ssscoring.constants import FT_IN_M
 from ssscoring.constants import PERFORMANCE_WINDOW_LENGTH
-from ssscoring.fs1 import getAllSpeedJumpFilesFrom
-from ssscoring.fs1 import validFlySightHeaderIn
+from ssscoring.flysight import getAllSpeedJumpFilesFrom
+from ssscoring.flysight import validFlySightHeaderIn
 from ssscoring.notebook import SPEED_COLORS
 from ssscoring.notebook import graphAltitude
 from ssscoring.notebook import graphAngle
@@ -42,10 +42,10 @@ import pandas as pd
 
 DATA_LAKE_ROOT = './data'
 
-dropZoneAltMSL = 23
+dropZoneAltMSL = 617
 dropZoneAltMSLMeters = dropZoneAltMSL/FT_IN_M
 jumpFiles = getAllSpeedJumpFilesFrom(DATA_LAKE_ROOT)
-# jumpResults = processAllJumpFiles(jumpFiles, altitudeDZMeters = dropZoneAltMSLMeters)
+jumpResults = processAllJumpFiles(jumpFiles, altitudeDZMeters = dropZoneAltMSLMeters)
 # aggregate = aggregateResults(jumpResults)
 # roundedAggregateResults(aggregate)
 

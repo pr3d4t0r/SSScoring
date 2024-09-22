@@ -2,10 +2,14 @@
 
 
 from ssscoring.constants import BREAKOFF_ALTITUDE
+from ssscoring.errors import SSScoringError
+from ssscoring.flysight import FlySightVersion
 from ssscoring.flysight import _FS2_COLUMNS
 from ssscoring.flysight import _skipOverFS2MetadataRowsIn
+from ssscoring.flysight import detectFlySightFileVersionOf
 from ssscoring.flysight import getAllSpeedJumpFilesFrom
 from ssscoring.flysight import validFlySightHeaderIn
+
 
 
 import os
@@ -85,6 +89,28 @@ def test_getAllSpeedJumpFilesFrom(_tooSmallCSV):
     # vs implementation that uses os.walk() uses the relative path.
     testFiles = [ './'+TEST_FLYSIGHT_1_DATA.as_posix(), './'+TEST_FLYSIGHT_2_DATA.as_posix() ]
     assert len(files) >= 1
-    assert set(testFiles).issubset(set(files))
+    assert set(testFiles).issubset(set(files.keys()))
     assert not len(getAllSpeedJumpFilesFrom('./bogus'))
+
+
+def test_detectFlySightFileVersionOf(_missingColumnInCSV):
+    invalidFile = TEST_FLYSIGHT_2_DATA.as_posix().replace('TRACK', 'BAD_CSV_FILE')
+
+    with pytest.raises(SSScoringError):
+        detectFlySightFileVersionOf('bogus.dat')
+
+    with pytest.raises(SSScoringError):
+        detectFlySightFileVersionOf('EVENT.CSV')
+
+    with pytest.raises(SSScoringError):
+        detectFlySightFileVersionOf('bogus.CSV')
+
+    with pytest.raises(SSScoringError):
+        detectFlySightFileVersionOf(invalidFile)
+
+    with pytest.raises(SSScoringError):
+        detectFlySightFileVersionOf(_missingColumnInCSV)
+
+    assert detectFlySightFileVersionOf(TEST_FLYSIGHT_1_DATA.as_posix()) == FlySightVersion.V1
+    assert detectFlySightFileVersionOf(TEST_FLYSIGHT_2_DATA.as_posix()) == FlySightVersion.V2
 
