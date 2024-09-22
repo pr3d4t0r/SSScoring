@@ -1,5 +1,5 @@
 #
-# *** Used for interactive debugging sessions with pdb 
+# *** Used for interactive debugging sessions with pdb
 # *** or PyCharm's debugger.
 #
 
@@ -9,20 +9,20 @@ from copy import deepcopy
 from haversine import haversine
 from haversine import Unit
 
+from ssscoring.calc import aggregateResults
+from ssscoring.calc import convertFlySight2SSScoring
+from ssscoring.calc import dropNonSkydiveDataFrom
+from ssscoring.calc import getSpeedSkydiveFrom
+from ssscoring.calc import isValidJump
+from ssscoring.calc import isValidMinimumAltitude
+from ssscoring.calc import jumpAnalysisTable
+from ssscoring.calc import processAllJumpFiles
+from ssscoring.calc import roundedAggregateResults
+from ssscoring.calc import totalResultsFrom
 from ssscoring.constants import BREAKOFF_ALTITUDE
 from ssscoring.constants import FT_IN_M
 from ssscoring.constants import PERFORMANCE_WINDOW_LENGTH
-from ssscoring.fs1 import aggregateResults
-from ssscoring.fs1 import convertFlySight2SSScoring
-from ssscoring.fs1 import dropNonSkydiveDataFrom
 from ssscoring.fs1 import getAllSpeedJumpFilesFrom
-from ssscoring.fs1 import getSpeedSkydiveFrom
-from ssscoring.fs1 import isValidJump
-from ssscoring.fs1 import isValidMinimumAltitude
-from ssscoring.fs1 import jumpAnalysisTable
-from ssscoring.fs1 import processAllJumpFiles
-from ssscoring.fs1 import roundedAggregateResults
-from ssscoring.fs1 import totalResultsFrom
 from ssscoring.fs1 import validFlySightHeaderIn
 from ssscoring.notebook import SPEED_COLORS
 from ssscoring.notebook import graphAltitude
@@ -45,7 +45,7 @@ DATA_LAKE_ROOT = './data'
 dropZoneAltMSL = 23
 dropZoneAltMSLMeters = dropZoneAltMSL/FT_IN_M
 jumpFiles = getAllSpeedJumpFilesFrom(DATA_LAKE_ROOT)
-jumpResults = processAllJumpFiles(jumpFiles, altitudeDZMeters = dropZoneAltMSLMeters)
-aggregate = aggregateResults(jumpResults)
-roundedAggregateResults(aggregate)
+# jumpResults = processAllJumpFiles(jumpFiles, altitudeDZMeters = dropZoneAltMSLMeters)
+# aggregate = aggregateResults(jumpResults)
+# roundedAggregateResults(aggregate)
 
