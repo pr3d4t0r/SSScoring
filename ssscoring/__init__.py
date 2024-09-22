@@ -24,7 +24,7 @@ You are welcome to **<a href='https://github.com/pr3d4t0r/SSScoring' target='_ne
 on GitHub.  You will need Python 3.9 or later, pandas, and NumPy as minimum
 requirements.
 
-You may the latest stable source files at:
+You may study or download the latest stable source files at:
 
 <a href='https://github.com/pr3d4t0r/SSScoring/tree/master/ssscoring' target='_new'>https://github.com/pr3d4t0r/SSScoring/tree/master/ssscoring</a>
 """
