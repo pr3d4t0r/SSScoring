@@ -10,7 +10,6 @@ local or cloud-based).
 
 from enum import Enum
 
-from ssscoring.calc import isValidMinimumAltitude
 from ssscoring.constants import FLYSIGHT_1_HEADER
 from ssscoring.constants import IGNORE_LIST
 from ssscoring.constants import MIN_JUMP_FILE_SIZE
@@ -24,7 +23,7 @@ import pandas as pd
 
 # +++ constants +++
 
-_FS2_COLUMNS = ('GNSS', 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 'hAcc', 'vAcc', 'sAcc', 'numSV', )
+FS2_COLUMNS = ('GNSS', 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 'hAcc', 'vAcc', 'sAcc', 'numSV', )
 
 
 # --- classes and objects ---
@@ -38,7 +37,7 @@ class FlySightVersion(Enum):
 # +++ functions +++
 
 
-def _skipOverFS2MetadataRowsIn(data: pd.DataFrame) -> pd.DataFrame:
+def skipOverFS2MetadataRowsIn(data: pd.DataFrame) -> pd.DataFrame:
     """
     Returns a clean dataframe on which any metadata rows within the first 100
     are skipped.  This function uses the `time` column to detect valid rows.  A
@@ -112,6 +111,8 @@ def getAllSpeedJumpFilesFrom(dataLake: str) -> dict:
         - keys are the file names
         - values are a FlySight version string tag
     """
+    from ssscoring.calc import isValidMinimumAltitude # skirt circular dependency
+
     jumpFiles = dict()
     for root, dirs, files in os.walk(dataLake):
         if any(name in root for name in IGNORE_LIST):
@@ -129,8 +130,8 @@ def getAllSpeedJumpFilesFrom(dataLake: str) -> dict:
                     data = pd.read_csv(jumpFileName, skiprows = (1, 1))
                 elif 'TRACK' in fileName:
                     # FlySight 2 track custom format
-                    data = pd.read_csv(jumpFileName, names = _FS2_COLUMNS, skiprows = 6)
-                    data = _skipOverFS2MetadataRowsIn(data)
+                    data = pd.read_csv(jumpFileName, names = FS2_COLUMNS, skiprows = 6)
+                    data = skipOverFS2MetadataRowsIn(data)
                     data.drop('GNSS', inplace = True, axis = 1)
                     version = '2'
                 if data is not None and stat.st_size >= MIN_JUMP_FILE_SIZE and validFlySightHeaderIn(jumpFileName) and isValidMinimumAltitude(data.hMSL.max()):

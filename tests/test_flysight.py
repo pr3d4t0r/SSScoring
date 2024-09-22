@@ -4,8 +4,8 @@
 from ssscoring.constants import BREAKOFF_ALTITUDE
 from ssscoring.errors import SSScoringError
 from ssscoring.flysight import FlySightVersion
-from ssscoring.flysight import _FS2_COLUMNS
-from ssscoring.flysight import _skipOverFS2MetadataRowsIn
+from ssscoring.flysight import FS2_COLUMNS
+from ssscoring.flysight import skipOverFS2MetadataRowsIn
 from ssscoring.flysight import detectFlySightFileVersionOf
 from ssscoring.flysight import getAllSpeedJumpFilesFrom
 from ssscoring.flysight import validFlySightHeaderIn
@@ -61,15 +61,15 @@ def _invalidMaxAltitude(tmp_path_factory):
 @pytest.fixture
 def _tooSmallCSV(tmp_path_factory):
     fileName = TEST_FLYSIGHT_2_DATA.as_posix().replace('TRACK', 'BOGUS')
-    data = pd.read_csv(TEST_FLYSIGHT_2_DATA, names = _FS2_COLUMNS, skiprows = 6).head(50)
+    data = pd.read_csv(TEST_FLYSIGHT_2_DATA, names = FS2_COLUMNS, skiprows = 6).head(50)
     data.to_csv(fileName, sep = ',')
     yield fileName
     os.unlink(fileName)
 
 
-def test__skipOverFS2MetadataRowsIn():
-    data = pd.read_csv(TEST_FLYSIGHT_2_DATA, names = _FS2_COLUMNS, skiprows = 6).head(50)
-    dataMod = _skipOverFS2MetadataRowsIn(data)
+def test_skipOverFS2MetadataRowsIn():
+    data = pd.read_csv(TEST_FLYSIGHT_2_DATA, names = FS2_COLUMNS, skiprows = 6).head(50)
+    dataMod = skipOverFS2MetadataRowsIn(data)
     assert len(dataMod) < len(data)
     assert pd.isnull(data.iloc[0].time)
     assert pd.notnull(dataMod.iloc[0].time)

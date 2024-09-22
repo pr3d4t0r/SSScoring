@@ -19,6 +19,8 @@ from ssscoring.constants import VALIDATION_WINDOW_LENGTH
 from ssscoring.datatypes import JumpResults
 from ssscoring.datatypes import PerformanceWindow
 from ssscoring.errors import SSScoringError
+from ssscoring.flysight import FlySightVersion
+from ssscoring.flysight import detectFlySightFileVersionOf
 
 import math
 
@@ -365,6 +367,28 @@ def processJump(data: pd.DataFrame):
     return JumpResults(color, data, maxSpeed, result, score, scores, table, window)
 
 
+def _readVersion1CSV(jumpFile: str) -> pd.DataFrame:
+    return pd.read_csv(jumpFile, skiprows = (1, 1))
+
+
+def _tagVersion1From(jumpFile: str) -> str:
+    return jumpFile.replace('CSV', '').replace('.', '').replace('/data', '').replace('/', ' ').strip()+':v1'
+
+
+def _tagVersion2From(jumpFile: str) -> str:
+    return jumpFile.split('/')[-2]+':v2'
+
+
+
+def _readVersion2CSV(jumpFile: str) -> pd.DataFrame:
+    from ssscoring.flysight import FS2_COLUMNS
+    from ssscoring.flysight import skipOverFS2MetadataRowsIn
+
+    rawData = pd.read_csv(jumpFile, names = FS2_COLUMNS, skiprows = 6)
+    rawData = skipOverFS2MetadataRowsIn(rawData)
+    rawData.drop('GNSS', inplace = True, axis = 1)
+    return rawData
+
 
 def processAllJumpFiles(jumpFiles: list, altitudeDZMeters = 0.0) -> dict:
     """
@@ -388,11 +412,15 @@ def processAllJumpFiles(jumpFiles: list, altitudeDZMeters = 0.0) -> dict:
     and non-ANSI characters are allowed in file names.
     """
     jumpResults = dict()
-    for jumpFile in jumpFiles:
-        jumpResult = processJump(
-            convertFlySight2SSScoring(pd.read_csv(jumpFile, skiprows = (1, 1)),
-            altitudeDZMeters = altitudeDZMeters))
-        tag = jumpFile.replace('CSV', '').replace('.', '').replace('/data', '').replace('/', ' ').strip()
+    for jumpFile in jumpFiles.keys():
+        version = detectFlySightFileVersionOf(jumpFile)
+        if version == FlySightVersion.V1:
+            rawData = _readVersion1CSV(jumpFile)
+            tag = _tagVersion1From(jumpFile)
+        elif version == FlySightVersion.V2:
+            rawData = _readVersion2CSV(jumpFile)
+            tag = _tagVersion2From(jumpFile)
+        jumpResult = processJump(convertFlySight2SSScoring(rawData, altitudeDZMeters = altitudeDZMeters))
         if 'valid' in jumpResult.result:
             jumpResults[tag] = jumpResult
     return jumpResults

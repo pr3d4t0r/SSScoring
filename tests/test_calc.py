@@ -16,7 +16,7 @@ from ssscoring.calc import totalResultsFrom
 from ssscoring.constants import BREAKOFF_ALTITUDE
 from ssscoring.constants import FT_IN_M
 from ssscoring.errors import SSScoringError
-from ssscoring.fs1 import getAllSpeedJumpFilesFrom
+from ssscoring.flysight import getAllSpeedJumpFilesFrom
 
 import os
 import pytest
