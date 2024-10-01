@@ -11,6 +11,7 @@ local or cloud-based).
 from enum import Enum
 
 from ssscoring.constants import FLYSIGHT_1_HEADER
+from ssscoring.constants import FLYSIGHT_2_HEADER
 from ssscoring.constants import IGNORE_LIST
 from ssscoring.constants import MIN_JUMP_FILE_SIZE
 from ssscoring.errors import SSScoringError
@@ -19,11 +20,6 @@ import csv
 import os
 
 import pandas as pd
-
-
-# +++ constants +++
-
-FS2_COLUMNS = ('GNSS', 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 'hAcc', 'vAcc', 'sAcc', 'numSV', )
 
 
 # --- classes and objects ---
@@ -127,10 +123,10 @@ def getAllSpeedJumpFilesFrom(dataLake: str) -> dict:
                 stat = os.stat(jumpFileName)
                 if all(x not in fileName for x in ('EVENT', 'SENSOR', 'TRACK')):
                     # FlySight 1 track format
-                    data = pd.read_csv(jumpFileName, skiprows = (1, 1))
+                    data = pd.read_csv(jumpFileName, skiprows = (1, 1), index_col = False)
                 elif 'TRACK' in fileName:
                     # FlySight 2 track custom format
-                    data = pd.read_csv(jumpFileName, names = FS2_COLUMNS, skiprows = 6)
+                    data = pd.read_csv(jumpFileName, names = FLYSIGHT_2_HEADER, skiprows = 6, index_col = False)
                     data = skipOverFS2MetadataRowsIn(data)
                     data.drop('GNSS', inplace = True, axis = 1)
                     version = '2'

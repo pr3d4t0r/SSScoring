@@ -31,6 +31,12 @@ FLYSIGHT_1_HEADER = set([ 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 
 FlySight v1 CSV file headers.
 """
 
+FLYSIGHT_2_HEADER = ('GNSS', 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 'hAcc', 'vAcc', 'sAcc', 'numSV', )
+"""
+FlySight v1 CSV file headers.  Unlike other constants, this is a `tuple` instead
+of a `set` because the code manipulates the headers/columns during file ingress.
+"""
+
 FT_IN_M = 3.2808
 """
 Number of feet in a meter.
@@ -68,6 +74,7 @@ Speed accuracy for the FlySight device.
 """
 
 MIN_JUMP_FILE_SIZE = 1024*512
+MIN_JUMP_FILE_SIZE = 1024*64
 """
 FlySight v1 files smaller than `MIN_JUMP_FILE_SIZE` are ignored because they
 lack the minimum number of data points to contain a valid speed skydive.
@@ -77,6 +84,11 @@ lack the minimum number of data points to contain a valid speed skydive.
 PERFORMANCE_WINDOW_LENGTH = 2256.0
 """
 Performance window length as defined by ISSA/IPC/USPA.
+"""
+
+SKYTRAX_1_HEADER = set([ 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 'hAcc', 'vAcc', 'sAcc', 'heading', 'cAcc', 'gpsFix', 'numSV', ])
+"""
+SkyTraX GPS + barometric SMD v1 CSV file headers.
 """
 
 VALIDATION_WINDOW_LENGTH = 1006.0
