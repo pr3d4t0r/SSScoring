@@ -50,6 +50,7 @@ devpi:
 # [[ -e ".env" ]] && mv ".env" "_env"
 # [[ -e "_env" ]] && mv "_env" ".env"
 docs: ALWAYS
+	pip install -U pdoc
 	mkdir -p $(API_DOC_DIR)
 	VERSION="$(VERSION)" PDOC_ALLOW_EXEC=1 pdoc --logo="https://github.com/pr3d4t0r/SSScoring/blob/master/assets/ssscoring-logo.png?raw=true" --favicon="https://cime.net/upload_area/favicon.ico" -n -o $(API_DOC_DIR) -t ./resources $(PACKAGE)
 
@@ -90,6 +91,7 @@ package:
 #
 # PyPI user name:  ciurana; pypi AT cime_net
 publish:
+	pip install -U twine
 	twine --no-color check $(DIST)/*
 	twine --no-color upload --verbose $(DIST)/*
 

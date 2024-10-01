@@ -368,7 +368,7 @@ def processJump(data: pd.DataFrame):
 
 
 def _readVersion1CSV(jumpFile: str) -> pd.DataFrame:
-    return pd.read_csv(jumpFile, skiprows = (1, 1))
+    return pd.read_csv(jumpFile, skiprows = (1, 1), index_col = False)
 
 
 def _tagVersion1From(jumpFile: str) -> str:
@@ -381,10 +381,10 @@ def _tagVersion2From(jumpFile: str) -> str:
 
 
 def _readVersion2CSV(jumpFile: str) -> pd.DataFrame:
-    from ssscoring.flysight import FS2_COLUMNS
+    from ssscoring.constants import FLYSIGHT_2_HEADER
     from ssscoring.flysight import skipOverFS2MetadataRowsIn
 
-    rawData = pd.read_csv(jumpFile, names = FS2_COLUMNS, skiprows = 6)
+    rawData = pd.read_csv(jumpFile, names = FLYSIGHT_2_HEADER, skiprows = 6, index_col = False)
     rawData = skipOverFS2MetadataRowsIn(rawData)
     rawData.drop('GNSS', inplace = True, axis = 1)
     return rawData
