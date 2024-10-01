@@ -40,7 +40,7 @@ chipset support like Nvidia and M-chipsets.
 
 - Pure Python
 - Supports output from FlySight versions v1 and v2, and SkyTrax devices
-- Automatic detection of file version
+- Automatic file version detection
 - Bulk file processing via data lake scanning
 - Automatic selection of FlySight-like files mixed among files of multiple types
   and from different applications and operating systems
@@ -56,11 +56,12 @@ chipset support like Nvidia and M-chipsets.
   to competitors during training
 - Internal data representation includes SI and Imperial units
 
-The <a href='https://pr3d4t0r.github.io/SSScoring/ssscoring.html' target='_blank'>
-current SSScoring API is available on GitHub</a>.
+The current SSScoring API is available on GitHub:
+https://pr3d4t0r.github.io/SSScoring/ssscoring.html
 
-The <a href='https://pypi.org/project/ssscoring'>SSScoring package</a> can be
-installed into any Python installation version 3.9 or later.
+The SSScoring package can be installed into any Python installation version 3.9
+or later.
+https://pypi.org/project/ssscoring
 
 SSScoring also includes Jupyter notebooks for dataset exploratory analysis and
 for code troubleshooting.  Unit test coverage is greater than 92%, limited only
