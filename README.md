@@ -30,7 +30,7 @@ print(roundedAggregateResults(aggregateResults(jumpResults)))
 Output:
 
 ```bash
-python -W ignore synopsys.py
+python synopsys.py
                            score  5.0  10.0  15.0  20.0  25.0  finalTime  maxSpeed
 01-00-00:v2                  472  181   329   420   472   451       24.7       475
 resources test-data-00:v1    443  175   299   374   427   449       25.0       449
