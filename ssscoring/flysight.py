@@ -155,7 +155,7 @@ def detectFlySightFileVersionOf(fileName: str) -> FlySightVersion:
     `ssscoring.errors.SSScoringError` if the file is not a CSV and it's some
     other invalid format.
     """
-    if not '.CSV' in fileName:
+    if not '.CSV' in fileName.upper():
         raise SSScoringError('Invalid file extension type')
     if any(x in fileName for x in ('EVENT.CSV', 'SENSOR.CSV')):
         raise SSScoringError('Only TRACK.CSV v2 files can be processed at this time')

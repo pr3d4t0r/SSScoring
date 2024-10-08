@@ -2,9 +2,11 @@
 
 
 from ssscoring.calc import aggregateResults
+from ssscoring.calc import calcScoreMeanVelocity
 from ssscoring.calc import calculateDistance
 from ssscoring.calc import convertFlySight2SSScoring
 from ssscoring.calc import dropNonSkydiveDataFrom
+from ssscoring.calc import getFlySightDataFromCSV
 from ssscoring.calc import getSpeedSkydiveFrom
 from ssscoring.calc import isValidJump
 from ssscoring.calc import isValidMinimumAltitude
@@ -30,6 +32,7 @@ import pandas as pd
 TEST_FLYSIGHG_DATA_LAKE = './resources'
 TEST_FLYSIGHT_DATA = os.path.join(TEST_FLYSIGHG_DATA_LAKE, 'test-data-00.csv')
 TEST_FLYSIGHT_DATA_XX = os.path.join(TEST_FLYSIGHG_DATA_LAKE, 'test-data-02.csv')
+TEST_FLYSIGHT_DATA_BAD_HEADERS = os.path.join(TEST_FLYSIGHG_DATA_LAKE, 'test-data-03.csv')
 
 
 # +++ globals +++
@@ -132,6 +135,20 @@ def test_jumpAnalysisTable():
     assert 'netVectorKMh' in table.columns
 
 
+def test_calcScoreMeanVelocity():
+    data = convertFlySight2SSScoring(pd.read_csv(TEST_FLYSIGHT_DATA_XX, skiprows = (1,1)))
+    data = dropNonSkydiveDataFrom(data)
+    _, data = getSpeedSkydiveFrom(data)
+    baseTime = data.iloc[0].timeUnix
+    data['plotTime'] = data.timeUnix-baseTime
+
+    score, scores = calcScoreMeanVelocity(data)
+    assert score == 451.4055
+    assert score in scores
+    assert len(scores) > 0
+    assert type(scores) == dict
+
+
 def test_processJump():
     data = convertFlySight2SSScoring(pd.read_csv(TEST_FLYSIGHT_DATA_XX, skiprows = (1,1)))
 
@@ -140,6 +157,16 @@ def test_processJump():
     assert '{0:,.2f}'.format(jumpResults.score) == '451.41'
     assert jumpResults.maxSpeed == 452.664
     assert 'valid' in jumpResults.result
+
+
+def test_getFlySightDataFromCSV():
+    rawData = None
+    tag = None
+    rawData, tag = getFlySightDataFromCSV(TEST_FLYSIGHT_DATA)
+    assert isinstance(rawData, pd.DataFrame)
+    assert 'v1' in tag
+    with pytest.raises(SSScoringError):
+        rawData, tag = getFlySightDataFromCSV(TEST_FLYSIGHT_DATA_BAD_HEADERS)
 
 
 def test_processAllJumpFiles():
@@ -200,7 +227,9 @@ def test_totalResultsFrom():
 # test_getSpeedSkydiveFrom()
 # test_jumpAnalysisTable()
 # test_isValidMinimumAltitude(_invalidAltFileName)
+# test__calcScoreMeanVelocity()
 
+# test_getFlySightDataFromCSV()
 # test_processJump()
 # test_processAllJumpFiles()
 # test_aggregateResults()

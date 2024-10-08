@@ -1,4 +1,4 @@
-% ssscoring(3) Version 1.7.1 | Speed Skydiving Scoring API documentation
+% ssscoring(3) Version 1.7.2 | Speed Skydiving Scoring API documentation
 
 Name
 ====
@@ -8,16 +8,45 @@ Name
 
 Synopsis
 ========
-```python
-# Short code snippet will go here.
+```bash
+pip install -U ssscoring
 ```
+
+Have a FlySight speed run track file available (can be v1 or v2):
+Have one or more FlySight speed run track files available (can be v1 or v2), set
+the source directory to the data lake containing them.
+
+```python
+from ssscoring.calc import aggregateResults
+from ssscoring.calc import processAllJumpFiles
+from ssscoring.calc import roundedAggregateResults
+from ssscoring.flysight import getAllSpeedJumpFilesFrom
+
+DATA_LAKE = './resources' # can be anywhere
+jumpResults = processAllJumpFiles(getAllSpeedJumpFilesFrom(DATA_LAKE))
+print(roundedAggregateResults(aggregateResults(jumpResults)))
+```
+
+Output:
+
+```bash
+python -W ignore synopsys.py
+                           score  5.0  10.0  15.0  20.0  25.0  finalTime  maxSpeed
+01-00-00:v2                  472  181   329   420   472   451       24.7       475
+resources test-data-00:v1    443  175   299   374   427   449       25.0       449
+resources test-data-01:v1    441  176   305   388   432   442       25.0       442
+resources test-data-02:v1    451  164   295   387   441   452       25.0       453
+```
+
+SSScoring processes all FlySight files (tagged as v1 or v2, depending on the
+device) and SkyTrax files.  It aggregates and summarizes the results.  Full
+API documentation is available at:
+
+https://pr3d4t0r.github.io/SSScoring/ssscoring.html
 
 
 Description
 ===========
-<<<<<<< Updated upstream
-Documentation in progress.
-=======
 SSScoring provides analsysis tools for individual or bulk processing of FlySight
 GPS competition data gathered during speed skydiving training and competition.
 Scoring methodology adheres to International Skydiving Commission (ISC),
@@ -66,6 +95,29 @@ https://pypi.org/project/ssscoring
 SSScoring also includes Jupyter notebooks for dataset exploratory analysis and
 for code troubleshooting.  Unit test coverage is greater than 92%, limited only
 by Jupyter-specific components that can't be tested in a standalone environment.
+
+
+### What is a data lake?
+
+A **data lake** is a files repository that stores data in its raw, unprocessed
+form.  A speed skydiving data lake often has two or more of these types of
+files:
+
+- FlySight versions 1 or 2 files
+- SkyTrax files
+- Video files (MP4 or MOV of whatever)
+- PDFs of meet bulletins and related event information
+- Miscellaneous other junk
+
+SSScoring identifies FlySight and SkyTrax files regardless of what other file
+types are available in the data lake.  SSScoring also classifies speed files
+from other types of tracks (e.g. wingsuit) based on the performance profile and
+scoring windows.  Tell the SSScoring tools where to get all the track files,
+even if they are several levels deep in the directory structure, and SSScoring
+will find, validate, and score only the speed skydiving files regardless of what
+else is available in the data lake.  The only limitation is available memory.
+SSScoring has been tested with as many as 467 speed files during a single run,
+representing all the training files for a competitive skydiver over 10 months.
 
 
 ### Additional tools

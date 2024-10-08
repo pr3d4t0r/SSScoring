@@ -232,6 +232,7 @@ def getSpeedSkydiveFrom(data: pd.DataFrame) -> tuple:
 
     return PerformanceWindow(windowStart, windowEnd, validationWindowStart), data
 
+
 def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
     """
     Generates the HCD jump analysis table, with speed data at 5-second intervals
@@ -294,6 +295,10 @@ def dropNonSkydiveDataFrom(data: pd.DataFrame) -> pd.DataFrame:
     Discards all data rows before maximum altitude, and all "negative" altitude
     rows because we don't skydive underground (FlySight bug?).
 
+    This is a more accurate mean velocity calculation from a physics point of
+    view, but it differs from the ISC definition using in scoring - which, if we
+    get technical, is the one that counts.
+
     Arguments
     ---------
         data : pd.DataFrame
@@ -309,6 +314,29 @@ def dropNonSkydiveDataFrom(data: pd.DataFrame) -> pd.DataFrame:
     data = data[data.altitudeAGL > 0]
 
     return data
+
+
+def calcScoreMeanVelocity(data: pd.DataFrame) -> tuple:
+    """
+    Calculates the speeds over a 3-second interval as the mean of all the speeds
+    recorded within that 3-second window and resolves the maximum speed.
+
+    Arguments
+    ---------
+        data
+    A `pd.dataframe` with speed run data.
+
+    Returns
+    -------
+    A `tuple` with the best score throughout the speed run, and a dicitionary
+    of the meanVSpeed:spotInTime used in determining the exact scoring speed
+    at every datat point during the speed run.
+    """
+    scores = dict()
+    for spot in data.plotTime[::1]:
+        subset = data[(data.plotTime <= spot) & (data.plotTime >= (spot-3.0))]
+        scores[subset.vKMh.mean()] = spot
+    return (max(scores), scores)
 
 
 def processJump(data: pd.DataFrame):
@@ -343,7 +371,7 @@ def processJump(data: pd.DataFrame):
     window, data = getSpeedSkydiveFrom(data)
     validJump = isValidJump(data, window)
     score = 0.0
-    scores = dict()
+    scores = None
     table = None
 
     if validJump:
@@ -352,12 +380,7 @@ def processJump(data: pd.DataFrame):
         result = '🟢 valid'
         baseTime = data.iloc[0].timeUnix
         data['plotTime'] = data.timeUnix-baseTime
-
-        for spot in data.plotTime[::1]:
-            subset = data[(data.plotTime <= spot) & (data.plotTime >= (spot-3.0))]
-            scores[subset.vKMh.mean()] = spot
-        score = max(scores)
-
+        score, scores = calcScoreMeanVelocity(data)
     else:
         color = '#f00'
         maxSpeed = -1
@@ -372,7 +395,7 @@ def _readVersion1CSV(jumpFile: str) -> pd.DataFrame:
 
 
 def _tagVersion1From(jumpFile: str) -> str:
-    return jumpFile.replace('CSV', '').replace('.', '').replace('/data', '').replace('/', ' ').strip()+':v1'
+    return jumpFile.replace('CSV', '').replace('csv', '').replace('.', '').replace('/data', '').replace('/', ' ').strip()+':v1'
 
 
 def _tagVersion2From(jumpFile: str) -> str:
@@ -388,6 +411,43 @@ def _readVersion2CSV(jumpFile: str) -> pd.DataFrame:
     rawData = skipOverFS2MetadataRowsIn(rawData)
     rawData.drop('GNSS', inplace = True, axis = 1)
     return rawData
+
+
+def getFlySightDataFromCSV(jumpFile: str) -> tuple:
+    """
+    Ingress a known FlySight or SkyTrax file into memory for SSScoring
+    processing.
+
+    Arguments
+    ---------
+        jumpFile
+    A string with the file name; can be a relative or an asbolute path.
+
+    Returns
+    -------
+    A `tuple` with two items:
+        - `rawData` - a dataframe representation of the CSV with the original
+          headers but without the data type header
+        - `tag` - a string with an identifying tag derived from the path name
+          and file version in the form `some name:vX`.  It uses the current
+          path as metadata to infer the name.  There's no semantics enforcement.
+
+    Raises
+    ------
+    `SSScoringError` if the CSV file is invalid in any way.
+    """
+    from ssscoring.flysight import validFlySightHeaderIn
+
+    if not validFlySightHeaderIn(jumpFile):
+        raise SSScoringError('%s is an invalid speed skydiving file')
+    version = detectFlySightFileVersionOf(jumpFile)
+    if version == FlySightVersion.V1:
+        rawData = _readVersion1CSV(jumpFile)
+        tag = _tagVersion1From(jumpFile)
+    elif version == FlySightVersion.V2:
+        rawData = _readVersion2CSV(jumpFile)
+        tag = _tagVersion2From(jumpFile)
+    return (rawData, tag)
 
 
 def processAllJumpFiles(jumpFiles: list, altitudeDZMeters = 0.0) -> dict:
@@ -413,13 +473,7 @@ def processAllJumpFiles(jumpFiles: list, altitudeDZMeters = 0.0) -> dict:
     """
     jumpResults = dict()
     for jumpFile in jumpFiles.keys():
-        version = detectFlySightFileVersionOf(jumpFile)
-        if version == FlySightVersion.V1:
-            rawData = _readVersion1CSV(jumpFile)
-            tag = _tagVersion1From(jumpFile)
-        elif version == FlySightVersion.V2:
-            rawData = _readVersion2CSV(jumpFile)
-            tag = _tagVersion2From(jumpFile)
+        rawData, tag = getFlySightDataFromCSV(jumpFile)
         jumpResult = processJump(convertFlySight2SSScoring(rawData, altitudeDZMeters = altitudeDZMeters))
         if 'valid' in jumpResult.result:
             jumpResults[tag] = jumpResult
