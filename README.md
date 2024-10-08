@@ -12,7 +12,6 @@ Synopsis
 pip install -U ssscoring
 ```
 
-Have a FlySight speed run track file available (can be v1 or v2):
 Have one or more FlySight speed run track files available (can be v1 or v2), set
 the source directory to the data lake containing them.
 
