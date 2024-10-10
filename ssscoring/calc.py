@@ -5,6 +5,8 @@ Functions and logic for analyzing and manipulating FlySight dataframes.
 """
 
 
+from pathlib import Path
+
 from haversine import haversine
 from haversine import Unit
 
@@ -339,6 +341,26 @@ def calcScoreMeanVelocity(data: pd.DataFrame) -> tuple:
     return (max(scores), scores)
 
 
+def calcScoreISC(data: pd.DataFrame) -> tuple:
+    """
+    Calculates the speeds over a 3-second interval as the ds/dt and dt is the
+    is a 3-second sliding interval from exit.  The window slider moves along the
+    `plotTime` axis in the dataframe.
+
+    Arguments
+    ---------
+        data
+    A `pd.dataframe` with speed run data.
+
+    Returns
+    -------
+    A `tuple` with the best score throughout the speed run, and a dicitionary
+    of the meanVSpeed:spotInTime used in determining the exact scoring speed
+    at every datat point during the speed run.
+    """
+    raise NotImplementedError("calcScoreISC()")
+
+
 def processJump(data: pd.DataFrame):
     """
     Take a dataframe in SSScoring format and process it for display.  It
@@ -379,8 +401,9 @@ def processJump(data: pd.DataFrame):
         color = '#0f0'
         result = '🟢 valid'
         baseTime = data.iloc[0].timeUnix
-        data['plotTime'] = data.timeUnix-baseTime
-        score, scores = calcScoreMeanVelocity(data)
+        data['plotTime'] = round(data.timeUnix-baseTime, 1)
+        # score, scores = calcScoreMeanVelocity(data)
+        score, scores = calcScoreISC(data)
     else:
         color = '#f00'
         maxSpeed = -1
@@ -413,7 +436,7 @@ def _readVersion2CSV(jumpFile: str) -> pd.DataFrame:
     return rawData
 
 
-def getFlySightDataFromCSV(jumpFile: str) -> tuple:
+def getFlySightDataFromCSV(jumpFile) -> tuple:
     """
     Ingress a known FlySight or SkyTrax file into memory for SSScoring
     processing.
@@ -421,7 +444,7 @@ def getFlySightDataFromCSV(jumpFile: str) -> tuple:
     Arguments
     ---------
         jumpFile
-    A string with the file name; can be a relative or an asbolute path.
+    A string or `pathlib.Path` object; can be a relative or an asbolute path.
 
     Returns
     -------
@@ -438,6 +461,12 @@ def getFlySightDataFromCSV(jumpFile: str) -> tuple:
     """
     from ssscoring.flysight import validFlySightHeaderIn
 
+    if isinstance(jumpFile, Path):
+        jumpFile = jumpFile.as_posix()
+    elif isinstance(jumpFile, str):
+        pass
+    else:
+        raise SSScoringError('jumpFile must be a string or a Path object')
     if not validFlySightHeaderIn(jumpFile):
         raise SSScoringError('%s is an invalid speed skydiving file')
     version = detectFlySightFileVersionOf(jumpFile)
