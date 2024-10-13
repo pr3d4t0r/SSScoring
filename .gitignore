@@ -151,6 +151,8 @@ venv.bak/
 **/test.json
 **/test.py
 **/tmp/*
+**/.pydist*bak
+README-1ST.ipynb
 
 
 # FlySafe exclusions
