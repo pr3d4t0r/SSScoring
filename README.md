@@ -46,6 +46,11 @@ API documentation is available at:
 https://pr3d4t0r.github.io/SSScoring/ssscoring.html
 
 
+Quickstart
+==========
+Coming soon.
+
+
 Description
 ===========
 SSScoring provides analsysis tools for individual or bulk processing of FlySight
