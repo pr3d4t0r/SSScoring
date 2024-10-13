@@ -8,6 +8,7 @@ local or cloud-based).
 """
 
 
+from collections import OrderedDict
 from enum import Enum
 from pathlib import Path
 
@@ -55,7 +56,7 @@ def skipOverFS2MetadataRowsIn(data: pd.DataFrame) -> pd.DataFrame:
     return data.iloc[ref:]
 
 
-def validFlySightHeaderIn(fileCSV: str) -> bool:
+def validFlySightHeaderIn(fileCSV) -> bool:
     """
     Checks if a file is a CSV in FlySight 1 or FlySight 2 formats.  The checks
     include:
@@ -67,7 +68,8 @@ def validFlySightHeaderIn(fileCSV: str) -> bool:
     Arguments
     ---------
         fileCSV
-    A file name to verify as a valid FlySight file
+    A file name to verify as a valid FlySight file; can be a string or an
+    instance of `libpath.Path`
 
     Returns
     -------
@@ -110,7 +112,7 @@ def getAllSpeedJumpFilesFrom(dataLake: str) -> dict:
     """
     from ssscoring.calc import isValidMinimumAltitude # skirt circular dependency
 
-    jumpFiles = dict()
+    jumpFiles = OrderedDict()
     for root, dirs, files in os.walk(dataLake):
         if any(name in root for name in IGNORE_LIST):
             continue
