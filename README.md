@@ -37,7 +37,9 @@ resources test-data-01:v1    441  176   305   388   432   442       25.0       4
 resources test-data-02:v1    451  164   295   387   441   452       25.0       453
 ```
 
-![Speed run summary example.](./resources/SSScoring-speed-run-summary.png)
+![Speed run summary example](./resources/SSScoring-speed-run-summary.png)
+Speed run summary example:
+https://raw.githubusercontent.com/pr3d4t0r/SSScoring/refs/heads/master/resources/SSScoring-speed-run-summary.png
 
 SSScoring processes all FlySight files (tagged as v1 or v2, depending on the
 device) and SkyTrax files.  It aggregates and summarizes the results.  Full
