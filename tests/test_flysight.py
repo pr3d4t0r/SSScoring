@@ -1,6 +1,8 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 
+from pathlib import Path
+
 from ssscoring.constants import BREAKOFF_ALTITUDE
 from ssscoring.constants import FLYSIGHT_2_HEADER
 from ssscoring.errors import SSScoringError
@@ -13,7 +15,6 @@ from ssscoring.flysight import validFlySightHeaderIn
 
 
 import os
-import pathlib
 import pytest
 
 import pandas as pd
@@ -21,9 +22,9 @@ import pandas as pd
 
 # +++ constants ***
 
-TEST_FLYSIGHT_DATA_LAKE = './resources'
-TEST_FLYSIGHT_1_DATA = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE, 'test-data-00.CSV')
-TEST_FLYSIGHT_2_DATA = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'test-data-FS2' / '01-00-00' / 'TRACK.CSV'
+TEST_FLYSIGHT_DATA_LAKE = './resources/test-tracks'
+TEST_FLYSIGHT_1_DATA = Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-00.CSV'
+TEST_FLYSIGHT_2_DATA = Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS2' / '01-00-00' / 'TRACK.CSV'
 
 
 # +++ tests +++
@@ -87,7 +88,7 @@ def test_getAllSpeedJumpFilesFrom(_tooSmallCSV):
     files = getAllSpeedJumpFilesFrom(TEST_FLYSIGHT_DATA_LAKE)
     # Manual ./ because path.resolve(strict = False) resolves to the full path
     # vs implementation that uses os.walk() uses the relative path.
-    testFiles = [ './'+TEST_FLYSIGHT_1_DATA.as_posix(), './'+TEST_FLYSIGHT_2_DATA.as_posix() ]
+    testFiles = [ TEST_FLYSIGHT_1_DATA, TEST_FLYSIGHT_2_DATA ]
     assert len(files) >= 1
     assert set(testFiles).issubset(set(files.keys()))
     assert not len(getAllSpeedJumpFilesFrom('./bogus'))

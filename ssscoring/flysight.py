@@ -9,6 +9,7 @@ local or cloud-based).
 
 
 from enum import Enum
+from pathlib import Path
 
 from ssscoring.constants import FLYSIGHT_1_HEADER
 from ssscoring.constants import FLYSIGHT_2_HEADER
@@ -117,9 +118,10 @@ def getAllSpeedJumpFilesFrom(dataLake: str) -> dict:
             data = None
             if '.swp' in fileName: # Ignore Vim, other editors swap file
                 continue
-            if '.CSV' in fileName:
+            if '.CSV' in fileName.upper():
                 version = '1'
-                jumpFileName = os.path.join(root, fileName)
+                # jumpFileName = os.path.join(root, fileName)
+                jumpFileName = Path(root) / fileName
                 stat = os.stat(jumpFileName)
                 if all(x not in fileName for x in ('EVENT', 'SENSOR', 'TRACK')):
                     # FlySight 1 track format
@@ -136,14 +138,14 @@ def getAllSpeedJumpFilesFrom(dataLake: str) -> dict:
     return jumpFiles
 
 
-def detectFlySightFileVersionOf(fileName: str) -> FlySightVersion:
+def detectFlySightFileVersionOf(fileThing) -> FlySightVersion:
     """
     Detects the FlySight file version based on its file name and format.
 
     Arguments
     ---------
-        fileName
-    A string corresponding to the file name.
+        fileThing
+    A string or `pathlib.Path` object corresponding to the file name.
 
     Returns
     -------
@@ -155,11 +157,17 @@ def detectFlySightFileVersionOf(fileName: str) -> FlySightVersion:
     `ssscoring.errors.SSScoringError` if the file is not a CSV and it's some
     other invalid format.
     """
-    if not '.CSV' in fileName:
+    if isinstance(fileThing, Path):
+        fileName = fileThing.as_posix()
+    elif isinstance(fileThing, str):
+        fileName = fileThing
+        fileThing = Path(fileThing)
+
+    if not '.CSV' in fileName.upper():
         raise SSScoringError('Invalid file extension type')
     if any(x in fileName for x in ('EVENT.CSV', 'SENSOR.CSV')):
         raise SSScoringError('Only TRACK.CSV v2 files can be processed at this time')
-    if not os.path.exists(fileName):
+    if not fileThing.is_file():
         raise SSScoringError('%s - file not found in data lake' % fileName)
     if not validFlySightHeaderIn(fileName):
         raise SSScoringError('CSV is not a valid FlySight file')
