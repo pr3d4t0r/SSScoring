@@ -48,9 +48,25 @@ API documentation is available at:
 https://pr3d4t0r.github.io/SSScoring/ssscoring.html
 
 
+Installation and requirements
+=============================
+
+- Python 3.9.9 or later
+- pandas and NumPy
+
+The [requirements.txt](./requirements.txt) file lists all the packages required
+for running SSScoring or using the API.
+
+
 Quickstart
 ==========
-Coming soon.
+
+- The [SSScoring interactive quickstart](./quickstart.ipynb) notebook for
+  Jupyter/Lucyfer is the fastest way to learn how to use the library
+- The `ssscoring` command line tool implements the same functionality as the
+  interactive quickstart, can be used for scoring speed skydives from the
+  command line with minimum installation - EXPERIMENTAL
+- SSScoring browser tools - EXPERIMENTAL
 
 
 Description
