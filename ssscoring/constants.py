@@ -81,9 +81,27 @@ lack the minimum number of data points to contain a valid speed skydive.
 **TODO:** Revise for FlySight v2.
 """
 
+MPS_2_KMH = 3.6
+"""
+m/s to km/h conversion factor:
+
+```python
+s = mps * 60 * 60 / 1000
+  = mps * 3600 / 1000
+  = mps * 3.6
+```
+"""
+
 PERFORMANCE_WINDOW_LENGTH = 2256.0
 """
 Performance window length as defined by ISSA/IPC/USPA.
+"""
+
+SCORING_INTERVAL = 3.0
+"""
+Scoring is based on the maximum speed the jumper attained within the `VALIDATION_WINDOW_LENGTH`
+as the average speed during a sliding window of SCORING_INTERVAL seconds.  The
+value is set by governing bodies like ISC and USPA.
 """
 
 SKYTRAX_1_HEADER = set([ 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 'hAcc', 'vAcc', 'sAcc', 'heading', 'cAcc', 'gpsFix', 'numSV', ])

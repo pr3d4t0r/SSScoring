@@ -1,10 +1,12 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
-
 from ssscoring.calc import aggregateResults
+from ssscoring.calc import calcScoreISC
+from ssscoring.calc import calcScoreMeanVelocity
 from ssscoring.calc import calculateDistance
 from ssscoring.calc import convertFlySight2SSScoring
 from ssscoring.calc import dropNonSkydiveDataFrom
+from ssscoring.calc import getFlySightDataFromCSV
 from ssscoring.calc import getSpeedSkydiveFrom
 from ssscoring.calc import isValidJump
 from ssscoring.calc import isValidMinimumAltitude
@@ -19,17 +21,20 @@ from ssscoring.errors import SSScoringError
 from ssscoring.flysight import getAllSpeedJumpFilesFrom
 
 import os
+import pathlib
 import pytest
 import tempfile
 
+import numpy as np
 import pandas as pd
 
 
 # +++ constants ***
 
-TEST_FLYSIGHG_DATA_LAKE = './resources'
-TEST_FLYSIGHT_DATA = os.path.join(TEST_FLYSIGHG_DATA_LAKE, 'test-data-00.csv')
-TEST_FLYSIGHT_DATA_XX = os.path.join(TEST_FLYSIGHG_DATA_LAKE, 'test-data-02.csv')
+TEST_FLYSIGHT_DATA_LAKE = './resources/test-tracks'
+TEST_FLYSIGHT_DATA = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-00.csv'
+TEST_FLYSIGHT_DATA_V1 = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-02.csv'
+TEST_FLYSIGHT_DATA_BAD_HEADERS = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-03.csv'
 
 
 # +++ globals +++
@@ -108,7 +113,7 @@ def test_getSpeedSkydiveFrom():
 
 
 def test_isValidJump():
-    bogus = pd.DataFrame( { 'altitudeAGL': (2800, ), 'speedAccuracy': (42.0, ), } )
+    bogus = pd.DataFrame( { 'altitudeAGL': (2800, ), 'speedAccuracyISC': (3.1, ), } )
     assert isValidJump(_data, _window)
     assert not isValidJump(bogus, _window)
 
@@ -132,22 +137,56 @@ def test_jumpAnalysisTable():
     assert 'netVectorKMh' in table.columns
 
 
+def test_calcScoreMeanVelocity():
+    data = _data.copy()
+    baseTime = data.iloc[0].timeUnix
+    data['plotTime'] = np.round(data.timeUnix-baseTime, decimals = 2)
+
+    score, scores = calcScoreMeanVelocity(data)
+    assert score == 443.47
+    assert score in scores
+    assert len(scores) > 0
+    assert type(scores) == dict
+
+
+def test_calcScoreISC():
+    data = _data.copy()
+    baseTime = data.iloc[0].timeUnix
+    data['plotTime'] = np.round(data.timeUnix-baseTime, decimals = 2)
+
+    score, scores = calcScoreISC(data)
+    assert score == 444.61
+    assert score in scores
+    assert len(scores) > 0
+    assert type(scores) == dict
+
+
 def test_processJump():
-    data = convertFlySight2SSScoring(pd.read_csv(TEST_FLYSIGHT_DATA_XX, skiprows = (1,1)))
+    data = convertFlySight2SSScoring(pd.read_csv(TEST_FLYSIGHT_DATA_V1, skiprows = (1,1)))
 
     jumpResults = processJump(data)
 
-    assert '{0:,.2f}'.format(jumpResults.score) == '451.41'
+    assert '{0:,.2f}'.format(jumpResults.score) == '451.86'
     assert jumpResults.maxSpeed == 452.664
     assert 'valid' in jumpResults.result
 
 
+def test_getFlySightDataFromCSV():
+    rawData = None
+    tag = None
+    rawData, tag = getFlySightDataFromCSV(TEST_FLYSIGHT_DATA)
+    assert isinstance(rawData, pd.DataFrame)
+    assert 'v1' in tag
+    with pytest.raises(SSScoringError):
+        rawData, tag = getFlySightDataFromCSV(TEST_FLYSIGHT_DATA_BAD_HEADERS)
+
+
 def test_processAllJumpFiles():
     global _jumpResults
-    jumpFiles = getAllSpeedJumpFilesFrom(TEST_FLYSIGHG_DATA_LAKE)
+    jumpFiles = getAllSpeedJumpFilesFrom(TEST_FLYSIGHT_DATA_LAKE)
     _jumpResults = processAllJumpFiles(jumpFiles)
     assert _jumpResults
-    assert 'test-data' in list(_jumpResults.keys())[0] # first item
+    assert '01-00-00:v2' in list(_jumpResults.keys())
 
     bogusDataLake = tempfile.mkdtemp()
     jumpFiles = getAllSpeedJumpFilesFrom(bogusDataLake)
@@ -195,12 +234,17 @@ def test_totalResultsFrom():
         totalResultsFrom(bogus)
 
 
+# For symbolic debugger:
+
 # test_convertFlySight2SSScoring()
 # test_dropNonSkydiveDataFrom()
 # test_getSpeedSkydiveFrom()
 # test_jumpAnalysisTable()
 # test_isValidMinimumAltitude(_invalidAltFileName)
+# test_calcScoreMeanVelocity()
+# test_calcScoreISC()
 
+# test_getFlySightDataFromCSV()
 # test_processJump()
 # test_processAllJumpFiles()
 # test_aggregateResults()

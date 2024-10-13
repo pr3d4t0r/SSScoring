@@ -1,3 +1,5 @@
 click
 haversine
 jupyter_bokeh
+numpy
+pandas
