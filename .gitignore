@@ -131,6 +131,7 @@ venv.bak/
 **/.jupyter
 **/.local
 **/.profile
+**/.pydist*bak
 **/.pydistutils.cfg
 **/.pypirc*
 **/.python_history
@@ -151,7 +152,8 @@ venv.bak/
 **/test.json
 **/test.py
 **/tmp/*
-**/.pydist*bak
+.lesshst
+.vimrc
 README-1ST.ipynb
 
 
