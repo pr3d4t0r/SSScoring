@@ -1,0 +1,38 @@
+$FLYS,1
+$VAR,FIRMWARE_VER,v2024.08.07.release_candidate
+$VAR,DEVICE_ID,004e003a484e501420353131
+$VAR,SESSION_ID,dddb0bcd27f526359405bb57
+$COL,EVNT,time,description
+$UNIT,EVNT,s,
+$DATA
+$EVNT,69009.939,"6/15 timers used before active mode initialization"
+$EVNT,69009.941,"----------"
+$EVNT,72673.325,"----------"
+$EVNT,72673.328,"724/2048 slots used in GNSS buffer"
+$EVNT,72673.333,"0 ms average time spent in GNSS update task"
+$EVNT,72673.335,"2 ms maximum time spent in GNSS update task"
+$EVNT,72673.338,"69 ms maximum time between calls to GNSS update task"
+$EVNT,72673.342,"----------"
+$EVNT,72673.344,"1055/2048 slots used in audio buffer"
+$EVNT,72673.346,"0 ms average time spent in audio update task"
+$EVNT,72673.352,"4 ms maximum time spent in audio update task"
+$EVNT,72673.354,"44 ms maximum time between calls to audio update task"
+$EVNT,72673.357,"----------"
+$EVNT,72673.359,"6/15 timers used after active mode de-initialization"
+$EVNT,72673.362,"----------"
+$EVNT,72673.364,"1/30 slots used in $BARO message buffer"
+$EVNT,72673.370,"1/3 slots used in $HUM message buffer"
+$EVNT,72673.373,"1/15 slots used in $MAG message buffer"
+$EVNT,72673.375,"2/6 slots used in $GNSS message buffer"
+$EVNT,72673.378,"1/2 slots used in $TIME message buffer"
+$EVNT,72673.380,"3/5 slots used in $RAW message buffer"
+$EVNT,72673.383,"3/667 slots used in $IMU message buffer"
+$EVNT,72673.388,"1/2 slots used in $VBAT message buffer"
+$EVNT,72673.390,"----------"
+$EVNT,72673.393,"0 ms average time spent in log update task"
+$EVNT,72673.396,"29 ms maximum time spent in log update task"
+$EVNT,72673.399,"52 ms maximum time between calls to log update task"
+$EVNT,72673.401,"----------"
+$EVNT,72673.406,"2 ms average time spent in log sync task"
+$EVNT,72673.409,"31 ms maximum time spent in log sync task"
+$EVNT,72673.411,"332 ms maximum time between calls to log sync task"
