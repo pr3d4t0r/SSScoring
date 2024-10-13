@@ -25,6 +25,7 @@ import pathlib
 import pytest
 import tempfile
 
+import numpy as np
 import pandas as pd
 
 
@@ -137,21 +138,27 @@ def test_jumpAnalysisTable():
 
 
 def test_calcScoreMeanVelocity():
-    data = convertFlySight2SSScoring(pd.read_csv(TEST_FLYSIGHT_DATA_V1, skiprows = (1,1)))
-    data = dropNonSkydiveDataFrom(data)
-    _, data = getSpeedSkydiveFrom(data)
+    data = _data.copy()
     baseTime = data.iloc[0].timeUnix
-    data['plotTime'] = data.timeUnix-baseTime
+    data['plotTime'] = np.round(data.timeUnix-baseTime, decimals = 2)
 
     score, scores = calcScoreMeanVelocity(data)
-    assert score == 451.4055
+    assert score == 443.47
     assert score in scores
     assert len(scores) > 0
     assert type(scores) == dict
 
 
 def test_calcScoreISC():
-    raise NotImplementedError()
+    data = _data.copy()
+    baseTime = data.iloc[0].timeUnix
+    data['plotTime'] = np.round(data.timeUnix-baseTime, decimals = 2)
+
+    score, scores = calcScoreISC(data)
+    assert score == 444.61
+    assert score in scores
+    assert len(scores) > 0
+    assert type(scores) == dict
 
 
 def test_processJump():
@@ -159,7 +166,7 @@ def test_processJump():
 
     jumpResults = processJump(data)
 
-    assert '{0:,.2f}'.format(jumpResults.score) == '451.41'
+    assert '{0:,.2f}'.format(jumpResults.score) == '451.86'
     assert jumpResults.maxSpeed == 452.664
     assert 'valid' in jumpResults.result
 
@@ -179,7 +186,7 @@ def test_processAllJumpFiles():
     jumpFiles = getAllSpeedJumpFilesFrom(TEST_FLYSIGHT_DATA_LAKE)
     _jumpResults = processAllJumpFiles(jumpFiles)
     assert _jumpResults
-    assert 'test-data' in list(_jumpResults.keys())[0] # first item
+    assert '01-00-00:v2' in list(_jumpResults.keys())
 
     bogusDataLake = tempfile.mkdtemp()
     jumpFiles = getAllSpeedJumpFilesFrom(bogusDataLake)
@@ -227,15 +234,18 @@ def test_totalResultsFrom():
         totalResultsFrom(bogus)
 
 
-test_convertFlySight2SSScoring()
-test_dropNonSkydiveDataFrom()
-test_getSpeedSkydiveFrom()
-test_jumpAnalysisTable()
-# test_isValidMinimumAltitude(_invalidAltFileName)
-# test__calcScoreMeanVelocity()
+# For symbolic debugger:
 
-test_getFlySightDataFromCSV()
-test_processJump()
+# test_convertFlySight2SSScoring()
+# test_dropNonSkydiveDataFrom()
+# test_getSpeedSkydiveFrom()
+# test_jumpAnalysisTable()
+# test_isValidMinimumAltitude(_invalidAltFileName)
+# test_calcScoreMeanVelocity()
+# test_calcScoreISC()
+
+# test_getFlySightDataFromCSV()
+# test_processJump()
 # test_processAllJumpFiles()
 # test_aggregateResults()
 # test_roundedAggregateResults()

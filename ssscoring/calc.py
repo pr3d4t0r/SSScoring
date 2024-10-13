@@ -16,7 +16,9 @@ from ssscoring.constants import EXIT_SPEED
 from ssscoring.constants import FT_IN_M
 from ssscoring.constants import LAST_TIME_TRANCHE
 from ssscoring.constants import MAX_SPEED_ACCURACY
+from ssscoring.constants import MPS_2_KMH
 from ssscoring.constants import PERFORMANCE_WINDOW_LENGTH
+from ssscoring.constants import SCORING_INTERVAL
 from ssscoring.constants import VALIDATION_WINDOW_LENGTH
 from ssscoring.datatypes import JumpResults
 from ssscoring.datatypes import PerformanceWindow
@@ -26,6 +28,7 @@ from ssscoring.flysight import detectFlySightFileVersionOf
 
 import math
 
+import numpy as np
 import pandas as pd
 
 
@@ -153,10 +156,10 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
     data['altitudeMSLFt'] = data['hMSL'].apply(lambda h: FT_IN_M*h)
     data['altitudeAGL'] = data.hMSL-altitudeDZMeters
     data['altitudeAGLFt'] = data.altitudeMSLFt-altitudeDZFt
-    data['timeUnix'] = data['time'].apply(lambda t: pd.Timestamp(t).timestamp())
+    data['timeUnix'] = round(data['time'].apply(lambda t: pd.Timestamp(t).timestamp()), 2)
     data['hMetersPerSecond'] = (data.velE**2.0+data.velN**2.0)**0.5
     speedAngle = data['hMetersPerSecond']/data['velD']
-    speedAngle = round(90.0-speedAngle.apply(math.atan)/DEG_IN_RADIANS, 1)
+    speedAngle = round(90.0-speedAngle.apply(math.atan)/DEG_IN_RADIANS, 2)
 
     data = pd.DataFrame(data = {
         'timeUnix': data.timeUnix,
@@ -172,6 +175,7 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
         'hKMh': 3.6*data.hMetersPerSecond,
         'latitude': data.lat,
         'longitude': data.lon,
+        'verticalAccuracy': data.vAcc,
     })
 
     return data
@@ -264,7 +268,7 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
             tranche = data.query('timeUnix == %f' % timeOffset).copy()
             tranche['time'] = [ column, ]
             currentPosition = (tranche.iloc[0].latitude, tranche.iloc[0].longitude)
-            tranche['distanceFromExit'] = [ round(calculateDistance(distanceStart, currentPosition), 1), ]
+            tranche['distanceFromExit'] = [ round(calculateDistance(distanceStart, currentPosition), 2), ]
             if not tranche.isnull().any().any():
                 break
 
@@ -272,7 +276,7 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
             tranche = data.tail(1).copy()
             currentPosition = (tranche.iloc[0].latitude, tranche.iloc[0].longitude)
             tranche['time'] = tranche.timeUnix-data.iloc[0].timeUnix
-            tranche['distanceFromExit'] = [ calculateDistance(distanceStart, currentPosition), ]
+            tranche['distanceFromExit'] = [ round(calculateDistance(distanceStart, currentPosition), 2), ]
 
         if table is not None:
             table = pd.concat([ table, tranche, ])
@@ -284,7 +288,7 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
                 'vKMh': table.vKMh,
                 'hKMh': table.hKMh,
                 'speedAngle': table.speedAngle,
-                'distanceFromExit': table.distanceFromExit,
+                'distanceFromExit (m)': table.distanceFromExit,
                 'altitude (ft)': table.altitudeAGLFt,
                 'netVectorKMh': (table.vKMh**2+table.hKMh**2)**0.5,
             })
@@ -336,8 +340,8 @@ def calcScoreMeanVelocity(data: pd.DataFrame) -> tuple:
     """
     scores = dict()
     for spot in data.plotTime[::1]:
-        subset = data[(data.plotTime <= spot) & (data.plotTime >= (spot-3.0))]
-        scores[subset.vKMh.mean()] = spot
+        subset = data[(data.plotTime <= spot) & (data.plotTime >= (spot-SCORING_INTERVAL))]
+        scores[np.round(subset.vKMh.mean(), decimals = 2)] = spot
     return (max(scores), scores)
 
 
@@ -358,7 +362,21 @@ def calcScoreISC(data: pd.DataFrame) -> tuple:
     of the meanVSpeed:spotInTime used in determining the exact scoring speed
     at every datat point during the speed run.
     """
-    raise NotImplementedError("calcScoreISC()")
+    scores = dict()
+    step = data.plotTime.diff().dropna().mode().iloc[0]
+    end = data.plotTime[-1:].iloc[0]-SCORING_INTERVAL
+    for spot in np.arange(0.0, end, step):
+        intervalStart = np.round(spot, decimals = 2)
+        intervalEnd = np.round(intervalStart+SCORING_INTERVAL, decimals = 2)
+        try:
+            h1 = data[data.plotTime == intervalStart].altitudeAGL.iloc[0]
+            h2 = data[data.plotTime == intervalEnd].altitudeAGL.iloc[0]
+        except IndexError:
+            # TODO: Decide whether to log the missing FlySight samples.
+            continue
+        intervalScore = np.round(MPS_2_KMH*abs(h1-h2)/SCORING_INTERVAL, decimals = 2)
+        scores[intervalScore] = intervalStart
+    return (max(scores), scores)
 
 
 def processJump(data: pd.DataFrame):
@@ -401,7 +419,7 @@ def processJump(data: pd.DataFrame):
         color = '#0f0'
         result = '🟢 valid'
         baseTime = data.iloc[0].timeUnix
-        data['plotTime'] = round(data.timeUnix-baseTime, 1)
+        data['plotTime'] = round(data.timeUnix-baseTime, 2)
         # score, scores = calcScoreMeanVelocity(data)
         score, scores = calcScoreISC(data)
     else:
