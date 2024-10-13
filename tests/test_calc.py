@@ -113,7 +113,7 @@ def test_getSpeedSkydiveFrom():
 
 
 def test_isValidJump():
-    bogus = pd.DataFrame( { 'altitudeAGL': (2800, ), 'speedAccuracy': (42.0, ), } )
+    bogus = pd.DataFrame( { 'altitudeAGL': (2800, ), 'speedAccuracyISC': (3.1, ), } )
     assert isValidJump(_data, _window)
     assert not isValidJump(bogus, _window)
 

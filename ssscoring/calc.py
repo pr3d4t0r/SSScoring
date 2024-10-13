@@ -73,8 +73,10 @@ def isValidJump(data: pd.DataFrame,
     -------
     `True` if the jump is valid according to ISC/FAI/USPA rules.
     """
-    accuracy = data[data.altitudeAGL < window.validationStart].speedAccuracy.max()
-    return accuracy < MAX_SPEED_ACCURACY
+    # TODO:  Remove these if present after 20241201:
+    # accuracy = data[data.altitudeAGL < window.validationStart].verticalAccuracy.max()
+    # return accuracy < MAX_SPEED_ACCURACY
+    return max(data.speedAccuracyISC) < MAX_SPEED_ACCURACY
 
 
 def calculateDistance(start: tuple, end: tuple) -> float:
@@ -134,7 +136,13 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
     - vMetersPerSecond
     - vKMh (km/h)
     - angle
-    - speedAccuracy
+    - speedAccuracy (ignore; see ISC documentation)
+    - hMetersPerSecond
+    - hKMh
+    - latitude
+    - longitude
+    - verticalAccuracy
+    - speedAccuracyISC
 
     Errors
     ------
@@ -156,10 +164,11 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
     data['altitudeMSLFt'] = data['hMSL'].apply(lambda h: FT_IN_M*h)
     data['altitudeAGL'] = data.hMSL-altitudeDZMeters
     data['altitudeAGLFt'] = data.altitudeMSLFt-altitudeDZFt
-    data['timeUnix'] = round(data['time'].apply(lambda t: pd.Timestamp(t).timestamp()), 2)
+    data['timeUnix'] = np.round(data['time'].apply(lambda t: pd.Timestamp(t).timestamp()), decimals = 2)
     data['hMetersPerSecond'] = (data.velE**2.0+data.velN**2.0)**0.5
     speedAngle = data['hMetersPerSecond']/data['velD']
-    speedAngle = round(90.0-speedAngle.apply(math.atan)/DEG_IN_RADIANS, 2)
+    speedAngle = np.round(90.0-speedAngle.apply(math.atan)/DEG_IN_RADIANS, decimals = 2)
+    speedAccuracyISC = np.round(data.vAcc.apply(lambda a: (2.0**0.5)*a/3.0), decimals = 2)
 
     data = pd.DataFrame(data = {
         'timeUnix': data.timeUnix,
@@ -176,6 +185,7 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
         'latitude': data.lat,
         'longitude': data.lon,
         'verticalAccuracy': data.vAcc,
+        'speedAccuracyISC': speedAccuracyISC,
     })
 
     return data
