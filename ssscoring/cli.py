@@ -124,5 +124,5 @@ def ssscoreCommand(datalake: str) -> int:
 
 # For interactive testing and symbolic debugging:
 if '__main__' == __name__:
-    ssscore()
+    ssscoreCommand()
 
