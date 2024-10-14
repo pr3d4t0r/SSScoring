@@ -36,7 +36,7 @@
                     <a class="function" href="#die">die</a>
             </li>
             <li>
-                    <a class="variable" href="#ssscore">ssscore</a>
+                    <a class="function" href="#ssscore">ssscore</a>
             </li>
     </ul>
 
@@ -144,39 +144,48 @@
 </span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>    <span class="k">return</span> <span class="n">retVal</span>
 </span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>
 </span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s1">&#39;ssscore&#39;</span><span class="p">)</span>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="nd">@click</span><span class="o">.</span><span class="n">version_option</span><span class="p">(</span><span class="n">__VERSION__</span><span class="p">,</span> <span class="n">prog_name</span> <span class="o">=</span> <span class="s1">&#39;ssscore&#39;</span><span class="p">)</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="s1">&#39;datalake&#39;</span><span class="p">,</span> <span class="n">nargs</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">STRING</span><span class="p">)</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="k">def</span> <span class="nf">ssscore</span><span class="p">(</span><span class="n">datalake</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="sd">    Process all the speed skydiving files contained in `dataLakeSpec`.</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="sd">    Arguments</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="sd">    ---------</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="sd">        datalake</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="sd">    Command line argument with the path to the data lake.</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">    Returns</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">    -------</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="sd">    The number of jump results from processing all the FlySight files in the</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="sd">    data lake.</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>    <span class="n">_assertDataLake</span><span class="p">(</span><span class="n">datalake</span><span class="p">)</span>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>    <span class="n">click</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s1">&#39;Processing speed tracks in </span><span class="si">%s</span><span class="s1">...&#39;</span> <span class="o">%</span> <span class="n">datalake</span><span class="p">)</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>    <span class="n">jumpResults</span> <span class="o">=</span> <span class="n">processAllJumpFiles</span><span class="p">(</span><span class="n">getAllSpeedJumpFilesFrom</span><span class="p">(</span><span class="n">datalake</span><span class="p">))</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>    <span class="k">if</span> <span class="n">jumpResults</span><span class="p">:</span>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>        <span class="n">click</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="n">aggregateResults</span><span class="p">(</span><span class="n">jumpResults</span><span class="p">),</span> <span class="n">fg</span> <span class="o">=</span> <span class="s1">&#39;bright_green&#39;</span><span class="p">)</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>        <span class="n">click</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s1">&#39;There were no speed track files to score in </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">fg</span> <span class="o">=</span> <span class="s1">&#39;bright_red&#39;</span><span class="p">)</span>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">jumpResults</span><span class="p">)</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="k">def</span> <span class="nf">ssscore</span><span class="p">(</span><span class="n">dataLake</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="sd">    Process all the speed skydiving files contained in `dataLakeSpec`.</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="sd">    Arguments</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="sd">    ---------</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="sd">        dataLake</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="sd">    Command line argument with the path to the data lake.</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="sd">    Returns</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="sd">    -------</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="sd">    The number of jump results from processing all the FlySight files in the</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">    data lake.</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>    <span class="n">_assertDataLake</span><span class="p">(</span><span class="n">dataLake</span><span class="p">)</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>    <span class="n">click</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s1">&#39;Processing speed tracks in </span><span class="si">%s</span><span class="s1">...</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">dataLake</span><span class="p">)</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>    <span class="n">jumpResults</span> <span class="o">=</span> <span class="n">processAllJumpFiles</span><span class="p">(</span><span class="n">getAllSpeedJumpFilesFrom</span><span class="p">(</span><span class="n">dataLake</span><span class="p">))</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>    <span class="k">if</span> <span class="n">jumpResults</span><span class="p">:</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>        <span class="n">resultsSummary</span> <span class="o">=</span> <span class="n">aggregateResults</span><span class="p">(</span><span class="n">jumpResults</span><span class="p">)</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>        <span class="n">click</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="n">resultsSummary</span><span class="p">,</span> <span class="n">fg</span> <span class="o">=</span> <span class="s1">&#39;bright_green&#39;</span><span class="p">)</span>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>        <span class="n">click</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Total score = </span><span class="si">%5.2f</span><span class="s1">, mean speed = </span><span class="si">%5.2f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">resultsSummary</span><span class="o">.</span><span class="n">score</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">resultsSummary</span><span class="o">.</span><span class="n">score</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span> <span class="n">fg</span> <span class="o">=</span> <span class="s1">&#39;bright_white&#39;</span><span class="p">)</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>        <span class="n">click</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s1">&#39;There were no speed track files to score in </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">fg</span> <span class="o">=</span> <span class="s1">&#39;bright_red&#39;</span><span class="p">)</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">jumpResults</span><span class="p">)</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>
 </span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="c1"># +++ main +++</span>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="c1"># For interactive testing and symbolic debugging:</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="k">if</span> <span class="s1">&#39;__main__&#39;</span> <span class="o">==</span> <span class="vm">__name__</span><span class="p">:</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>    <span class="n">ssscore</span><span class="p">()</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s1">&#39;ssscore&#39;</span><span class="p">)</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="s1">&#39;datalake&#39;</span><span class="p">,</span> <span class="n">nargs</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">STRING</span><span class="p">)</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a><span class="nd">@click</span><span class="o">.</span><span class="n">version_option</span><span class="p">(</span><span class="n">__VERSION__</span><span class="p">,</span> <span class="n">prog_name</span> <span class="o">=</span> <span class="s1">&#39;ssscore&#39;</span><span class="p">)</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="k">def</span> <span class="nf">ssscoreCommand</span><span class="p">(</span><span class="n">datalake</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="sd">    @private</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>    <span class="k">return</span> <span class="n">ssscore</span><span class="p">(</span><span class="n">datalake</span><span class="p">)</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="c1"># +++ main +++</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="c1"># For interactive testing and symbolic debugging:</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="k">if</span> <span class="s1">&#39;__main__&#39;</span> <span class="o">==</span> <span class="vm">__name__</span><span class="p">:</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>    <span class="n">ssscore</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -242,19 +251,49 @@ caller, otherwise it terminates with <code>sys.exit(exitCode)</code>.</p>
 
                 </section>
                 <section id="ssscore">
-                    <div class="attr variable">
-            <span class="name">ssscore</span>        =
-<span class="default_value">&lt;Command ssscore&gt;</span>
+                            <input id="ssscore-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">ssscore</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">dataLake</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
 
-        
+                <label class="view-source-button" for="ssscore-view-source"><span>View Source</span></label>
+
     </div>
     <a class="headerlink" href="#ssscore"></a>
-    
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ssscore-85"><a href="#ssscore-85"><span class="linenos"> 85</span></a><span class="k">def</span> <span class="nf">ssscore</span><span class="p">(</span><span class="n">dataLake</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="ssscore-86"><a href="#ssscore-86"><span class="linenos"> 86</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ssscore-87"><a href="#ssscore-87"><span class="linenos"> 87</span></a><span class="sd">    Process all the speed skydiving files contained in `dataLakeSpec`.</span>
+</span><span id="ssscore-88"><a href="#ssscore-88"><span class="linenos"> 88</span></a>
+</span><span id="ssscore-89"><a href="#ssscore-89"><span class="linenos"> 89</span></a><span class="sd">    Arguments</span>
+</span><span id="ssscore-90"><a href="#ssscore-90"><span class="linenos"> 90</span></a><span class="sd">    ---------</span>
+</span><span id="ssscore-91"><a href="#ssscore-91"><span class="linenos"> 91</span></a><span class="sd">        dataLake</span>
+</span><span id="ssscore-92"><a href="#ssscore-92"><span class="linenos"> 92</span></a><span class="sd">    Command line argument with the path to the data lake.</span>
+</span><span id="ssscore-93"><a href="#ssscore-93"><span class="linenos"> 93</span></a>
+</span><span id="ssscore-94"><a href="#ssscore-94"><span class="linenos"> 94</span></a><span class="sd">    Returns</span>
+</span><span id="ssscore-95"><a href="#ssscore-95"><span class="linenos"> 95</span></a><span class="sd">    -------</span>
+</span><span id="ssscore-96"><a href="#ssscore-96"><span class="linenos"> 96</span></a><span class="sd">    The number of jump results from processing all the FlySight files in the</span>
+</span><span id="ssscore-97"><a href="#ssscore-97"><span class="linenos"> 97</span></a><span class="sd">    data lake.</span>
+</span><span id="ssscore-98"><a href="#ssscore-98"><span class="linenos"> 98</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="ssscore-99"><a href="#ssscore-99"><span class="linenos"> 99</span></a>    <span class="n">_assertDataLake</span><span class="p">(</span><span class="n">dataLake</span><span class="p">)</span>
+</span><span id="ssscore-100"><a href="#ssscore-100"><span class="linenos">100</span></a>
+</span><span id="ssscore-101"><a href="#ssscore-101"><span class="linenos">101</span></a>    <span class="n">click</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s1">&#39;Processing speed tracks in </span><span class="si">%s</span><span class="s1">...</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">dataLake</span><span class="p">)</span>
+</span><span id="ssscore-102"><a href="#ssscore-102"><span class="linenos">102</span></a>    <span class="n">jumpResults</span> <span class="o">=</span> <span class="n">processAllJumpFiles</span><span class="p">(</span><span class="n">getAllSpeedJumpFilesFrom</span><span class="p">(</span><span class="n">dataLake</span><span class="p">))</span>
+</span><span id="ssscore-103"><a href="#ssscore-103"><span class="linenos">103</span></a>    <span class="k">if</span> <span class="n">jumpResults</span><span class="p">:</span>
+</span><span id="ssscore-104"><a href="#ssscore-104"><span class="linenos">104</span></a>        <span class="n">resultsSummary</span> <span class="o">=</span> <span class="n">aggregateResults</span><span class="p">(</span><span class="n">jumpResults</span><span class="p">)</span>
+</span><span id="ssscore-105"><a href="#ssscore-105"><span class="linenos">105</span></a>        <span class="n">click</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="n">resultsSummary</span><span class="p">,</span> <span class="n">fg</span> <span class="o">=</span> <span class="s1">&#39;bright_green&#39;</span><span class="p">)</span>
+</span><span id="ssscore-106"><a href="#ssscore-106"><span class="linenos">106</span></a>        <span class="n">click</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Total score = </span><span class="si">%5.2f</span><span class="s1">, mean speed = </span><span class="si">%5.2f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">resultsSummary</span><span class="o">.</span><span class="n">score</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">resultsSummary</span><span class="o">.</span><span class="n">score</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span> <span class="n">fg</span> <span class="o">=</span> <span class="s1">&#39;bright_white&#39;</span><span class="p">)</span>
+</span><span id="ssscore-107"><a href="#ssscore-107"><span class="linenos">107</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="ssscore-108"><a href="#ssscore-108"><span class="linenos">108</span></a>        <span class="n">click</span><span class="o">.</span><span class="n">secho</span><span class="p">(</span><span class="s1">&#39;There were no speed track files to score in </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">fg</span> <span class="o">=</span> <span class="s1">&#39;bright_red&#39;</span><span class="p">)</span>
+</span><span id="ssscore-109"><a href="#ssscore-109"><span class="linenos">109</span></a>    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">jumpResults</span><span class="p">)</span>
+</span></pre></div>
+
+
             <div class="docstring"><p>Process all the speed skydiving files contained in <code>dataLakeSpec</code>.</p>
 
 <h2 id="arguments">Arguments</h2>
 
-<pre><code>datalake
+<pre><code>dataLake
 </code></pre>
 
 <p>Command line argument with the path to the data lake.</p>

@@ -4,7 +4,7 @@ from click.testing import CliRunner
 
 from ssscoring.cli import _assertDataLake
 from ssscoring.cli import die
-from ssscoring.cli import ssscore
+from ssscoring.cli import ssscoreCommand
 
 import pathlib
 import pytest
@@ -45,8 +45,8 @@ def test__assertDataLake(_bogusFile, _bogusDir):
     assert not _assertDataLake(_bogusDir, isUnitTest = True)
 
 
-def test_ssscore():
+def test_ssscoreCommand():
     runner = CliRunner()
-    result = runner.invoke(ssscore, [ TEST_DATA_LAKE, ])
+    result = runner.invoke(ssscoreCommand, [ TEST_DATA_LAKE, ])
     assert result
 

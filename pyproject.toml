@@ -32,7 +32,7 @@ version = '1.8.2'
 
 
 [project.scripts]
-ssscoring = "ssscoring.cli:ssscore"
+ssscoring = "ssscoring.cli:ssscoreCommand"
 
 
 [tool.pytest.ini_options]

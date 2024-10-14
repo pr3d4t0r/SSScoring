@@ -81,16 +81,15 @@ def _assertDataLake(dataLake: str, isUnitTest = False) -> bool:
     return retVal
 
 
-@click.command('ssscore')
-@click.version_option(__VERSION__, prog_name = 'ssscore')
-@click.argument('datalake', nargs = 1, type = click.STRING)
-def ssscore(datalake: str) -> None:
+def ssscore(dataLake: str) -> int:
     """
-    Process all the speed skydiving files contained in `dataLakeSpec`.
+    Process all the speed skydiving files contained in `dataLakeSpec`.  This
+    function implements the business logic for the `/usr/local/bin/ssscore`
+    command.  See `pyproject.toml` for command details.
 
     Arguments
     ---------
-        datalake
+        dataLake
     Command line argument with the path to the data lake.
 
     Returns
@@ -98,10 +97,10 @@ def ssscore(datalake: str) -> None:
     The number of jump results from processing all the FlySight files in the
     data lake.
     """
-    _assertDataLake(datalake)
+    _assertDataLake(dataLake)
 
-    click.secho('Processing speed tracks in %s...\n' % datalake)
-    jumpResults = processAllJumpFiles(getAllSpeedJumpFilesFrom(datalake))
+    click.secho('Processing speed tracks in %s...\n' % dataLake)
+    jumpResults = processAllJumpFiles(getAllSpeedJumpFilesFrom(dataLake))
     if jumpResults:
         resultsSummary = aggregateResults(jumpResults)
         click.secho(resultsSummary, fg = 'bright_green')
@@ -109,6 +108,16 @@ def ssscore(datalake: str) -> None:
     else:
         click.secho('There were no speed track files to score in %s', fg = 'bright_red')
     return len(jumpResults)
+
+
+@click.command('ssscore')
+@click.argument('datalake', nargs = 1, type = click.STRING)
+@click.version_option(__VERSION__, prog_name = 'ssscore')
+def ssscoreCommand(datalake: str) -> int:
+    """
+    @private
+    """
+    return ssscore(datalake)
 
 
 # +++ main +++
