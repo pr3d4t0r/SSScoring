@@ -1,12 +1,12 @@
-% ssscoring(3) Version 1.8.1 | Speed Skydiving Scoring API documentation
+% ssscoring(3) Version 1.8.2 | Speed Skydiving Scoring API documentation
 
-Name
+NAME
 ====
 
 **SSScoring** - Speed Skydiving Scoring high level library in Python
 
 
-Synopsis
+SYNOPSIS
 ========
 ```bash
 pip install -U ssscoring
@@ -37,7 +37,7 @@ resources test-data-01:v1    441  176   305   388   432   442       25.0       4
 resources test-data-02:v1    451  164   295   387   441   452       25.0       453
 ```
 
-![Speed run summary example](./resources/SSScoring-speed-run-summary.png)
+![Speed run summary example](https://github.com/pr3d4t0r/SSScoring/blob/master/resources/SSScoring-speed-run-summary.png?raw=true)
 Speed run summary example:
 https://raw.githubusercontent.com/pr3d4t0r/SSScoring/refs/heads/master/resources/SSScoring-speed-run-summary.png
 
@@ -48,7 +48,7 @@ API documentation is available at:
 https://pr3d4t0r.github.io/SSScoring/ssscoring.html
 
 
-Installation and requirements
+INSTALLATION AND REQUIREMENTS
 =============================
 
 - Python 3.9.9 or later
@@ -58,7 +58,7 @@ The [requirements.txt](./requirements.txt) file lists all the packages required
 for running SSScoring or using the API.
 
 
-Quickstart
+QUICKSTART
 ==========
 
 - The [SSScoring interactive quickstart](./quickstart.ipynb) notebook for
@@ -69,7 +69,7 @@ Quickstart
 - SSScoring browser tools - EXPERIMENTAL
 
 
-Description
+DESCRIPTION
 ===========
 SSScoring provides analsysis tools for individual or bulk processing of FlySight
 GPS competition data gathered during speed skydiving training and competition.
@@ -154,7 +154,12 @@ representing all the training files for a competitive skydiver over 10 months.
   device from a Macintosh computer
 
 
-License
+SEE ALSO
+========
+ssscore(1)
+
+
+LICENSE
 =======
 The **SSScoring** package, documentation and examples are licensed under the
 [BSD-3 open source license](https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt).
