@@ -51,6 +51,8 @@ def isValidMinimumAltitude(altitude: float) -> bool:
     -------
     `True` if the altitude is valid.
     """
+    if not isinstance(altitude, float):
+        altitude = float(altitude)
     minAltitude = BREAKOFF_ALTITUDE+PERFORMANCE_WINDOW_LENGTH
     return altitude >= minAltitude
 

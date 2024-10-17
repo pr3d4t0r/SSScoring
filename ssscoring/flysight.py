@@ -20,6 +20,8 @@ from ssscoring.errors import SSScoringError
 
 import csv
 import os
+import shutil
+import tempfile
 
 import pandas as pd
 
@@ -33,6 +35,53 @@ class FlySightVersion(Enum):
 
 
 # +++ functions +++
+
+def isCRMangledCSV(fileThing) -> bool:
+    """
+    Tests if `fileThing` is an Excel or Dropbox DOS file with lines terminated
+    in CRCRLF.  These occur when someone opens the file with Excel or some other
+    tool in a Windows system and saves the file back to the file system,
+    mangling the original format.
+
+    Arguments
+    ---------
+        fileThing
+    A string or `pathlib.Path` object associated with what looks like a FlySight
+    CR mangled file.
+
+    Returns
+    -------
+    `True` if the file has one or more lines ending in CRCRLF within the first
+    512 bytes of data.
+    """
+    with open (fileThing, 'rb') as file:
+        rawData = file.read()
+        return b'\r\r\n' in rawData
+
+
+def fixCRMangledCSV(fileThing):
+    """
+    Open the file associated with `fileThing` and repleace all`\r\r\b` with
+    `\r\n` EOL markers.
+
+    Arguments
+    ---------
+        fileThing
+    A string or `pathlib.Path` object associated with what looks like a FlySight
+    CR mangled file.
+
+    See
+    ---
+    `ssscoring.flysight.isCRMangledCSV`
+    """
+    with open(fileThing, 'rb') as inputFile:
+        fileContents = inputFile.read()
+    fileContents = fileContents.replace(b'\r\r\n', b'\r\n')
+    with tempfile.NamedTemporaryFile(delete = False) as outputFile:
+        outputFile.write(fileContents)
+        tempFileName = outputFile.name
+    shutil.copy(tempFileName, fileThing)
+    os.unlink(tempFileName)
 
 
 def skipOverFS2MetadataRowsIn(data: pd.DataFrame) -> pd.DataFrame:
@@ -130,7 +179,7 @@ def getAllSpeedJumpFilesFrom(dataLake: str) -> dict:
                     data = pd.read_csv(jumpFileName, skiprows = (1, 1), index_col = False)
                 elif 'TRACK' in fileName:
                     # FlySight 2 track custom format
-                    data = pd.read_csv(jumpFileName, names = FLYSIGHT_2_HEADER, skiprows = 6, index_col = False)
+                    data = pd.read_csv(jumpFileName, names = FLYSIGHT_2_HEADER, skiprows = 6, index_col = False, na_values = ['NA', ], dtype={ 'hMSL': float, })
                     data = skipOverFS2MetadataRowsIn(data)
                     data.drop('GNSS', inplace = True, axis = 1)
                     version = '2'
