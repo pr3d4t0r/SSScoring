@@ -20,6 +20,7 @@ from ssscoring.constants import MPS_2_KMH
 from ssscoring.constants import PERFORMANCE_WINDOW_LENGTH
 from ssscoring.constants import SCORING_INTERVAL
 from ssscoring.constants import VALIDATION_WINDOW_LENGTH
+from ssscoring.datatypes import InvalidJumpReason
 from ssscoring.datatypes import JumpResults
 from ssscoring.datatypes import PerformanceWindow
 from ssscoring.errors import SSScoringError
@@ -55,7 +56,7 @@ def isValidMinimumAltitude(altitude: float) -> bool:
     return altitude >= minAltitude
 
 
-def isValidJump(data: pd.DataFrame,
+def isValidJumpISC(data: pd.DataFrame,
                 window: PerformanceWindow) -> bool:
     """
     Validates the jump according to ISC/FAI/USPA competition rules.  A jump is
@@ -419,26 +420,22 @@ def processJump(data: pd.DataFrame):
     data = data.copy()
     data = dropNonSkydiveDataFrom(data)
     window, data = getSpeedSkydiveFrom(data)
-    validJump = isValidJump(data, window)
-    score = 0.0
-    scores = None
+    validJump = isValidJumpISC(data, window)
     table = None
-
+    invalidReason = None
+    maxSpeed, table = jumpAnalysisTable(data)
+    baseTime = data.iloc[0].timeUnix
+    data['plotTime'] = round(data.timeUnix-baseTime, 2)
+    score, scores = calcScoreISC(data)
     if validJump:
-        maxSpeed, table = jumpAnalysisTable(data)
         color = '#0f0'
         result = '🟢 valid'
-        baseTime = data.iloc[0].timeUnix
-        data['plotTime'] = round(data.timeUnix-baseTime, 2)
-        # score, scores = calcScoreMeanVelocity(data)
-        score, scores = calcScoreISC(data)
     else:
         color = '#f00'
         maxSpeed = -1
-        score = 0
         result = '🔴 invalid'
-
-    return JumpResults(color, data, maxSpeed, result, score, scores, table, window)
+        invalidReason = InvalidJumpReason.SPEED_ACCURACY_ABOVE_LIMIT
+    return JumpResults(color, data, maxSpeed, result, score, scores, table, window, invalidReason)
 
 
 def _readVersion1CSV(jumpFile: str) -> pd.DataFrame:
@@ -562,7 +559,8 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
     speeds = pd.DataFrame()
     for jumpResultIndex in sorted(list(jumpResults.keys())):
         jumpResult = jumpResults[jumpResultIndex]
-        if jumpResult.score > 0.0:
+        # TODO: if jumpResult.score > 0.0:
+        if not jumpResult.invalidReason:
             t = jumpResult.table
             finalTime = t.iloc[-1].time
             t.iloc[-1].time = LAST_TIME_TRANCHE

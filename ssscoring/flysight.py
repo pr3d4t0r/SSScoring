@@ -9,27 +9,19 @@ local or cloud-based).
 
 
 from collections import OrderedDict
-from enum import Enum
 from pathlib import Path
 
 from ssscoring.constants import FLYSIGHT_1_HEADER
 from ssscoring.constants import FLYSIGHT_2_HEADER
 from ssscoring.constants import IGNORE_LIST
 from ssscoring.constants import MIN_JUMP_FILE_SIZE
+from ssscoring.datatypes import FlySightVersion
 from ssscoring.errors import SSScoringError
 
 import csv
 import os
 
 import pandas as pd
-
-
-# --- classes and objects ---
-
-class FlySightVersion(Enum):
-    V1 = 1000
-    V2 = 2000
-
 
 
 # +++ functions +++
