@@ -149,7 +149,7 @@ representing all the training files for a competitive skydiver over 10 months.
 ### Additional tools
 
 - `nospot` shell script for disabling Spotlight scanning of FlySight file
-  file systems
+  systems
 - `umountFlySight` Mac app and shell script for safe unmounting of a FlySight
   device from a Macintosh computer
 

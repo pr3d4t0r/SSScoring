@@ -25,11 +25,11 @@ ssscore datalake
 ```
 
 Where `datalake` is a directory containing one or more speed skydiving tracks,
-either in the topmost level or nested.  `ssscore` ignores all files present in
-the data lake that aren't speed skydives, even if they are FlySight-compatible
-CSV files.
+either in the topmost directory or nested.  `ssscore` ignores all files present
+in the data lake that aren't speed skydives, even if they are
+FlySight-compatible CSV files.
 
-Examples:
+_Examples_:
 
 Scores all of Joe's files in his speed skydiving directory:
 
@@ -76,8 +76,8 @@ None.
 
 FILES
 =====
-/usr/local/bin/ssscore if installed via `pip` to the derault Python run-time
-$VIRTUAL_ENV/bin/ssscore if installed to an active virtual environment
+`/usr/local/bin/ssscore` if installed via `pip` to the derault Python run-time
+`$VIRTUAL_ENV/bin/ssscore` if installed to an active virtual environment.
 
 
 BUGS AND NOTES
