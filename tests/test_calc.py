@@ -8,7 +8,7 @@ from ssscoring.calc import convertFlySight2SSScoring
 from ssscoring.calc import dropNonSkydiveDataFrom
 from ssscoring.calc import getFlySightDataFromCSV
 from ssscoring.calc import getSpeedSkydiveFrom
-from ssscoring.calc import isValidJump
+from ssscoring.calc import isValidJumpISC
 from ssscoring.calc import isValidMinimumAltitude
 from ssscoring.calc import jumpAnalysisTable
 from ssscoring.calc import processAllJumpFiles
@@ -112,10 +112,10 @@ def test_getSpeedSkydiveFrom():
     assert _data.iloc[-1].altitudeAGL >= _window.end
 
 
-def test_isValidJump():
+def test_isValidJumpISC():
     bogus = pd.DataFrame( { 'altitudeAGL': (2800, ), 'speedAccuracyISC': (3.1, ), } )
-    assert isValidJump(_data, _window)
-    assert not isValidJump(bogus, _window)
+    assert isValidJumpISC(_data, _window)
+    assert not isValidJumpISC(bogus, _window)
 
 
 def test_calculateDistance():

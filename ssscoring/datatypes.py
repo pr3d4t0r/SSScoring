@@ -6,11 +6,26 @@ SSScoring custom type definitions for easier symbolic manipuation.
 """
 
 from collections import namedtuple
+from enum import Enum
 
 
 # +++ implementation +++
 
-JumpResults = namedtuple('JumpResults', 'color data maxSpeed result score scores table window')
+class FlySightVersion(Enum):
+    """
+    Symbols for handling device version.
+    """
+    V1 = 1000
+    V2 = 2000
+
+
+class InvalidJumpReason(Enum):
+    OK = 0
+    ALTITUDE_EXCEEDS_MINIMUM = 100
+    SPEED_ACCURACY_ABOVE_LIMIT = 200
+
+
+JumpResults = namedtuple('JumpResults', 'color data maxSpeed result score scores table window invalidReason')
 """
 A named tuple containing the score, maximum speed, scores throught the
 performance window, the results table for a jump, the output color for the
@@ -50,5 +65,4 @@ See
     ssscoring.constants.PERFORMANCE_WINDOW_LENGTH
     ssscoring.constants.VALIDATION_WINDOW_END
 """
-
 

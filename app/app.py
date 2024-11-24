@@ -25,7 +25,7 @@ def _setPageBasics():
 
 
 if '__main__' == __name__:
-    dropZoneAltMSL = 1515
+    dropZoneAltMSL = 615 
     dropZoneAltMSLMeters = dropZoneAltMSL/FT_IN_M
 
     jumpFiles = getAllSpeedJumpFilesFrom(DATA_LAKE)
@@ -39,8 +39,10 @@ if '__main__' == __name__:
 
     _setPageBasics()
     st.dataframe(results.style.highlight_max(subset = ['score'], axis = 0, color = 'green').highlight_min(subset = ['score'], axis = 0, color = 'orange').format(cellStyles))
-    mapHeader = 'data 12-09-17-EC:v1'
-    st.map(jumpResults[mapHeader].data, size = 10, color = '#ff0000')
-    mapHeader = 'data 19-22-17-ND:v1'
+    mapHeader = 'data Nik-R8_16-07-14:v1'
+    st.map(jumpResults[mapHeader].data, size = 10, color = '#00ff00')
+    mapHeader = 'data Brianne-R8_16-07-28:v1'
+    st.map(jumpResults[mapHeader].data, size = 10, color = '#ffc080')
+    mapHeader = 'data Eugene-R8_16-07-35:v1'
     st.map(jumpResults[mapHeader].data, size = 10, color = '#0000ff')
 

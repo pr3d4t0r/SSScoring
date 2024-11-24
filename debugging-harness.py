@@ -13,7 +13,6 @@ from ssscoring.calc import aggregateResults
 from ssscoring.calc import convertFlySight2SSScoring
 from ssscoring.calc import dropNonSkydiveDataFrom
 from ssscoring.calc import getSpeedSkydiveFrom
-from ssscoring.calc import isValidJump
 from ssscoring.calc import isValidMinimumAltitude
 from ssscoring.calc import jumpAnalysisTable
 from ssscoring.calc import processAllJumpFiles
@@ -42,10 +41,11 @@ import pandas as pd
 
 DATA_LAKE_ROOT = './data'
 
-dropZoneAltMSL = 100
+dropZoneAltMSL = 23
 dropZoneAltMSLMeters = dropZoneAltMSL/FT_IN_M
 jumpFiles = getAllSpeedJumpFilesFrom(DATA_LAKE_ROOT)
 jumpResults = processAllJumpFiles(jumpFiles, altitudeDZMeters = dropZoneAltMSLMeters)
-# aggregate = aggregateResults(jumpResults)
+aggregate = aggregateResults(jumpResults)
+sumResults = totalResultsFrom(aggregate)
 # roundedAggregateResults(aggregate)
 
