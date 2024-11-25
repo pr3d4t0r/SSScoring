@@ -175,7 +175,9 @@ def getAllSpeedJumpFilesFrom(dataLake: str) -> dict:
                     data = skipOverFS2MetadataRowsIn(data)
                     data.drop('GNSS', inplace = True, axis = 1)
                     version = '2'
-                if data is not None and stat.st_size >= MIN_JUMP_FILE_SIZE and validFlySightHeaderIn(jumpFileName) and isValidMinimumAltitude(data.hMSL.max()):
+                # TODO:  Refator this to signal the minimum altitude exit issue.
+                # if data is not None and stat.st_size >= MIN_JUMP_FILE_SIZE and validFlySightHeaderIn(jumpFileName) and isValidMinimumAltitude(data.hMSL.max()):
+                if data is not None and stat.st_size >= MIN_JUMP_FILE_SIZE and validFlySightHeaderIn(jumpFileName):
                     # explicit because `not data` is ambiguous for dataframes
                     jumpFiles[jumpFileName] = version
     return jumpFiles
