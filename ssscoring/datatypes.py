@@ -22,6 +22,7 @@ class FlySightVersion(Enum):
 class InvalidJumpReason(Enum):
     OK = 0
     ALTITUDE_EXCEEDS_MINIMUM = 100
+    INVALID_SPEED_FILE = 110
     SPEED_ACCURACY_ABOVE_LIMIT = 200
 
 

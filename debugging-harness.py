@@ -1,5 +1,3 @@
-#
-# *** Used for interactive debugging sessions with pdb
 # *** or PyCharm's debugger.
 #
 

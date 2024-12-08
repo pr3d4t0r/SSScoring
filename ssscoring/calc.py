@@ -79,8 +79,11 @@ def isValidJumpISC(data: pd.DataFrame,
     # TODO:  Remove these if present after 20250101:
     # accuracy = data[data.altitudeAGL < window.validationStart].verticalAccuracy.max()
     # return accuracy < MAX_SPEED_ACCURACY
-    accuracy = data[data.altitudeAGL < window.validationStart].speedAccuracyISC.max()
-    return accuracy < MAX_SPEED_ACCURACY
+    if len(data) > 0:
+        accuracy = data[data.altitudeAGL < window.validationStart].speedAccuracyISC.max()
+        return accuracy < MAX_SPEED_ACCURACY
+    else:
+        return False
 
 
 def calculateDistance(start: tuple, end: tuple) -> float:
@@ -222,6 +225,12 @@ def getSpeedSkydiveFrom(data: pd.DataFrame) -> tuple:
 
     - A named tuple with performance and validation window data
     - A dataframe featuring only speed skydiving data
+
+    Warm up FlySight files and non-speed skydiving files may return invalid
+    values:
+
+    - `None` for the `PerformanceWindow` instance
+    - `data`, most likely empty
     """
     data = _dataGroups(data)
     groups = data.group.max()+1
@@ -237,20 +246,23 @@ def getSpeedSkydiveFrom(data: pd.DataFrame) -> tuple:
     data = data[data.group == freeFallGroup]
     data = data.drop('group', axis = 1).drop('positive', axis = 1)
 
-    # Speed ~= 9.81 m/s; subtract 1 second for actual exit.
-    exitTime = data[data.vMetersPerSecond > EXIT_SPEED].head(1).timeUnix.iat[0]-2.0
-    data = data[data.timeUnix >= exitTime]
-    data = data[data.altitudeAGL >= BREAKOFF_ALTITUDE]
+    if len(data) > 0:
+        # Speed ~= 9.81 m/s; subtract 1 second for actual exit.
+        exitTime = data[data.vMetersPerSecond > EXIT_SPEED].head(1).timeUnix.iat[0]-2.0
+        data = data[data.timeUnix >= exitTime]
+        data = data[data.altitudeAGL >= BREAKOFF_ALTITUDE]
 
-    windowStart = data.iloc[0].altitudeAGL
-    windowEnd = windowStart-PERFORMANCE_WINDOW_LENGTH
-    if windowEnd < BREAKOFF_ALTITUDE:
-        windowEnd = BREAKOFF_ALTITUDE
+        windowStart = data.iloc[0].altitudeAGL
+        windowEnd = windowStart-PERFORMANCE_WINDOW_LENGTH
+        if windowEnd < BREAKOFF_ALTITUDE:
+            windowEnd = BREAKOFF_ALTITUDE
 
-    validationWindowStart = windowEnd+VALIDATION_WINDOW_LENGTH
-    data = data[data.altitudeAGL >= windowEnd]
+        validationWindowStart = windowEnd+VALIDATION_WINDOW_LENGTH
+        data = data[data.altitudeAGL >= windowEnd]
 
-    return PerformanceWindow(windowStart, windowEnd, validationWindowStart), data
+        return PerformanceWindow(windowStart, windowEnd, validationWindowStart), data
+    else:
+        return None, data
 
 
 def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
@@ -424,20 +436,23 @@ def processJump(data: pd.DataFrame):
     data = dropNonSkydiveDataFrom(data)
     window, data = getSpeedSkydiveFrom(data)
     validJump = isValidJumpISC(data, window)
-    table = None
     invalidReason = None
-    maxSpeed, table = jumpAnalysisTable(data)
-    baseTime = data.iloc[0].timeUnix
-    data['plotTime'] = round(data.timeUnix-baseTime, 2)
-    score, scores = calcScoreISC(data)
+    score = None
+    scores = None
+    table = None
     if validJump:
         color = '#0f0'
         result = '🟢 valid'
+        table = None
+        maxSpeed, table = jumpAnalysisTable(data)
+        baseTime = data.iloc[0].timeUnix
+        data['plotTime'] = round(data.timeUnix-baseTime, 2)
+        score, scores = calcScoreISC(data)
     else:
         color = '#f00'
         maxSpeed = -1
         result = '🔴 invalid'
-        invalidReason = InvalidJumpReason.SPEED_ACCURACY_ABOVE_LIMIT
+        invalidReason = InvalidJumpReason.SPEED_ACCURACY_ABOVE_LIMIT if len(data) else InvalidJumpReason.INVALID_SPEED_FILE
     return JumpResults(color, data, maxSpeed, result, score, scores, table, window, invalidReason)
 
 
@@ -639,7 +654,10 @@ def totalResultsFrom(aggregate: pd.DataFrame) -> pd.DataFrame:
     `AttributeError` if aggregate is an empty dataframe or `None`, or if the
     `aggregate` dataframe doesn't conform to the output of `ssscoring.aggregateResults`.
     """
-    totals = pd.DataFrame({ 'totalSpeed': [ aggregate.score.sum(), ], 'meanSpeed': [ aggregate.score.mean(), ], 'maxScore': [ aggregate.score.max(), ], }, index = [ 'totalSpeed'],)
+    if len(aggregate):
+      totals = pd.DataFrame({ 'totalSpeed': [ aggregate.score.sum(), ], 'meanSpeed': [ aggregate.score.mean(), ], 'maxScore': [ aggregate.score.max(), ], }, index = [ 'totalSpeed'],)
+    else:
+      totals = pd.DataFrame({ 'totalSpeed': [ 0.0, ], 'meanSpeed': [ 0.0, ], 'maxScore': [ 0.0, ], }, index = [ 'totalSpeed'],)
 
     return totals
 
