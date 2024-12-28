@@ -51,6 +51,9 @@ def test_JumpStatus():
     status = JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT
     assert status == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT
 
+    status = JumpStatus.WARM_UP_FILE
+    assert status == JumpStatus.WARM_UP_FILE
+
 
 def test_JumpResults(_validJump):
     assert isinstance(_validJump, JumpResults)

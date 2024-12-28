@@ -435,27 +435,36 @@ def processJump(data: pd.DataFrame) -> JumpResults:
     data = data.copy()
     data = dropNonSkydiveDataFrom(data)
     window, data = getSpeedSkydiveFrom(data)
-    validJump = isValidJumpISC(data, window)
-    jumpStatus = JumpStatus.OK
-    score = None
-    scores = None
-    table = None
-    if validJump:
-#         color = '#0f0'
-#         result = '🟢 valid'
+    if data.empty and not window:
+        data = None
+        maxSpeed = -1.0
+        score = -1.0
+        scores = None
         table = None
-        maxSpeed, table = jumpAnalysisTable(data)
-        baseTime = data.iloc[0].timeUnix
-        data['plotTime'] = round(data.timeUnix-baseTime, 2)
-        score, scores = calcScoreISC(data)
+        window = None
+        jumpStatus = JumpStatus.WARM_UP_FILE
     else:
-#         color = '#f00'
-#         result = '🔴 invalid'
-        maxSpeed = -1
-        if len(data):
-            jumpStatus = JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT
+        validJump = isValidJumpISC(data, window)
+        jumpStatus = JumpStatus.OK
+        score = None
+        scores = None
+        table = None
+        if validJump:
+    #         color = '#0f0'
+    #         result = '🟢 valid'
+            table = None
+            maxSpeed, table = jumpAnalysisTable(data)
+            baseTime = data.iloc[0].timeUnix
+            data['plotTime'] = round(data.timeUnix-baseTime, 2)
+            score, scores = calcScoreISC(data)
         else:
-            jumpStatus = JumpStatus.INVALID_SPEED_FILE
+    #         color = '#f00'
+    #         result = '🔴 invalid'
+            maxSpeed = -1
+            if len(data):
+                jumpStatus = JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT
+            else:
+                jumpStatus = JumpStatus.INVALID_SPEED_FILE
     return JumpResults(data, maxSpeed, score, scores, table, window, jumpStatus)
 
 

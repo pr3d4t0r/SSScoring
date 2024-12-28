@@ -10,10 +10,12 @@ from haversine import Unit
 from ssscoring.calc import aggregateResults
 from ssscoring.calc import convertFlySight2SSScoring
 from ssscoring.calc import dropNonSkydiveDataFrom
+from ssscoring.calc import getFlySightDataFromCSV
 from ssscoring.calc import getSpeedSkydiveFrom
 from ssscoring.calc import isValidMinimumAltitude
 from ssscoring.calc import jumpAnalysisTable
 from ssscoring.calc import processAllJumpFiles
+from ssscoring.calc import processJump
 from ssscoring.calc import roundedAggregateResults
 from ssscoring.calc import totalResultsFrom
 from ssscoring.constants import BREAKOFF_ALTITUDE
@@ -39,11 +41,17 @@ import pandas as pd
 
 DATA_LAKE_ROOT = './data'
 
-dropZoneAltMSL = 23
+dropZoneAltMSL = 15
 dropZoneAltMSLMeters = dropZoneAltMSL/FT_IN_M
 jumpFiles = getAllSpeedJumpFilesFrom(DATA_LAKE_ROOT)
-jumpResults = processAllJumpFiles(jumpFiles, altitudeDZMeters = dropZoneAltMSLMeters)
-aggregate = aggregateResults(jumpResults)
-sumResults = totalResultsFrom(aggregate)
+filePath = list(jumpFiles.keys())[0]
+rawData, tag = getFlySightDataFromCSV(filePath)
+data = convertFlySight2SSScoring(rawData, altitudeDZMeters=dropZoneAltMSLMeters)
+jumpResult = processJump(data)
+
+# --------------------------------------------------
+# jumpResults = processAllJumpFiles(jumpFiles, altitudeDZMeters = dropZoneAltMSLMeters)
+# aggregate = aggregateResults(jumpResults)
+# sumResults = totalResultsFrom(aggregate)
 # roundedAggregateResults(aggregate)
 

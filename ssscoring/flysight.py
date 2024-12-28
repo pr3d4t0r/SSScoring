@@ -176,6 +176,7 @@ def getAllSpeedJumpFilesFrom(dataLake: Path) -> dict:
                 if data is not None and stat.st_size >= MIN_JUMP_FILE_SIZE and validFlySightHeaderIn(jumpFileName):
                     # explicit because `not data` is ambiguous for dataframes
                     jumpFiles[jumpFileName] = version
+    jumpFiles = OrderedDict(sorted(jumpFiles.items()))
     return jumpFiles
 
 

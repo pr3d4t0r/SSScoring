@@ -17,6 +17,7 @@ from ssscoring.calc import roundedAggregateResults
 from ssscoring.calc import totalResultsFrom
 from ssscoring.constants import BREAKOFF_ALTITUDE
 from ssscoring.constants import FT_IN_M
+from ssscoring.datatypes import JumpStatus
 from ssscoring.errors import SSScoringError
 from ssscoring.flysight import getAllSpeedJumpFilesFrom
 
@@ -36,6 +37,7 @@ TEST_FLYSIGHT_DATA_LAKE = './resources/test-tracks'
 TEST_FLYSIGHT_DATA = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-00.csv'
 TEST_FLYSIGHT_DATA_V1 = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-02.csv'
 TEST_FLYSIGHT_DATA_BAD_HEADERS = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-03.csv'
+TEST_FLYSIGHT_DATA_V1_WARM_UP = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-05-warm-up.csv'
 
 
 # +++ globals +++
@@ -165,13 +167,18 @@ def test_calcScoreISC():
 
 def test_processJump():
     data = convertFlySight2SSScoring(pd.read_csv(TEST_FLYSIGHT_DATA_V1, skiprows = (1,1)))
-
     jumpResults = processJump(data)
 
     assert jumpResults
     assert '{0:,.2f}'.format(jumpResults.score) == '451.86'
     assert jumpResults.maxSpeed == 452.664
     assert isinstance(jumpResults.scores, dict)
+
+
+def test_processJump_WarmUpFile():
+    data = convertFlySight2SSScoring(pd.read_csv(TEST_FLYSIGHT_DATA_V1_WARM_UP, skiprows = (1,1)))
+    jumpResults = processJump(data)
+    assert jumpResults.status == JumpStatus.WARM_UP_FILE
 
 
 def test_getFlySightDataFromCSV():

@@ -24,6 +24,7 @@ class JumpStatus(Enum):
     ALTITUDE_EXCEEDS_MINIMUM = 100
     INVALID_SPEED_FILE = 110
     SPEED_ACCURACY_EXCEEDS_LIMIT = 200
+    WARM_UP_FILE = 300
 
 
 JumpResults = namedtuple('JumpResults', 'data maxSpeed score scores table window status')
