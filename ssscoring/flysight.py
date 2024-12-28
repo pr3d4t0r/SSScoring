@@ -132,12 +132,13 @@ def validFlySightHeaderIn(fileCSV) -> bool:
     return hasAllHeaders
 
 
-def getAllSpeedJumpFilesFrom(dataLake: str) -> dict:
+def getAllSpeedJumpFilesFrom(dataLake: Path) -> dict:
     """
     Get a list of all the speed jump files from a data lake, where data lake is
     defined as a reachable path that contains one or more FlySight CSV files.
     This function tests each file to ensure that it's a speed skydive FlySight
-    file in a valid format and length.
+    file in a valid format and length.  It doesn't validate data like versions
+    prior to 1.9.0.
 
     Arguments
     ---------
@@ -151,8 +152,6 @@ def getAllSpeedJumpFilesFrom(dataLake: str) -> dict:
         - keys are the file names
         - values are a FlySight version string tag
     """
-    from ssscoring.calc import isValidMinimumAltitude # skirt circular dependency
-
     jumpFiles = OrderedDict()
     for root, dirs, files in os.walk(dataLake):
         if any(name in root for name in IGNORE_LIST):
@@ -163,7 +162,6 @@ def getAllSpeedJumpFilesFrom(dataLake: str) -> dict:
                 continue
             if '.CSV' in fileName.upper():
                 version = '1'
-                # jumpFileName = os.path.join(root, fileName)
                 jumpFileName = Path(root) / fileName
                 stat = os.stat(jumpFileName)
                 if all(x not in fileName for x in ('EVENT', 'SENSOR', 'TRACK')):
@@ -175,8 +173,6 @@ def getAllSpeedJumpFilesFrom(dataLake: str) -> dict:
                     data = skipOverFS2MetadataRowsIn(data)
                     data.drop('GNSS', inplace = True, axis = 1)
                     version = '2'
-                # TODO:  Refator this to signal the minimum altitude exit issue.
-                # if data is not None and stat.st_size >= MIN_JUMP_FILE_SIZE and validFlySightHeaderIn(jumpFileName) and isValidMinimumAltitude(data.hMSL.max()):
                 if data is not None and stat.st_size >= MIN_JUMP_FILE_SIZE and validFlySightHeaderIn(jumpFileName):
                     # explicit because `not data` is ambiguous for dataframes
                     jumpFiles[jumpFileName] = version

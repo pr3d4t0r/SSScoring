@@ -68,7 +68,8 @@ def _tooSmallCSV(tmp_path_factory):
     fileName = TEST_FLYSIGHT_2_DATA.as_posix().replace('TRACK', 'BOGUS')
     data = pd.read_csv(TEST_FLYSIGHT_2_DATA, names = FLYSIGHT_2_HEADER, skiprows = 6).head(50)
     data.to_csv(fileName, sep = ',')
-    yield fileName
+    pathName = Path(fileName)
+    yield pathName
     os.unlink(fileName)
 
 

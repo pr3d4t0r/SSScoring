@@ -24,6 +24,7 @@ import os
 import pathlib
 import pytest
 import tempfile
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -119,6 +120,7 @@ def test_isValidJumpISC():
 
 
 def test_calculateDistance():
+    warnings.filterwarnings('ignore', category=UserWarning)
     start = (37.8329426, -121.64040112)
     end = (37.8285883, -121.6356015)
 
@@ -166,9 +168,10 @@ def test_processJump():
 
     jumpResults = processJump(data)
 
+    assert jumpResults
     assert '{0:,.2f}'.format(jumpResults.score) == '451.86'
     assert jumpResults.maxSpeed == 452.664
-    assert 'valid' in jumpResults.result
+    assert isinstance(jumpResults.scores, dict)
 
 
 def test_getFlySightDataFromCSV():
@@ -249,4 +252,5 @@ def test_totalResultsFrom():
 # test_processAllJumpFiles()
 # test_aggregateResults()
 # test_roundedAggregateResults()
+# test_totalResultsFrom()
 

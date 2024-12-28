@@ -20,7 +20,7 @@ from ssscoring.constants import MPS_2_KMH
 from ssscoring.constants import PERFORMANCE_WINDOW_LENGTH
 from ssscoring.constants import SCORING_INTERVAL
 from ssscoring.constants import VALIDATION_WINDOW_LENGTH
-from ssscoring.datatypes import InvalidJumpReason
+from ssscoring.datatypes import JumpStatus
 from ssscoring.datatypes import JumpResults
 from ssscoring.datatypes import PerformanceWindow
 from ssscoring.errors import SSScoringError
@@ -405,7 +405,7 @@ def calcScoreISC(data: pd.DataFrame) -> tuple:
     return (max(scores), scores)
 
 
-def processJump(data: pd.DataFrame):
+def processJump(data: pd.DataFrame) -> JumpResults:
     """
     Take a dataframe in SSScoring format and process it for display.  It
     serializes all the steps that would be taken from the ssscoring module, but
@@ -436,24 +436,27 @@ def processJump(data: pd.DataFrame):
     data = dropNonSkydiveDataFrom(data)
     window, data = getSpeedSkydiveFrom(data)
     validJump = isValidJumpISC(data, window)
-    invalidReason = None
+    jumpStatus = JumpStatus.OK
     score = None
     scores = None
     table = None
     if validJump:
-        color = '#0f0'
-        result = '🟢 valid'
+#         color = '#0f0'
+#         result = '🟢 valid'
         table = None
         maxSpeed, table = jumpAnalysisTable(data)
         baseTime = data.iloc[0].timeUnix
         data['plotTime'] = round(data.timeUnix-baseTime, 2)
         score, scores = calcScoreISC(data)
     else:
-        color = '#f00'
+#         color = '#f00'
+#         result = '🔴 invalid'
         maxSpeed = -1
-        result = '🔴 invalid'
-        invalidReason = InvalidJumpReason.SPEED_ACCURACY_ABOVE_LIMIT if len(data) else InvalidJumpReason.INVALID_SPEED_FILE
-    return JumpResults(color, data, maxSpeed, result, score, scores, table, window, invalidReason)
+        if len(data):
+            jumpStatus = JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT
+        else:
+            jumpStatus = JumpStatus.INVALID_SPEED_FILE
+    return JumpResults(data, maxSpeed, score, scores, table, window, jumpStatus)
 
 
 def _readVersion1CSV(jumpFile: str) -> pd.DataFrame:
@@ -547,7 +550,7 @@ def processAllJumpFiles(jumpFiles: list, altitudeDZMeters = 0.0) -> dict:
     for jumpFile in jumpFiles.keys():
         rawData, tag = getFlySightDataFromCSV(jumpFile)
         jumpResult = processJump(convertFlySight2SSScoring(rawData, altitudeDZMeters = altitudeDZMeters))
-        if 'valid' in jumpResult.result:
+        if JumpStatus.OK == jumpResult.status:
             jumpResults[tag] = jumpResult
     return jumpResults
 
@@ -578,7 +581,7 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
     for jumpResultIndex in sorted(list(jumpResults.keys())):
         jumpResult = jumpResults[jumpResultIndex]
         # TODO: if jumpResult.score > 0.0:
-        if not jumpResult.invalidReason:
+        if jumpResult.status == JumpStatus.OK:
             t = jumpResult.table
             finalTime = t.iloc[-1].time
             t.iloc[-1].time = LAST_TIME_TRANCHE
@@ -654,10 +657,11 @@ def totalResultsFrom(aggregate: pd.DataFrame) -> pd.DataFrame:
     `AttributeError` if aggregate is an empty dataframe or `None`, or if the
     `aggregate` dataframe doesn't conform to the output of `ssscoring.aggregateResults`.
     """
-    if len(aggregate):
-      totals = pd.DataFrame({ 'totalSpeed': [ aggregate.score.sum(), ], 'meanSpeed': [ aggregate.score.mean(), ], 'maxScore': [ aggregate.score.max(), ], }, index = [ 'totalSpeed'],)
-    else:
-      totals = pd.DataFrame({ 'totalSpeed': [ 0.0, ], 'meanSpeed': [ 0.0, ], 'maxScore': [ 0.0, ], }, index = [ 'totalSpeed'],)
+    if aggregate is None:
+        raise AttributeError('aggregate dataframe is empty')
+    elif isinstance(aggregate, pd.DataFrame) and not len(aggregate):
+        raise AttributeError('aggregate dataframe is empty')
 
+    totals = pd.DataFrame({ 'totalSpeed': [ aggregate.score.sum(), ], 'meanSpeed': [ aggregate.score.mean(), ], 'maxScore': [ aggregate.score.max(), ], }, index = [ 'totalSpeed'],)
     return totals
 
