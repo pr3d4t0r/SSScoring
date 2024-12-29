@@ -9,6 +9,7 @@ from ssscoring.calc import dropNonSkydiveDataFrom
 from ssscoring.calc import getFlySightDataFromCSV
 from ssscoring.calc import getSpeedSkydiveFrom
 from ssscoring.calc import isValidJumpISC
+from ssscoring.calc import isValidMaximumAltitude
 from ssscoring.calc import isValidMinimumAltitude
 from ssscoring.calc import jumpAnalysisTable
 from ssscoring.calc import processAllJumpFiles
@@ -38,6 +39,7 @@ TEST_FLYSIGHT_DATA = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-
 TEST_FLYSIGHT_DATA_V1 = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-02.csv'
 TEST_FLYSIGHT_DATA_BAD_HEADERS = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-03.csv'
 TEST_FLYSIGHT_DATA_V1_WARM_UP = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-05-warm-up.csv'
+TEST_FLYSIGHT_DATA_V1_EXCEEDS_MAX_ALT = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-06-exceeds-max-alt.CSV'
 
 
 # +++ globals +++
@@ -51,7 +53,7 @@ _speeds = None
 # +++ tests +++
 
 @pytest.fixture
-def _invalidMaxAltitude(tmp_path_factory):
+def _invalidMinAltitude(tmp_path_factory):
     fileName = tmp_path_factory.mktemp('data')/'bogus.CSV'
     data = pd.read_csv(TEST_FLYSIGHT_DATA)
     data.hMSL = BREAKOFF_ALTITUDE-100.0
@@ -60,9 +62,16 @@ def _invalidMaxAltitude(tmp_path_factory):
     os.unlink(fileName.as_posix())
 
 
-def test_isValidMinimumAltitude(_invalidMaxAltitude):
-    d = pd.read_csv(_invalidMaxAltitude, skiprows = (1, 1))
+def test_isValidMinimumAltitude(_invalidMinAltitude):
+    d = pd.read_csv(_invalidMinAltitude, skiprows = (1, 1))
     assert not isValidMinimumAltitude(d.hMSL.max())
+    d = pd.read_csv(TEST_FLYSIGHT_DATA, skiprows = (1, 1))
+    assert isValidMinimumAltitude(d.hMSL.max())
+
+
+def test_isValidMaximumAltitude():
+    d = pd.read_csv(TEST_FLYSIGHT_DATA_V1_EXCEEDS_MAX_ALT, skiprows=(1, 1))
+    assert not isValidMaximumAltitude(d.hMSL.max())
     d = pd.read_csv(TEST_FLYSIGHT_DATA, skiprows = (1, 1))
     assert isValidMinimumAltitude(d.hMSL.max())
 
@@ -251,6 +260,7 @@ def test_totalResultsFrom():
 # test_getSpeedSkydiveFrom()
 # test_jumpAnalysisTable()
 # test_isValidMinimumAltitude(_invalidAltFileName)
+test_isValidMaximumAltitude()
 # test_calcScoreMeanVelocity()
 # test_calcScoreISC()
 

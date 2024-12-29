@@ -54,6 +54,9 @@ def test_JumpStatus():
     status = JumpStatus.WARM_UP_FILE
     assert status == JumpStatus.WARM_UP_FILE
 
+    status = JumpStatus.ALTITUDE_EXCEEDS_MAXIMUM
+    assert status == JumpStatus.ALTITUDE_EXCEEDS_MAXIMUM
+
 
 def test_JumpResults(_validJump):
     assert isinstance(_validJump, JumpResults)

@@ -41,7 +41,8 @@ import pandas as pd
 
 DATA_LAKE_ROOT = './data'
 
-dropZoneAltMSL = 15
+dropZoneAltMSL = 1509.0
+# dropZoneAltMSL = 15.0
 dropZoneAltMSLMeters = dropZoneAltMSL/FT_IN_M
 jumpFiles = getAllSpeedJumpFilesFrom(DATA_LAKE_ROOT)
 filePath = list(jumpFiles.keys())[0]

@@ -15,13 +15,14 @@ from ssscoring.constants import DEG_IN_RADIANS
 from ssscoring.constants import EXIT_SPEED
 from ssscoring.constants import FT_IN_M
 from ssscoring.constants import LAST_TIME_TRANCHE
+from ssscoring.constants import MAX_ALTITUDE_METERS
 from ssscoring.constants import MAX_SPEED_ACCURACY
 from ssscoring.constants import MPS_2_KMH
 from ssscoring.constants import PERFORMANCE_WINDOW_LENGTH
 from ssscoring.constants import SCORING_INTERVAL
 from ssscoring.constants import VALIDATION_WINDOW_LENGTH
-from ssscoring.datatypes import JumpStatus
 from ssscoring.datatypes import JumpResults
+from ssscoring.datatypes import JumpStatus
 from ssscoring.datatypes import PerformanceWindow
 from ssscoring.errors import SSScoringError
 from ssscoring.flysight import FlySightVersion
@@ -37,16 +38,18 @@ import pandas as pd
 
 def isValidMinimumAltitude(altitude: float) -> bool:
     """
-    Reports whether an `altitude` is within the IPC and USPA valid parameters,
+    Reports whether an `altitude` is below the IPC and USPA valid parameters,
     or within `BREAKOFF_ALTITUDE` and `PERFORMACE_WINDOW_LENGTH`.  In invalid
     altitude doesn't invalidate a FlySight data file.  This function can be used
     for generating warnings.  The stock FlySightViewer scores a speed jump even
     if the exit was below the minimum altitude.
 
+    See:  FAI Competition Rules Speed Skydiving section 5.3 for details.
+
     Arguments
     ---------
         altitude
-    An altitude in meters, often calculated as data.hMSL - DZ altitude.
+    An altitude in meters, calculated as data.hMSL - DZ altitude.
 
     Returns
     -------
@@ -56,6 +59,32 @@ def isValidMinimumAltitude(altitude: float) -> bool:
         altitude = float(altitude)
     minAltitude = BREAKOFF_ALTITUDE+PERFORMANCE_WINDOW_LENGTH
     return altitude >= minAltitude
+
+
+def isValidMaximumAltitude(altitude: float) -> bool:
+    """
+    Reports whether an `altitude` is above the maximum altitude allowed by the
+    rules.
+
+    See:  FAI Competition Rules Speed Skydiving section 5.3 for details.
+
+    Arguments
+    ---------
+        altitude
+    An altitude in meters, calculated as data.hMSL - DZ altitude.
+
+    Returns
+    -------
+    `True` if the altitude is valid.
+
+    See
+    ---
+    `ssscoring.constants.MAX_ALTITUDE_FT`
+    `ssscoring.constants.MAX_ALTITUDE_METERS`
+    """
+    if not isinstance(altitude, float):
+        altitude = float(altitude)
+    return altitude <= MAX_ALTITUDE_METERS
 
 
 def isValidJumpISC(data: pd.DataFrame,
@@ -232,19 +261,20 @@ def getSpeedSkydiveFrom(data: pd.DataFrame) -> tuple:
     - `None` for the `PerformanceWindow` instance
     - `data`, most likely empty
     """
-    data = _dataGroups(data)
-    groups = data.group.max()+1
+    if len(data):
+        data = _dataGroups(data)
+        groups = data.group.max()+1
 
-    freeFallGroup = -1
-    MIN_DATA_POINTS = 100 # heuristic
-    MIN_MAX_SPEED = 200 # km/h, heuristic; slower ::= no free fall
-    for group in range(groups):
-        subset = data[data.group == group]
-        if len(subset) >= MIN_DATA_POINTS and subset.vKMh.max() >= MIN_MAX_SPEED:
-            freeFallGroup = group
+        freeFallGroup = -1
+        MIN_DATA_POINTS = 100 # heuristic
+        MIN_MAX_SPEED = 200 # km/h, heuristic; slower ::= no free fall
+        for group in range(groups):
+            subset = data[data.group == group]
+            if len(subset) >= MIN_DATA_POINTS and subset.vKMh.max() >= MIN_MAX_SPEED:
+                freeFallGroup = group
 
-    data = data[data.group == freeFallGroup]
-    data = data.drop('group', axis = 1).drop('positive', axis = 1)
+        data = data[data.group == freeFallGroup]
+        data = data.drop('group', axis = 1).drop('positive', axis = 1)
 
     if len(data) > 0:
         # Speed ~= 9.81 m/s; subtract 1 second for actual exit.
