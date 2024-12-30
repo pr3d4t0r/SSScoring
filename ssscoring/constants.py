@@ -54,18 +54,18 @@ Times > 25 s are irrelevant because it means that the speed skydiver flew at
 vSpeed < 400 km/h.
 """
 
-MAX_ALTITUDE_FT = 15500
+MAX_ALTITUDE_FT = 14000.0
 """
-Maximum suggested altitude but irrelevant in general.  Max altitude without
-oxygen is 15,500 ft AGL at most DZs.  A jumnp from a higher altitude would
-require oxygen and would be scored 3,000 ft higher than the hard deck.
+Maximum exit altitude AGL according to FAI Competition Rules Speed Skydiving
+section 5.3.
 """
 
 MAX_ALTITUDE_METERS = MAX_ALTITUDE_FT/3.28
 """
 See
 ---
-    ssscoring.constants.MAX_ALTITUDE_FT
+Maximum exit altitude AGL according to FAI Competition Rules Speed Skydiving
+section 5.3.
 """
 
 MAX_SPEED_ACCURACY = 3.0

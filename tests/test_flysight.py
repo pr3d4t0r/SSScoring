@@ -8,7 +8,9 @@ from ssscoring.constants import FLYSIGHT_2_HEADER
 from ssscoring.errors import SSScoringError
 from ssscoring.flysight import FlySightVersion
 from ssscoring.flysight import detectFlySightFileVersionOf
+from ssscoring.flysight import fixCRMangledCSV
 from ssscoring.flysight import getAllSpeedJumpFilesFrom
+from ssscoring.flysight import isCRMangledCSV
 from ssscoring.flysight import skipOverFS2MetadataRowsIn
 from ssscoring.flysight import validFlySightHeaderIn
 
@@ -16,6 +18,7 @@ from ssscoring.flysight import validFlySightHeaderIn
 
 import os
 import pytest
+import tempfile
 
 import pandas as pd
 
@@ -25,6 +28,7 @@ import pandas as pd
 TEST_FLYSIGHT_DATA_LAKE = './resources/test-tracks'
 TEST_FLYSIGHT_1_DATA = Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-00.CSV'
 TEST_FLYSIGHT_2_DATA = Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS2' / '01-00-00' / 'TRACK.CSV'
+TEST_FLYSIGHT_4_DATA = Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-04-DOS-CRLF.CSV'
 
 
 # +++ tests +++
@@ -64,7 +68,8 @@ def _tooSmallCSV(tmp_path_factory):
     fileName = TEST_FLYSIGHT_2_DATA.as_posix().replace('TRACK', 'BOGUS')
     data = pd.read_csv(TEST_FLYSIGHT_2_DATA, names = FLYSIGHT_2_HEADER, skiprows = 6).head(50)
     data.to_csv(fileName, sep = ',')
-    yield fileName
+    pathName = Path(fileName)
+    yield pathName
     os.unlink(fileName)
 
 
@@ -114,4 +119,23 @@ def test_detectFlySightFileVersionOf(_missingColumnInCSV):
 
     assert detectFlySightFileVersionOf(TEST_FLYSIGHT_1_DATA.as_posix()) == FlySightVersion.V1
     assert detectFlySightFileVersionOf(TEST_FLYSIGHT_2_DATA.as_posix()) == FlySightVersion.V2
+
+
+def test_isCRMangledCSV():
+    assert isCRMangledCSV(TEST_FLYSIGHT_4_DATA)
+    x = isCRMangledCSV(TEST_FLYSIGHT_1_DATA)
+    assert not x
+
+
+def test_fixCRMangledCSV():
+    descriptor, tempFile = tempfile.mkstemp()
+    with open(TEST_FLYSIGHT_4_DATA, 'rb') as inputFile:
+        rawData = inputFile.read()
+    with os.fdopen(descriptor, 'wb') as outputFile:
+        outputFile.write(rawData)
+
+    assert isCRMangledCSV(tempFile)
+    fixCRMangledCSV(tempFile)
+    assert not isCRMangledCSV(tempFile)
+    os.unlink(tempFile)
 

@@ -15,12 +15,14 @@ from ssscoring.constants import DEG_IN_RADIANS
 from ssscoring.constants import EXIT_SPEED
 from ssscoring.constants import FT_IN_M
 from ssscoring.constants import LAST_TIME_TRANCHE
+from ssscoring.constants import MAX_ALTITUDE_METERS
 from ssscoring.constants import MAX_SPEED_ACCURACY
 from ssscoring.constants import MPS_2_KMH
 from ssscoring.constants import PERFORMANCE_WINDOW_LENGTH
 from ssscoring.constants import SCORING_INTERVAL
 from ssscoring.constants import VALIDATION_WINDOW_LENGTH
 from ssscoring.datatypes import JumpResults
+from ssscoring.datatypes import JumpStatus
 from ssscoring.datatypes import PerformanceWindow
 from ssscoring.errors import SSScoringError
 from ssscoring.flysight import FlySightVersion
@@ -36,26 +38,56 @@ import pandas as pd
 
 def isValidMinimumAltitude(altitude: float) -> bool:
     """
-    Reports whether an `altitude` is within the IPC and USPA valid parameters,
+    Reports whether an `altitude` is below the IPC and USPA valid parameters,
     or within `BREAKOFF_ALTITUDE` and `PERFORMACE_WINDOW_LENGTH`.  In invalid
     altitude doesn't invalidate a FlySight data file.  This function can be used
     for generating warnings.  The stock FlySightViewer scores a speed jump even
     if the exit was below the minimum altitude.
 
+    See:  FAI Competition Rules Speed Skydiving section 5.3 for details.
+
     Arguments
     ---------
         altitude
-    An altitude in meters, often calculated as data.hMSL - DZ altitude.
+    An altitude in meters, calculated as data.hMSL - DZ altitude.
 
     Returns
     -------
     `True` if the altitude is valid.
     """
+    if not isinstance(altitude, float):
+        altitude = float(altitude)
     minAltitude = BREAKOFF_ALTITUDE+PERFORMANCE_WINDOW_LENGTH
     return altitude >= minAltitude
 
 
-def isValidJump(data: pd.DataFrame,
+def isValidMaximumAltitude(altitude: float) -> bool:
+    """
+    Reports whether an `altitude` is above the maximum altitude allowed by the
+    rules.
+
+    See:  FAI Competition Rules Speed Skydiving section 5.3 for details.
+
+    Arguments
+    ---------
+        altitude
+    An altitude in meters, calculated as data.hMSL - DZ altitude.
+
+    Returns
+    -------
+    `True` if the altitude is valid.
+
+    See
+    ---
+    `ssscoring.constants.MAX_ALTITUDE_FT`
+    `ssscoring.constants.MAX_ALTITUDE_METERS`
+    """
+    if not isinstance(altitude, float):
+        altitude = float(altitude)
+    return altitude <= MAX_ALTITUDE_METERS
+
+
+def isValidJumpISC(data: pd.DataFrame,
                 window: PerformanceWindow) -> bool:
     """
     Validates the jump according to ISC/FAI/USPA competition rules.  A jump is
@@ -73,10 +105,14 @@ def isValidJump(data: pd.DataFrame,
     -------
     `True` if the jump is valid according to ISC/FAI/USPA rules.
     """
-    # TODO:  Remove these if present after 20241201:
+    # TODO:  Remove these if present after 20250101:
     # accuracy = data[data.altitudeAGL < window.validationStart].verticalAccuracy.max()
     # return accuracy < MAX_SPEED_ACCURACY
-    return max(data.speedAccuracyISC) < MAX_SPEED_ACCURACY
+    if len(data) > 0:
+        accuracy = data[data.altitudeAGL < window.validationStart].speedAccuracyISC.max()
+        return accuracy < MAX_SPEED_ACCURACY
+    else:
+        return False
 
 
 def calculateDistance(start: tuple, end: tuple) -> float:
@@ -218,35 +254,45 @@ def getSpeedSkydiveFrom(data: pd.DataFrame) -> tuple:
 
     - A named tuple with performance and validation window data
     - A dataframe featuring only speed skydiving data
+
+    Warm up FlySight files and non-speed skydiving files may return invalid
+    values:
+
+    - `None` for the `PerformanceWindow` instance
+    - `data`, most likely empty
     """
-    data = _dataGroups(data)
-    groups = data.group.max()+1
+    if len(data):
+        data = _dataGroups(data)
+        groups = data.group.max()+1
 
-    freeFallGroup = -1
-    MIN_DATA_POINTS = 100 # heuristic
-    MIN_MAX_SPEED = 200 # km/h, heuristic; slower ::= no free fall
-    for group in range(groups):
-        subset = data[data.group == group]
-        if len(subset) >= MIN_DATA_POINTS and subset.vKMh.max() >= MIN_MAX_SPEED:
-            freeFallGroup = group
+        freeFallGroup = -1
+        MIN_DATA_POINTS = 100 # heuristic
+        MIN_MAX_SPEED = 200 # km/h, heuristic; slower ::= no free fall
+        for group in range(groups):
+            subset = data[data.group == group]
+            if len(subset) >= MIN_DATA_POINTS and subset.vKMh.max() >= MIN_MAX_SPEED:
+                freeFallGroup = group
 
-    data = data[data.group == freeFallGroup]
-    data = data.drop('group', axis = 1).drop('positive', axis = 1)
+        data = data[data.group == freeFallGroup]
+        data = data.drop('group', axis = 1).drop('positive', axis = 1)
 
-    # Speed ~= 9.81 m/s; subtract 1 second for actual exit.
-    exitTime = data[data.vMetersPerSecond > EXIT_SPEED].head(1).timeUnix.iat[0]-2.0
-    data = data[data.timeUnix >= exitTime]
-    data = data[data.altitudeAGL >= BREAKOFF_ALTITUDE]
+    if len(data) > 0:
+        # Speed ~= 9.81 m/s; subtract 1 second for actual exit.
+        exitTime = data[data.vMetersPerSecond > EXIT_SPEED].head(1).timeUnix.iat[0]-2.0
+        data = data[data.timeUnix >= exitTime]
+        data = data[data.altitudeAGL >= BREAKOFF_ALTITUDE]
 
-    windowStart = data.iloc[0].altitudeAGL
-    windowEnd = windowStart-PERFORMANCE_WINDOW_LENGTH
-    if windowEnd < BREAKOFF_ALTITUDE:
-        windowEnd = BREAKOFF_ALTITUDE
+        windowStart = data.iloc[0].altitudeAGL
+        windowEnd = windowStart-PERFORMANCE_WINDOW_LENGTH
+        if windowEnd < BREAKOFF_ALTITUDE:
+            windowEnd = BREAKOFF_ALTITUDE
 
-    validationWindowStart = windowEnd+VALIDATION_WINDOW_LENGTH
-    data = data[data.altitudeAGL >= windowEnd]
+        validationWindowStart = windowEnd+VALIDATION_WINDOW_LENGTH
+        data = data[data.altitudeAGL >= windowEnd]
 
-    return PerformanceWindow(windowStart, windowEnd, validationWindowStart), data
+        return PerformanceWindow(windowStart, windowEnd, validationWindowStart), data
+    else:
+        return None, data
 
 
 def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
@@ -389,7 +435,7 @@ def calcScoreISC(data: pd.DataFrame) -> tuple:
     return (max(scores), scores)
 
 
-def processJump(data: pd.DataFrame):
+def processJump(data: pd.DataFrame) -> JumpResults:
     """
     Take a dataframe in SSScoring format and process it for display.  It
     serializes all the steps that would be taken from the ssscoring module, but
@@ -419,26 +465,37 @@ def processJump(data: pd.DataFrame):
     data = data.copy()
     data = dropNonSkydiveDataFrom(data)
     window, data = getSpeedSkydiveFrom(data)
-    validJump = isValidJump(data, window)
-    score = 0.0
-    scores = None
-    table = None
-
-    if validJump:
-        maxSpeed, table = jumpAnalysisTable(data)
-        color = '#0f0'
-        result = '🟢 valid'
-        baseTime = data.iloc[0].timeUnix
-        data['plotTime'] = round(data.timeUnix-baseTime, 2)
-        # score, scores = calcScoreMeanVelocity(data)
-        score, scores = calcScoreISC(data)
+    if data.empty and not window:
+        data = None
+        maxSpeed = -1.0
+        score = -1.0
+        scores = None
+        table = None
+        window = None
+        jumpStatus = JumpStatus.WARM_UP_FILE
     else:
-        color = '#f00'
-        maxSpeed = -1
-        score = 0
-        result = '🔴 invalid'
-
-    return JumpResults(color, data, maxSpeed, result, score, scores, table, window)
+        validJump = isValidJumpISC(data, window)
+        jumpStatus = JumpStatus.OK
+        score = None
+        scores = None
+        table = None
+        if validJump:
+    #         color = '#0f0'
+    #         result = '🟢 valid'
+            table = None
+            maxSpeed, table = jumpAnalysisTable(data)
+            baseTime = data.iloc[0].timeUnix
+            data['plotTime'] = round(data.timeUnix-baseTime, 2)
+            score, scores = calcScoreISC(data)
+        else:
+    #         color = '#f00'
+    #         result = '🔴 invalid'
+            maxSpeed = -1
+            if len(data):
+                jumpStatus = JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT
+            else:
+                jumpStatus = JumpStatus.INVALID_SPEED_FILE
+    return JumpResults(data, maxSpeed, score, scores, table, window, jumpStatus)
 
 
 def _readVersion1CSV(jumpFile: str) -> pd.DataFrame:
@@ -532,7 +589,7 @@ def processAllJumpFiles(jumpFiles: list, altitudeDZMeters = 0.0) -> dict:
     for jumpFile in jumpFiles.keys():
         rawData, tag = getFlySightDataFromCSV(jumpFile)
         jumpResult = processJump(convertFlySight2SSScoring(rawData, altitudeDZMeters = altitudeDZMeters))
-        if 'valid' in jumpResult.result:
+        if JumpStatus.OK == jumpResult.status:
             jumpResults[tag] = jumpResult
     return jumpResults
 
@@ -562,7 +619,8 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
     speeds = pd.DataFrame()
     for jumpResultIndex in sorted(list(jumpResults.keys())):
         jumpResult = jumpResults[jumpResultIndex]
-        if jumpResult.score > 0.0:
+        # TODO: if jumpResult.score > 0.0:
+        if jumpResult.status == JumpStatus.OK:
             t = jumpResult.table
             finalTime = t.iloc[-1].time
             t.iloc[-1].time = LAST_TIME_TRANCHE
@@ -638,7 +696,11 @@ def totalResultsFrom(aggregate: pd.DataFrame) -> pd.DataFrame:
     `AttributeError` if aggregate is an empty dataframe or `None`, or if the
     `aggregate` dataframe doesn't conform to the output of `ssscoring.aggregateResults`.
     """
-    totals = pd.DataFrame({ 'totalSpeed': [ aggregate.score.sum(), ], 'meanSpeed': [ aggregate.score.mean(), ], 'maxScore': [ aggregate.score.max(), ], }, index = [ 'totalSpeed'],)
+    if aggregate is None:
+        raise AttributeError('aggregate dataframe is empty')
+    elif isinstance(aggregate, pd.DataFrame) and not len(aggregate):
+        raise AttributeError('aggregate dataframe is empty')
 
+    totals = pd.DataFrame({ 'totalSpeed': [ aggregate.score.sum(), ], 'meanSpeed': [ aggregate.score.mean(), ], 'maxScore': [ aggregate.score.max(), ], }, index = [ 'totalSpeed'],)
     return totals
 

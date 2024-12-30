@@ -9,30 +9,71 @@ local or cloud-based).
 
 
 from collections import OrderedDict
-from enum import Enum
 from pathlib import Path
 
 from ssscoring.constants import FLYSIGHT_1_HEADER
 from ssscoring.constants import FLYSIGHT_2_HEADER
 from ssscoring.constants import IGNORE_LIST
 from ssscoring.constants import MIN_JUMP_FILE_SIZE
+from ssscoring.datatypes import FlySightVersion
 from ssscoring.errors import SSScoringError
 
 import csv
 import os
+import shutil
+import tempfile
 
 import pandas as pd
 
 
-# --- classes and objects ---
-
-class FlySightVersion(Enum):
-    V1 = 1000
-    V2 = 2000
-
-
-
 # +++ functions +++
+
+def isCRMangledCSV(fileThing) -> bool:
+    """
+    Tests if `fileThing` is an Excel or Dropbox DOS file with lines terminated
+    in CRCRLF.  These occur when someone opens the file with Excel or some other
+    tool in a Windows system and saves the file back to the file system,
+    mangling the original format.
+
+    Arguments
+    ---------
+        fileThing
+    A string or `pathlib.Path` object associated with what looks like a FlySight
+    CR mangled file.
+
+    Returns
+    -------
+    `True` if the file has one or more lines ending in CRCRLF within the first
+    512 bytes of data.
+    """
+    with open (fileThing, 'rb') as file:
+        rawData = file.read()
+        return b'\r\r\n' in rawData
+
+
+def fixCRMangledCSV(fileThing):
+    """
+    Open the file associated with `fileThing` and repleace all`\r\r\b` with
+    `\r\n` EOL markers.
+
+    Arguments
+    ---------
+        fileThing
+    A string or `pathlib.Path` object associated with what looks like a FlySight
+    CR mangled file.
+
+    See
+    ---
+    `ssscoring.flysight.isCRMangledCSV`
+    """
+    with open(fileThing, 'rb') as inputFile:
+        fileContents = inputFile.read()
+    fileContents = fileContents.replace(b'\r\r\n', b'\r\n')
+    with tempfile.NamedTemporaryFile(delete = False) as outputFile:
+        outputFile.write(fileContents)
+        tempFileName = outputFile.name
+    shutil.copy(tempFileName, fileThing)
+    os.unlink(tempFileName)
 
 
 def skipOverFS2MetadataRowsIn(data: pd.DataFrame) -> pd.DataFrame:
@@ -91,12 +132,13 @@ def validFlySightHeaderIn(fileCSV) -> bool:
     return hasAllHeaders
 
 
-def getAllSpeedJumpFilesFrom(dataLake: str) -> dict:
+def getAllSpeedJumpFilesFrom(dataLake: Path) -> dict:
     """
     Get a list of all the speed jump files from a data lake, where data lake is
     defined as a reachable path that contains one or more FlySight CSV files.
     This function tests each file to ensure that it's a speed skydive FlySight
-    file in a valid format and length.
+    file in a valid format and length.  It doesn't validate data like versions
+    prior to 1.9.0.
 
     Arguments
     ---------
@@ -110,8 +152,6 @@ def getAllSpeedJumpFilesFrom(dataLake: str) -> dict:
         - keys are the file names
         - values are a FlySight version string tag
     """
-    from ssscoring.calc import isValidMinimumAltitude # skirt circular dependency
-
     jumpFiles = OrderedDict()
     for root, dirs, files in os.walk(dataLake):
         if any(name in root for name in IGNORE_LIST):
@@ -122,7 +162,6 @@ def getAllSpeedJumpFilesFrom(dataLake: str) -> dict:
                 continue
             if '.CSV' in fileName.upper():
                 version = '1'
-                # jumpFileName = os.path.join(root, fileName)
                 jumpFileName = Path(root) / fileName
                 stat = os.stat(jumpFileName)
                 if all(x not in fileName for x in ('EVENT', 'SENSOR', 'TRACK')):
@@ -130,13 +169,14 @@ def getAllSpeedJumpFilesFrom(dataLake: str) -> dict:
                     data = pd.read_csv(jumpFileName, skiprows = (1, 1), index_col = False)
                 elif 'TRACK' in fileName:
                     # FlySight 2 track custom format
-                    data = pd.read_csv(jumpFileName, names = FLYSIGHT_2_HEADER, skiprows = 6, index_col = False)
+                    data = pd.read_csv(jumpFileName, names = FLYSIGHT_2_HEADER, skiprows = 6, index_col = False, na_values = ['NA', ], dtype={ 'hMSL': float, })
                     data = skipOverFS2MetadataRowsIn(data)
                     data.drop('GNSS', inplace = True, axis = 1)
                     version = '2'
-                if data is not None and stat.st_size >= MIN_JUMP_FILE_SIZE and validFlySightHeaderIn(jumpFileName) and isValidMinimumAltitude(data.hMSL.max()):
+                if data is not None and stat.st_size >= MIN_JUMP_FILE_SIZE and validFlySightHeaderIn(jumpFileName):
                     # explicit because `not data` is ambiguous for dataframes
                     jumpFiles[jumpFileName] = version
+    jumpFiles = OrderedDict(sorted(jumpFiles.items()))
     return jumpFiles
 
 

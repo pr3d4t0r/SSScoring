@@ -6,11 +6,29 @@ SSScoring custom type definitions for easier symbolic manipuation.
 """
 
 from collections import namedtuple
+from enum import Enum
 
 
 # +++ implementation +++
 
-JumpResults = namedtuple('JumpResults', 'color data maxSpeed result score scores table window')
+class FlySightVersion(Enum):
+    """
+    Symbols for handling device version.
+    """
+    V1 = 1000
+    V2 = 2000
+
+
+class JumpStatus(Enum):
+    OK = 0
+    ALTITUDE_EXCEEDS_MINIMUM = 100
+    ALTITUDE_EXCEEDS_MAXIMUM = 110
+    INVALID_SPEED_FILE = 120
+    SPEED_ACCURACY_EXCEEDS_LIMIT = 200
+    WARM_UP_FILE = 300
+
+
+JumpResults = namedtuple('JumpResults', 'data maxSpeed score scores table window status')
 """
 A named tuple containing the score, maximum speed, scores throught the
 performance window, the results table for a jump, the output color for the
@@ -18,17 +36,15 @@ result, and the result information string.
 
 Attributes
 ----------
-- `color` - a string representing a color, green if the result is valid, red
-            otherwise
 - `data` - dataframe containing all the data points for plotting and
            calculations
 - `maxSpeed` - maximum absolute speed registered during a skydive
-- `result` - dataframe of results
 - `score` - maximum mean speed during a 3-second window during the skydive
-- `scores` - a series with all the scored ruding the sliding 3-sec window for
-             the whole speed skydive
+- `scores` - a dictionary with all the scored ruding the sliding 3-sec window
+             for the speed run
 - `table` - summary table of results of the speed run
 - `window` - the scoring window data, an instance of `PerformanceWindow`
+- 'status' - An instance of `ssscoring.datatypes.JumpStatus`
 """
 
 
@@ -50,5 +66,4 @@ See
     ssscoring.constants.PERFORMANCE_WINDOW_LENGTH
     ssscoring.constants.VALIDATION_WINDOW_END
 """
-
 

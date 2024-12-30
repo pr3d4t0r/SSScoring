@@ -1,12 +1,12 @@
-% ssscoring(3) Version 1.8.2 | Speed Skydiving Scoring API documentation
+% ssscoring(3) Version 1.9.0 | Speed Skydiving Scoring API documentation
 
-NAME
+Name
 ====
 
 **SSScoring** - Speed Skydiving Scoring high level library in Python
 
 
-SYNOPSIS
+Synopsis
 ========
 ```bash
 pip install -U ssscoring
@@ -16,6 +16,7 @@ Have one or more FlySight speed run track files available (can be v1 or v2), set
 the source directory to the data lake containing them.
 
 ```python
+# synopsys.py
 from ssscoring.calc import aggregateResults
 from ssscoring.calc import processAllJumpFiles
 from ssscoring.calc import roundedAggregateResults
@@ -48,7 +49,7 @@ API documentation is available at:
 https://pr3d4t0r.github.io/SSScoring/ssscoring.html
 
 
-INSTALLATION AND REQUIREMENTS
+Installation and Requirements
 =============================
 
 - Python 3.9.9 or later
@@ -58,18 +59,50 @@ The [requirements.txt](./requirements.txt) file lists all the packages required
 for running SSScoring or using the API.
 
 
-QUICKSTART
+Quickstart
 ==========
 
 - The [SSScoring interactive quickstart](./quickstart.ipynb) notebook for
   Jupyter/Lucyfer is the fastest way to learn how to use the library
-- The `ssscoring` command line tool implements the same functionality as the
+- The `ssscore` command line tool implements the same functionality as the
   interactive quickstart, can be used for scoring speed skydives from the
-  command line with minimum installation - EXPERIMENTAL
+  command line with minimum installation
+- Read the <a href='https://pr3d4t0r.github.io/SSScoring/ssscoring.html' target='_blank'>SSScoring API documentation</a>
 - SSScoring browser tools - EXPERIMENTAL
 
 
-DESCRIPTION
+### ssscore command line tool
+
+`ssscore` is a comnand line tool that scores one or more speed skydiving files
+with as little user participation as possible.  It supports options for
+specifying the DZ altitude MSL in feet and for "simple training output" that
+shows rounded speed values, useful for physical log book updates.
+
+```bash
+ssscore -e 616 -t ./TRACKS
+```
+
+Produces this outout:
+
+```
+elevation = 187.76 m (616.00')
+Processing speed tracks in quickstart-example/...
+
+                                   score  5.0  10.0  ...  25.0  finalTime  maxSpeed
+R3_13-32-20:v2                       490  187   333  ...   490       24.2       493
+quickstart-example R1_09-20-26:v1    325  135   211  ...   319       25.0       328
+quickstart-example R2_11-00-34:v1    476  185   333  ...   315       24.9       481
+
+[3 rows x 8 columns]
+
+Total score = 1291.00, mean speed = 430.33
+```
+
+See the <a href='https://github.com/pr3d4t0r/SSScoring/blob/master/ssscore.md' target='_blank'>`ssscore` man page</a>
+for details on this quickstart tool.
+
+
+Description
 ===========
 SSScoring provides analsysis tools for individual or bulk processing of FlySight
 GPS competition data gathered during speed skydiving training and competition.
@@ -118,9 +151,10 @@ The SSScoring package can be installed into any Python environment version 3.9
 or later.
 https://pypi.org/project/ssscoring
 
-SSScoring also includes Jupyter notebooks for dataset exploratory analysis and
-for code troubleshooting.  Unit test coverage is greater than 92%, limited only
-by Jupyter-specific components that can't be tested in a standalone environment.
+SSScoring also includes Lucyfer/Jupyter notebooks for dataset exploratory
+analysis and for code troubleshooting.  Unit test coverage is greater than 92%,
+limited only by Jupyter-specific components that can't be tested in a standalone
+environment.
 
 
 ### What is a data lake?
@@ -149,17 +183,19 @@ representing all the training files for a competitive skydiver over 10 months.
 ### Additional tools
 
 - `nospot` shell script for disabling Spotlight scanning of FlySight file
-  file systems
+  systems
 - `umountFlySight` Mac app and shell script for safe unmounting of a FlySight
   device from a Macintosh computer
 
 
-SEE ALSO
+See Also
 ========
+<a href='https://pr3d4t0r.github.io/SSScoring/ssscoring.html' target='_blank'>SSScoring API documentation</a> - github.io
 ssscore(1)
+https://github.com/pr3d4t0r/SSScoring/blob/master/ssscore.md
 
 
-LICENSE
+License
 =======
 The **SSScoring** package, documentation and examples are licensed under the
 [BSD-3 open source license](https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt).

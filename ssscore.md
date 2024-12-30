@@ -1,13 +1,13 @@
-% ssscore(1) Version 1.8.2 | Speed Skydiving Scoring command line tool
+% ssscore(1) Version 1.9.0 | Speed Skydiving Scoring command line tool
 
-NAME
+Name
 ====
 
 **sscore** - Speed Skydiving Scoring tool for processing spped dive FlySight
 files
 
 
-SYNOPSIS
+Synopsis
 ========
 ```bash
 pip install -U ssscoring
@@ -21,20 +21,30 @@ pip install -U ssscoring
 Command after installation:
 
 ```bash
-ssscore datalake
+ssscore [-e x.y] [-t] datalake
 ```
 
-Where `datalake` is a directory containing one or more speed skydiving tracks,
-either in the topmost level or nested.  `ssscore` ignores all files present in
-the data lake that aren't speed skydives, even if they are FlySight-compatible
-CSV files.
+Where:
+- `datalake` is a directory containing one or more speed skydiving tracks,
+  either in the topmost directory or nested.  `ssscore` ignores all files present
+  in the data lake that aren't speed skydives, even if they are
+  FlySight-compatible CSV files.
 
-Examples:
+- `-e` is drop zone elevation MSL in ft; defaults to 0.0; `x.y` is a floating
+  point number.
 
-Scores all of Joe's files in his speed skydiving directory:
+- `-t` if present, generates training output rounded values without decimals.
+  Many speeders prefer to report 481 instead of 480.731 or 482 instead of
+  482.297 for training logs.
+
+_Examples_:
+
+Scores all of Joe's files in his speed skydiving directory, sets the DZ
+elevation to 616 ft (Skydive Chicago), and wants training output with rounded
+values (no decimals):
 
 ```bash
-ssscore /Users/joe/speed-skydiving/tracks
+ssscore -e 616 -t /Users/joe/speed-skydiving/tracks
 ```
 
 Score all the files present in the FlySight device mounted at `/mnt`:
@@ -46,7 +56,7 @@ umount /mnt/FLYSIGHT1
 ```
 
 
-DESCRIPTION
+Description
 ===========
 `ssscore` processes speed skydiving FlySight files in bulk.  Track files can
 be in versions 1 or 2, or even in SkyTrax format.  The program scores files
@@ -58,7 +68,7 @@ competition rules.
 required.
 
 
-ARGUMENTS
+Arguments
 =========
 `datalake` is a directory containing one or more speed skydiving tracks,
 either at the topmost level or nested.  `ssscore` ignores all files present in
@@ -69,30 +79,30 @@ The man page or README.md file for the SSScoring API have a longer description
 of what a data lake is and how `ssscore` treats it.
 
 
-OOPTIONS
+Options
 ========
-None.
+`-e, --elevation x.y` - Drop zone elevation MSL; defaults to 0.
 
 
-FILES
+Files
 =====
-/usr/local/bin/ssscore if installed via `pip` to the derault Python run-time
-$VIRTUAL_ENV/bin/ssscore if installed to an active virtual environment
+`/usr/local/bin/ssscore` if installed via `pip` to the derault Python run-time
+`$VIRTUAL_ENV/bin/ssscore` if installed to an active virtual environment.
 
 
-BUGS AND NOTES
+Bugs and Notes
 ==============
 None.
 
 
-SEE ALSO
+See Also
 ========
 ssscoring(3)
 
 Project:  https://github.com/pr3d4t0r/SSScoring
 
 
-LICENSE
+License
 =======
 The **SSScoring** package, documentation and examples are licensed under the
 [BSD-3 open source license](https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt).

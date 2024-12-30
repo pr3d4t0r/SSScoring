@@ -8,7 +8,8 @@ from ssscoring.calc import convertFlySight2SSScoring
 from ssscoring.calc import dropNonSkydiveDataFrom
 from ssscoring.calc import getFlySightDataFromCSV
 from ssscoring.calc import getSpeedSkydiveFrom
-from ssscoring.calc import isValidJump
+from ssscoring.calc import isValidJumpISC
+from ssscoring.calc import isValidMaximumAltitude
 from ssscoring.calc import isValidMinimumAltitude
 from ssscoring.calc import jumpAnalysisTable
 from ssscoring.calc import processAllJumpFiles
@@ -17,6 +18,7 @@ from ssscoring.calc import roundedAggregateResults
 from ssscoring.calc import totalResultsFrom
 from ssscoring.constants import BREAKOFF_ALTITUDE
 from ssscoring.constants import FT_IN_M
+from ssscoring.datatypes import JumpStatus
 from ssscoring.errors import SSScoringError
 from ssscoring.flysight import getAllSpeedJumpFilesFrom
 
@@ -24,6 +26,7 @@ import os
 import pathlib
 import pytest
 import tempfile
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -35,6 +38,8 @@ TEST_FLYSIGHT_DATA_LAKE = './resources/test-tracks'
 TEST_FLYSIGHT_DATA = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-00.csv'
 TEST_FLYSIGHT_DATA_V1 = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-02.csv'
 TEST_FLYSIGHT_DATA_BAD_HEADERS = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-03.csv'
+TEST_FLYSIGHT_DATA_V1_WARM_UP = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-05-warm-up.csv'
+TEST_FLYSIGHT_DATA_V1_EXCEEDS_MAX_ALT = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-06-exceeds-max-alt.CSV'
 
 
 # +++ globals +++
@@ -48,7 +53,7 @@ _speeds = None
 # +++ tests +++
 
 @pytest.fixture
-def _invalidMaxAltitude(tmp_path_factory):
+def _invalidMinAltitude(tmp_path_factory):
     fileName = tmp_path_factory.mktemp('data')/'bogus.CSV'
     data = pd.read_csv(TEST_FLYSIGHT_DATA)
     data.hMSL = BREAKOFF_ALTITUDE-100.0
@@ -57,9 +62,16 @@ def _invalidMaxAltitude(tmp_path_factory):
     os.unlink(fileName.as_posix())
 
 
-def test_isValidMinimumAltitude(_invalidMaxAltitude):
-    d = pd.read_csv(_invalidMaxAltitude, skiprows = (1, 1))
+def test_isValidMinimumAltitude(_invalidMinAltitude):
+    d = pd.read_csv(_invalidMinAltitude, skiprows = (1, 1))
     assert not isValidMinimumAltitude(d.hMSL.max())
+    d = pd.read_csv(TEST_FLYSIGHT_DATA, skiprows = (1, 1))
+    assert isValidMinimumAltitude(d.hMSL.max())
+
+
+def test_isValidMaximumAltitude():
+    d = pd.read_csv(TEST_FLYSIGHT_DATA_V1_EXCEEDS_MAX_ALT, skiprows=(1, 1))
+    assert not isValidMaximumAltitude(d.hMSL.max())
     d = pd.read_csv(TEST_FLYSIGHT_DATA, skiprows = (1, 1))
     assert isValidMinimumAltitude(d.hMSL.max())
 
@@ -112,13 +124,14 @@ def test_getSpeedSkydiveFrom():
     assert _data.iloc[-1].altitudeAGL >= _window.end
 
 
-def test_isValidJump():
+def test_isValidJumpISC():
     bogus = pd.DataFrame( { 'altitudeAGL': (2800, ), 'speedAccuracyISC': (3.1, ), } )
-    assert isValidJump(_data, _window)
-    assert not isValidJump(bogus, _window)
+    assert isValidJumpISC(_data, _window)
+    assert not isValidJumpISC(bogus, _window)
 
 
 def test_calculateDistance():
+    warnings.filterwarnings('ignore', category=UserWarning)
     start = (37.8329426, -121.64040112)
     end = (37.8285883, -121.6356015)
 
@@ -163,12 +176,18 @@ def test_calcScoreISC():
 
 def test_processJump():
     data = convertFlySight2SSScoring(pd.read_csv(TEST_FLYSIGHT_DATA_V1, skiprows = (1,1)))
-
     jumpResults = processJump(data)
 
+    assert jumpResults
     assert '{0:,.2f}'.format(jumpResults.score) == '451.86'
     assert jumpResults.maxSpeed == 452.664
-    assert 'valid' in jumpResults.result
+    assert isinstance(jumpResults.scores, dict)
+
+
+def test_processJump_WarmUpFile():
+    data = convertFlySight2SSScoring(pd.read_csv(TEST_FLYSIGHT_DATA_V1_WARM_UP, skiprows = (1,1)))
+    jumpResults = processJump(data)
+    assert jumpResults.status == JumpStatus.WARM_UP_FILE
 
 
 def test_getFlySightDataFromCSV():
@@ -241,6 +260,7 @@ def test_totalResultsFrom():
 # test_getSpeedSkydiveFrom()
 # test_jumpAnalysisTable()
 # test_isValidMinimumAltitude(_invalidAltFileName)
+test_isValidMaximumAltitude()
 # test_calcScoreMeanVelocity()
 # test_calcScoreISC()
 
@@ -249,4 +269,5 @@ def test_totalResultsFrom():
 # test_processAllJumpFiles()
 # test_aggregateResults()
 # test_roundedAggregateResults()
+# test_totalResultsFrom()
 

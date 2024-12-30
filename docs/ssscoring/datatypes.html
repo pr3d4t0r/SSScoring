@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 15.0.0"/>
+    <meta name="generator" content="pdoc 15.0.1"/>
     <title>ssscoring.datatypes API documentation</title>
             <link rel="icon" href="https://cime.net/upload_area/favicon.ico"/>
 
@@ -33,22 +33,52 @@
             <h2>API Documentation</h2>
                 <ul class="memberlist">
             <li>
+                    <a class="class" href="#FlySightVersion">FlySightVersion</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#FlySightVersion.V1">V1</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#FlySightVersion.V2">V2</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#JumpStatus">JumpStatus</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#JumpStatus.OK">OK</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#JumpStatus.ALTITUDE_EXCEEDS_MINIMUM">ALTITUDE_EXCEEDS_MINIMUM</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#JumpStatus.ALTITUDE_EXCEEDS_MAXIMUM">ALTITUDE_EXCEEDS_MAXIMUM</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#JumpStatus.INVALID_SPEED_FILE">INVALID_SPEED_FILE</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT">SPEED_ACCURACY_EXCEEDS_LIMIT</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#JumpStatus.WARM_UP_FILE">WARM_UP_FILE</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
                     <a class="class" href="#JumpResults">JumpResults</a>
                             <ul class="memberlist">
                         <li>
                                 <a class="function" href="#JumpResults.__init__">JumpResults</a>
                         </li>
                         <li>
-                                <a class="variable" href="#JumpResults.color">color</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#JumpResults.data">data</a>
                         </li>
                         <li>
                                 <a class="variable" href="#JumpResults.maxSpeed">maxSpeed</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#JumpResults.result">result</a>
                         </li>
                         <li>
                                 <a class="variable" href="#JumpResults.score">score</a>
@@ -61,6 +91,9 @@
                         </li>
                         <li>
                                 <a class="variable" href="#JumpResults.window">window</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#JumpResults.status">status</a>
                         </li>
                 </ul>
 
@@ -114,54 +147,215 @@
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="c1"># +++ implementation +++</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="n">JumpResults</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;JumpResults&#39;</span><span class="p">,</span> <span class="s1">&#39;color data maxSpeed result score scores table window&#39;</span><span class="p">)</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">A named tuple containing the score, maximum speed, scores throught the</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="sd">performance window, the results table for a jump, the output color for the</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="sd">result, and the result information string.</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="sd">Attributes</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="sd">----------</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="sd">- `color` - a string representing a color, green if the result is valid, red</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="sd">            otherwise</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="sd">- `data` - dataframe containing all the data points for plotting and</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a><span class="sd">           calculations</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a><span class="sd">- `maxSpeed` - maximum absolute speed registered during a skydive</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a><span class="sd">- `result` - dataframe of results</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a><span class="sd">- `score` - maximum mean speed during a 3-second window during the skydive</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="sd">- `scores` - a series with all the scored ruding the sliding 3-sec window for</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a><span class="sd">             the whole speed skydive</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a><span class="sd">- `table` - summary table of results of the speed run</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a><span class="sd">- `window` - the scoring window data, an instance of `PerformanceWindow`</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="c1"># +++ implementation +++</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="k">class</span> <span class="nc">FlySightVersion</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="sd">    Symbols for handling device version.</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="n">V1</span> <span class="o">=</span> <span class="mi">1000</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="n">V2</span> <span class="o">=</span> <span class="mi">2000</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="k">class</span> <span class="nc">JumpStatus</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="n">OK</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="n">ALTITUDE_EXCEEDS_MINIMUM</span> <span class="o">=</span> <span class="mi">100</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="n">ALTITUDE_EXCEEDS_MAXIMUM</span> <span class="o">=</span> <span class="mi">110</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>    <span class="n">INVALID_SPEED_FILE</span> <span class="o">=</span> <span class="mi">120</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>    <span class="n">SPEED_ACCURACY_EXCEEDS_LIMIT</span> <span class="o">=</span> <span class="mi">200</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>    <span class="n">WARM_UP_FILE</span> <span class="o">=</span> <span class="mi">300</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a><span class="n">JumpResults</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;JumpResults&#39;</span><span class="p">,</span> <span class="s1">&#39;data maxSpeed score scores table window status&#39;</span><span class="p">)</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a><span class="n">PerformanceWindow</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;PerformanceWindow&#39;</span><span class="p">,</span> <span class="s1">&#39;start end validationStart&#39;</span><span class="p">)</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="sd">An object to handle the performance window (as defined in competition rules) as</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="sd">a single object with all the properties necessary to interpret it and manipulate</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a><span class="sd">it across different function or method calls.</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="sd">Attributes</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a><span class="sd">----------</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a><span class="sd">- `start` - beginning or start of the performance window, or exit from the</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a><span class="sd">            aircraft</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a><span class="sd">- `end` - end of the performance window, or `start-PERFORMANCE_WINDOW_LENGTH`</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a><span class="sd">- `validationStart` - end of the performance window - the `VALIDATION_WINDOW_END`</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>
-</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a><span class="sd">See</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a><span class="sd">---</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a><span class="sd">    ssscoring.constants.PERFORMANCE_WINDOW_LENGTH</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a><span class="sd">    ssscoring.constants.VALIDATION_WINDOW_END</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a><span class="sd">A named tuple containing the score, maximum speed, scores throught the</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a><span class="sd">performance window, the results table for a jump, the output color for the</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a><span class="sd">result, and the result information string.</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="sd">Attributes</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="sd">----------</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a><span class="sd">- `data` - dataframe containing all the data points for plotting and</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="sd">           calculations</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="sd">- `maxSpeed` - maximum absolute speed registered during a skydive</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a><span class="sd">- `score` - maximum mean speed during a 3-second window during the skydive</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a><span class="sd">- `scores` - a dictionary with all the scored ruding the sliding 3-sec window</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a><span class="sd">             for the speed run</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a><span class="sd">- `table` - summary table of results of the speed run</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a><span class="sd">- `window` - the scoring window data, an instance of `PerformanceWindow`</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a><span class="sd">- &#39;status&#39; - An instance of `ssscoring.datatypes.JumpStatus`</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a><span class="n">PerformanceWindow</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;PerformanceWindow&#39;</span><span class="p">,</span> <span class="s1">&#39;start end validationStart&#39;</span><span class="p">)</span>
 </span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a><span class="sd">An object to handle the performance window (as defined in competition rules) as</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a><span class="sd">a single object with all the properties necessary to interpret it and manipulate</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a><span class="sd">it across different function or method calls.</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>
+</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a><span class="sd">Attributes</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a><span class="sd">----------</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a><span class="sd">- `start` - beginning or start of the performance window, or exit from the</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a><span class="sd">            aircraft</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a><span class="sd">- `end` - end of the performance window, or `start-PERFORMANCE_WINDOW_LENGTH`</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a><span class="sd">- `validationStart` - end of the performance window - the `VALIDATION_WINDOW_END`</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>
+</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a><span class="sd">See</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a><span class="sd">---</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a><span class="sd">    ssscoring.constants.PERFORMANCE_WINDOW_LENGTH</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a><span class="sd">    ssscoring.constants.VALIDATION_WINDOW_END</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span></pre></div>
 
 
             </section>
+                <section id="FlySightVersion">
+                            <input id="FlySightVersion-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">FlySightVersion</span><wbr>(<span class="base">enum.Enum</span>):
+
+                <label class="view-source-button" for="FlySightVersion-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#FlySightVersion"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="FlySightVersion-15"><a href="#FlySightVersion-15"><span class="linenos">15</span></a><span class="k">class</span> <span class="nc">FlySightVersion</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+</span><span id="FlySightVersion-16"><a href="#FlySightVersion-16"><span class="linenos">16</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="FlySightVersion-17"><a href="#FlySightVersion-17"><span class="linenos">17</span></a><span class="sd">    Symbols for handling device version.</span>
+</span><span id="FlySightVersion-18"><a href="#FlySightVersion-18"><span class="linenos">18</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="FlySightVersion-19"><a href="#FlySightVersion-19"><span class="linenos">19</span></a>    <span class="n">V1</span> <span class="o">=</span> <span class="mi">1000</span>
+</span><span id="FlySightVersion-20"><a href="#FlySightVersion-20"><span class="linenos">20</span></a>    <span class="n">V2</span> <span class="o">=</span> <span class="mi">2000</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Symbols for handling device version.</p>
+</div>
+
+
+                            <div id="FlySightVersion.V1" class="classattr">
+                                <div class="attr variable">
+            <span class="name">V1</span>        =
+<span class="default_value">&lt;<a href="#FlySightVersion.V1">FlySightVersion.V1</a>: 1000&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#FlySightVersion.V1"></a>
+    
+    
+
+                            </div>
+                            <div id="FlySightVersion.V2" class="classattr">
+                                <div class="attr variable">
+            <span class="name">V2</span>        =
+<span class="default_value">&lt;<a href="#FlySightVersion.V2">FlySightVersion.V2</a>: 2000&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#FlySightVersion.V2"></a>
+    
+    
+
+                            </div>
+                </section>
+                <section id="JumpStatus">
+                            <input id="JumpStatus-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">JumpStatus</span><wbr>(<span class="base">enum.Enum</span>):
+
+                <label class="view-source-button" for="JumpStatus-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#JumpStatus"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="JumpStatus-23"><a href="#JumpStatus-23"><span class="linenos">23</span></a><span class="k">class</span> <span class="nc">JumpStatus</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+</span><span id="JumpStatus-24"><a href="#JumpStatus-24"><span class="linenos">24</span></a>    <span class="n">OK</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="JumpStatus-25"><a href="#JumpStatus-25"><span class="linenos">25</span></a>    <span class="n">ALTITUDE_EXCEEDS_MINIMUM</span> <span class="o">=</span> <span class="mi">100</span>
+</span><span id="JumpStatus-26"><a href="#JumpStatus-26"><span class="linenos">26</span></a>    <span class="n">ALTITUDE_EXCEEDS_MAXIMUM</span> <span class="o">=</span> <span class="mi">110</span>
+</span><span id="JumpStatus-27"><a href="#JumpStatus-27"><span class="linenos">27</span></a>    <span class="n">INVALID_SPEED_FILE</span> <span class="o">=</span> <span class="mi">120</span>
+</span><span id="JumpStatus-28"><a href="#JumpStatus-28"><span class="linenos">28</span></a>    <span class="n">SPEED_ACCURACY_EXCEEDS_LIMIT</span> <span class="o">=</span> <span class="mi">200</span>
+</span><span id="JumpStatus-29"><a href="#JumpStatus-29"><span class="linenos">29</span></a>    <span class="n">WARM_UP_FILE</span> <span class="o">=</span> <span class="mi">300</span>
+</span></pre></div>
+
+
+    
+
+                            <div id="JumpStatus.OK" class="classattr">
+                                <div class="attr variable">
+            <span class="name">OK</span>        =
+<span class="default_value">&lt;<a href="#JumpStatus.OK">JumpStatus.OK</a>: 0&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#JumpStatus.OK"></a>
+    
+    
+
+                            </div>
+                            <div id="JumpStatus.ALTITUDE_EXCEEDS_MINIMUM" class="classattr">
+                                <div class="attr variable">
+            <span class="name">ALTITUDE_EXCEEDS_MINIMUM</span>        =
+<span class="default_value">&lt;<a href="#JumpStatus.ALTITUDE_EXCEEDS_MINIMUM">JumpStatus.ALTITUDE_EXCEEDS_MINIMUM</a>: 100&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#JumpStatus.ALTITUDE_EXCEEDS_MINIMUM"></a>
+    
+    
+
+                            </div>
+                            <div id="JumpStatus.ALTITUDE_EXCEEDS_MAXIMUM" class="classattr">
+                                <div class="attr variable">
+            <span class="name">ALTITUDE_EXCEEDS_MAXIMUM</span>        =
+<span class="default_value">&lt;<a href="#JumpStatus.ALTITUDE_EXCEEDS_MAXIMUM">JumpStatus.ALTITUDE_EXCEEDS_MAXIMUM</a>: 110&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#JumpStatus.ALTITUDE_EXCEEDS_MAXIMUM"></a>
+    
+    
+
+                            </div>
+                            <div id="JumpStatus.INVALID_SPEED_FILE" class="classattr">
+                                <div class="attr variable">
+            <span class="name">INVALID_SPEED_FILE</span>        =
+<span class="default_value">&lt;<a href="#JumpStatus.INVALID_SPEED_FILE">JumpStatus.INVALID_SPEED_FILE</a>: 120&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#JumpStatus.INVALID_SPEED_FILE"></a>
+    
+    
+
+                            </div>
+                            <div id="JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT" class="classattr">
+                                <div class="attr variable">
+            <span class="name">SPEED_ACCURACY_EXCEEDS_LIMIT</span>        =
+<span class="default_value">&lt;<a href="#JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT">JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT</a>: 200&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT"></a>
+    
+    
+
+                            </div>
+                            <div id="JumpStatus.WARM_UP_FILE" class="classattr">
+                                <div class="attr variable">
+            <span class="name">WARM_UP_FILE</span>        =
+<span class="default_value">&lt;<a href="#JumpStatus.WARM_UP_FILE">JumpStatus.WARM_UP_FILE</a>: 300&gt;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#JumpStatus.WARM_UP_FILE"></a>
+    
+    
+
+                            </div>
+                </section>
                 <section id="JumpResults">
                     <div class="attr class">
             
@@ -179,17 +373,15 @@ result, and the result information string.</p>
 <h2 id="attributes">Attributes</h2>
 
 <ul>
-<li><code><a href="#JumpResults.color">color</a></code> - a string representing a color, green if the result is valid, red
-otherwise</li>
 <li><code><a href="#JumpResults.data">data</a></code> - dataframe containing all the data points for plotting and
 calculations</li>
 <li><code><a href="#JumpResults.maxSpeed">maxSpeed</a></code> - maximum absolute speed registered during a skydive</li>
-<li><code><a href="#JumpResults.result">result</a></code> - dataframe of results</li>
 <li><code><a href="#JumpResults.score">score</a></code> - maximum mean speed during a 3-second window during the skydive</li>
-<li><code><a href="#JumpResults.scores">scores</a></code> - a series with all the scored ruding the sliding 3-sec window for
-the whole speed skydive</li>
+<li><code><a href="#JumpResults.scores">scores</a></code> - a dictionary with all the scored ruding the sliding 3-sec window
+for the speed run</li>
 <li><code><a href="#JumpResults.table">table</a></code> - summary table of results of the speed run</li>
 <li><code><a href="#JumpResults.window">window</a></code> - the scoring window data, an instance of <code><a href="#PerformanceWindow">PerformanceWindow</a></code></li>
+<li>'status' - An instance of <code><a href="#JumpStatus">ssscoring.datatypes.JumpStatus</a></code></li>
 </ul>
 </div>
 
@@ -197,26 +389,13 @@ the whole speed skydive</li>
                             <div id="JumpResults.__init__" class="classattr">
                                 <div class="attr function">
             
-        <span class="name">JumpResults</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">color</span>, </span><span class="param"><span class="n">data</span>, </span><span class="param"><span class="n">maxSpeed</span>, </span><span class="param"><span class="n">result</span>, </span><span class="param"><span class="n">score</span>, </span><span class="param"><span class="n">scores</span>, </span><span class="param"><span class="n">table</span>, </span><span class="param"><span class="n">window</span></span>)</span>
+        <span class="name">JumpResults</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">data</span>, </span><span class="param"><span class="n">maxSpeed</span>, </span><span class="param"><span class="n">score</span>, </span><span class="param"><span class="n">scores</span>, </span><span class="param"><span class="n">table</span>, </span><span class="param"><span class="n">window</span>, </span><span class="param"><span class="n">status</span></span>)</span>
 
         
     </div>
     <a class="headerlink" href="#JumpResults.__init__"></a>
     
-            <div class="docstring"><p>Create new instance of JumpResults(color, data, maxSpeed, result, score, scores, table, window)</p>
-</div>
-
-
-                            </div>
-                            <div id="JumpResults.color" class="classattr">
-                                <div class="attr variable">
-            <span class="name">color</span>
-
-        
-    </div>
-    <a class="headerlink" href="#JumpResults.color"></a>
-    
-            <div class="docstring"><p>Alias for field number 0</p>
+            <div class="docstring"><p>Create new instance of JumpResults(data, maxSpeed, score, scores, table, window, status)</p>
 </div>
 
 
@@ -229,7 +408,7 @@ the whole speed skydive</li>
     </div>
     <a class="headerlink" href="#JumpResults.data"></a>
     
-            <div class="docstring"><p>Alias for field number 1</p>
+            <div class="docstring"><p>Alias for field number 0</p>
 </div>
 
 
@@ -242,20 +421,7 @@ the whole speed skydive</li>
     </div>
     <a class="headerlink" href="#JumpResults.maxSpeed"></a>
     
-            <div class="docstring"><p>Alias for field number 2</p>
-</div>
-
-
-                            </div>
-                            <div id="JumpResults.result" class="classattr">
-                                <div class="attr variable">
-            <span class="name">result</span>
-
-        
-    </div>
-    <a class="headerlink" href="#JumpResults.result"></a>
-    
-            <div class="docstring"><p>Alias for field number 3</p>
+            <div class="docstring"><p>Alias for field number 1</p>
 </div>
 
 
@@ -268,7 +434,7 @@ the whole speed skydive</li>
     </div>
     <a class="headerlink" href="#JumpResults.score"></a>
     
-            <div class="docstring"><p>Alias for field number 4</p>
+            <div class="docstring"><p>Alias for field number 2</p>
 </div>
 
 
@@ -281,7 +447,7 @@ the whole speed skydive</li>
     </div>
     <a class="headerlink" href="#JumpResults.scores"></a>
     
-            <div class="docstring"><p>Alias for field number 5</p>
+            <div class="docstring"><p>Alias for field number 3</p>
 </div>
 
 
@@ -294,7 +460,7 @@ the whole speed skydive</li>
     </div>
     <a class="headerlink" href="#JumpResults.table"></a>
     
-            <div class="docstring"><p>Alias for field number 6</p>
+            <div class="docstring"><p>Alias for field number 4</p>
 </div>
 
 
@@ -307,7 +473,20 @@ the whole speed skydive</li>
     </div>
     <a class="headerlink" href="#JumpResults.window"></a>
     
-            <div class="docstring"><p>Alias for field number 7</p>
+            <div class="docstring"><p>Alias for field number 5</p>
+</div>
+
+
+                            </div>
+                            <div id="JumpResults.status" class="classattr">
+                                <div class="attr variable">
+            <span class="name">status</span>
+
+        
+    </div>
+    <a class="headerlink" href="#JumpResults.status"></a>
+    
+            <div class="docstring"><p>Alias for field number 6</p>
 </div>
 
 
