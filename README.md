@@ -67,6 +67,7 @@ Quickstart
 - The `ssscore` command line tool implements the same functionality as the
   interactive quickstart, can be used for scoring speed skydives from the
   command line with minimum installation
+- Read the <a href='https://pr3d4t0r.github.io/SSScoring/ssscoring.html' target='_blank'>SSScoring API documentation</a>
 - SSScoring browser tools - EXPERIMENTAL
 
 
@@ -189,6 +190,7 @@ representing all the training files for a competitive skydiver over 10 months.
 
 See Also
 ========
+<a href='https://pr3d4t0r.github.io/SSScoring/ssscoring.html' target='_blank'>SSScoring API documentation</a> - github.io
 ssscore(1)
 https://github.com/pr3d4t0r/SSScoring/blob/master/ssscore.md
 
