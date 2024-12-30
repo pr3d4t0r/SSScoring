@@ -9,6 +9,7 @@ from ssscoring import __VERSION__
 from ssscoring.calc import aggregateResults
 from ssscoring.calc import processAllJumpFiles
 from ssscoring.calc import roundedAggregateResults
+from ssscoring.constants import FT_IN_M
 from ssscoring.flysight import getAllSpeedJumpFilesFrom
 
 import os
@@ -81,7 +82,7 @@ def _assertDataLake(dataLake: str, isUnitTest = False) -> bool:
     return retVal
 
 
-def ssscore(dataLake: str) -> int:
+def ssscore(elevation: float, trainingOutput: bool, dataLake: str) -> int:
     """
     Process all the speed skydiving files contained in `dataLakeSpec`.  This
     function implements the business logic for the `/usr/local/bin/ssscore`
@@ -89,6 +90,12 @@ def ssscore(dataLake: str) -> int:
 
     Arguments
     ---------
+        elevation
+    The drop zone elevation MSL in feet.
+
+        trainingOutput
+    If `True`, output will use rounded values.
+
         dataLake
     Command line argument with the path to the data lake.
 
@@ -99,10 +106,15 @@ def ssscore(dataLake: str) -> int:
     """
     _assertDataLake(dataLake)
 
+    elevationMeters = elevation/FT_IN_M
+    click.secho("elevation = %.2f m (%.2f')" % (elevationMeters, elevation))
     click.secho('Processing speed tracks in %s...\n' % dataLake)
-    jumpResults = processAllJumpFiles(getAllSpeedJumpFilesFrom(dataLake))
+    jumpResults = processAllJumpFiles(getAllSpeedJumpFilesFrom(dataLake), altitudeDZMeters=elevationMeters)
     if jumpResults:
-        resultsSummary = aggregateResults(jumpResults)
+        if trainingOutput:
+            resultsSummary = roundedAggregateResults(aggregateResults(jumpResults))
+        else:
+            resultsSummary = aggregateResults(jumpResults)
         click.secho(resultsSummary, fg = 'bright_green')
         click.secho('\nTotal score = %5.2f, mean speed = %5.2f\n' % (resultsSummary.score.sum(), resultsSummary.score.mean()), fg = 'bright_white')
     else:
@@ -113,16 +125,15 @@ def ssscore(dataLake: str) -> int:
 @click.command('ssscore')
 @click.argument('datalake', nargs = 1, type = click.STRING)
 @click.version_option(__VERSION__, prog_name = 'ssscore')
-def ssscoreCommand(datalake: str) -> int:
-    """
-    @private
-    """
-    return ssscore(datalake)
+@click.option('-e', '--elevation', default=0.0, show_default=True, help='DZ elevation in ft')
+@click.option('-t', '--training', is_flag=True, show_default=True, default=False, help='Show training output values')
+def _ssscoreCommand(elevation: float, training: bool, datalake: str) -> int:
+    return ssscore(elevation, training, datalake)
 
 
 # +++ main +++
 
 # For interactive testing and symbolic debugging:
 if '__main__' == __name__:
-    ssscoreCommand()
+    _ssscoreCommand()
 
