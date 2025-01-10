@@ -393,6 +393,13 @@ def calcScoreMeanVelocity(data: pd.DataFrame) -> tuple:
     A `tuple` with the best score throughout the speed run, and a dicitionary
     of the meanVSpeed:spotInTime used in determining the exact scoring speed
     at every datat point during the speed run.
+
+    Notes
+    -----
+    This implementation uses iteration instead of binning/factorization because
+    some implementers may be unfamiliar with data manipulation in dataframes
+    and this is a critical function that may be under heavy review.  Future
+    versions may revert to dataframe and series/np.array factorization.
     """
     scores = dict()
     for spot in data.plotTime[::1]:
@@ -521,7 +528,7 @@ def _readVersion2CSV(jumpFile: str) -> pd.DataFrame:
     return rawData
 
 
-def getFlySightDataFromCSV(jumpFile) -> tuple:
+def getFlySightDataFromCSVFileName(jumpFile) -> tuple:
     """
     Ingress a known FlySight or SkyTrax file into memory for SSScoring
     processing.
@@ -587,7 +594,7 @@ def processAllJumpFiles(jumpFiles: list, altitudeDZMeters = 0.0) -> dict:
     """
     jumpResults = dict()
     for jumpFile in jumpFiles.keys():
-        rawData, tag = getFlySightDataFromCSV(jumpFile)
+        rawData, tag = getFlySightDataFromCSVFileName(jumpFile)
         jumpResult = processJump(convertFlySight2SSScoring(rawData, altitudeDZMeters = altitudeDZMeters))
         if JumpStatus.OK == jumpResult.status:
             jumpResults[tag] = jumpResult

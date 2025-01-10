@@ -188,6 +188,18 @@ representing all the training files for a competitive skydiver over 10 months.
   device from a Macintosh computer
 
 
+Contributors
+============
+
+| Name | GitHub |
+|------|--------|
+|Jochen Althoff|@Quadriga14193|
+|Eugene Ciurana|@pr3d4t0r|
+|Nik Daniel|n/a|
+|Alexey Galda|@alexgalda|
+|Marco Hepp|n/a|
+
+
 See Also
 ========
 <a href='https://pr3d4t0r.github.io/SSScoring/ssscoring.html' target='_blank'>SSScoring API documentation</a> - github.io
