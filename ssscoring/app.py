@@ -51,6 +51,7 @@ def _initDropZonesFrom(fileName: str) -> pd.DataFrame:
 def _setSideBarAndMain():
     dropZones = _initDropZonesFrom(DZ_DIRECTORY)
     st.sidebar.title('SSScoring %s α' % __VERSION__)
+    processInvalidJumps = st.sidebar.checkbox('Process invalid jumps', value=True, help='Display results from jumps below or above ISC altitudes')
     dropZone = st.sidebar.selectbox('Select drop zone:', dropZones.dropZone, index=None)
     if dropZone:
         elevation = dropZones[dropZones.dropZone == dropZone ].iloc[0].elevation
@@ -58,6 +59,7 @@ def _setSideBarAndMain():
     else:
         elevation = 0.0
         st.session_state.elevation = None
+    st.session_state.processInvalidJumps = processInvalidJumps
     st.sidebar.metric('Elevation', value='%.1f m' % elevation)
     trackFile = st.sidebar.file_uploader('SMD file', [ 'CSV' ], disabled=(st.session_state.elevation == None))
     return trackFile
