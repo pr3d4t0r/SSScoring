@@ -1,5 +1,7 @@
+bokeh==2.4.3
 click
 haversine
-jupyter_bokeh
+jupyter_bokeh==3.0.4
+numpy<1.26.4
 streamlit
 

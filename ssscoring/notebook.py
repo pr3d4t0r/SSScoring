@@ -29,14 +29,12 @@ bi.curdoc().theme = 'dark_minimal'
 # *** functions ***
 
 def initializePlot(jumpTitle: str,
-                   height = 500,
-                   width = 900,
-                   xLabel = 'seconds from exit',
-                   yLabel = 'km/h',
-                   # TODO: roll back to 40.0?
-                   # xMax = 40.0,
-                   xMax = 35.0,
-                   yMax = 550.0):
+                   height=500,
+                   width=900,
+                   xLabel='seconds from exit',
+                   yLabel='km/h',
+                   xMax=35.0,
+                   yMax=550.0):
     """
     Initiialize a plotting area for notebook output.
 
@@ -63,28 +61,45 @@ def initializePlot(jumpTitle: str,
         yMax: float
     The maximum range for the Y axis.  Default = 550
     """
-    return bp.figure(title = jumpTitle,
-                     height = height,
-                     width = width,
-                     x_axis_label = xLabel,
-                     y_axis_label = yLabel,
-                     x_range = (0.0, xMax),
-                     y_range = (0.0, yMax))
+    bi.curdoc().theme = 'dark_minimal'
+    plot = bp.figure(title=jumpTitle,
+                     height=height,
+                     width=width,
+                     x_axis_label=xLabel,
+                     y_axis_label=yLabel,
+                     x_range=(0.0, xMax),
+                     y_range=(0.0, yMax),
+                     background_fill_color='#1a1a1a',
+                     border_fill_color='#1a1a1a')
+    # TODO:  Make this a separate function because it'll be done
+    #        in many places in the code.
+    plot.xaxis.axis_label_text_color='lightsteelblue'
+    plot.xaxis.major_label_text_color='lightsteelblue'
+    plot.xaxis.axis_line_color='lightsteelblue'
+    plot.xaxis.major_tick_line_color='lightsteelblue'
+    plot.xaxis.minor_tick_line_color='lightsteelblue'
+    plot.yaxis.axis_label_text_color='lightsteelblue'
+    plot.yaxis.major_label_text_color='lightsteelblue'
+    plot.yaxis.axis_line_color='lightsteelblue'
+    plot.yaxis.major_tick_line_color='lightsteelblue'
+    plot.yaxis.minor_tick_line_color='lightsteelblue'
+    plot.title.text_color = 'lightsteelblue'
+    return plot
 
 
 def _graphSegment(plot,
-                  x0 = 0.0,
-                  y0 = 0.0,
-                  x1 = 0.0,
-                  y1 = 0.0,
-                  lineWidth = 1,
-                  color = 'black'):
-    plot.segment(x0 = [ x0, ],
-                 y0 = [ y0, ],
-                 x1 = [ x1, ],
-                 y1 = [ y1, ],
-                 line_width = lineWidth,
-                 color = color)
+                  x0=0.0,
+                  y0=0.0,
+                  x1=0.0,
+                  y1=0.0,
+                  lineWidth=1,
+                  color='black'):
+    plot.segment(x0=[ x0, ],
+                 y0=[ y0, ],
+                 x1=[ x1, ],
+                 y1=[ y1, ],
+                 line_width=lineWidth,
+                 color=color)
 
 
 def initializeExtraYRanges(plot,
@@ -113,8 +128,26 @@ def initializeExtraYRanges(plot,
         'altitudeFt': Range1d(start = startY, end = endY),
         'angle': Range1d(start = 0.0, end = 90.0),
     }
-    plot.add_layout(LinearAxis(y_range_name = 'altitudeFt', axis_label = 'Alt (ft)'), 'left')
-    plot.add_layout(LinearAxis(y_range_name = 'angle', axis_label = 'angle'), 'left')
+    # TODO:  Make this a separate function because it'll be done
+    #        in many places in the code.
+    plot.add_layout(LinearAxis(
+            axis_label = 'Alt (ft)',
+            axis_label_text_color = 'lightsteelblue',
+            axis_line_color = 'lightsteelblue',
+            major_label_text_color = 'lightsteelblue',
+            major_tick_line_color='lightsteelblue',
+            minor_tick_line_color='lightsteelblue',
+            y_range_name = 'altitudeFt',
+        ), 'left')
+    plot.add_layout(LinearAxis(
+            axis_label = 'angle',
+            axis_label_text_color = 'lightsteelblue',
+            axis_line_color = 'lightsteelblue',
+            major_label_text_color = 'lightsteelblue',
+            major_tick_line_color='lightsteelblue',
+            minor_tick_line_color='lightsteelblue',
+            y_range_name = 'angle',
+        ), 'left')
 
     return plot
 
@@ -155,11 +188,19 @@ def graphJumpResult(plot,
         graphJumpResult(plot, result, showIt = False)
 
     bp.show(plot)
+    ```
+
+    Another alternative use is in Streamlit.io applications:
+
+    ```python
+    graphJumpResult(plot, result, showIt = False)
+
+    st.bokeh_chart(plot, use_container_width=True)
+    ```
 
     Returns
     -------
     `None`.
-    ```
     """
     data = jumpResult.data
     scores = jumpResult.scores

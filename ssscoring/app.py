@@ -13,10 +13,18 @@ from ssscoring.calc import isValidMaximumAltitude
 from ssscoring.calc import isValidMinimumAltitude
 from ssscoring.calc import processJump
 from ssscoring.datatypes import JumpStatus
+from ssscoring.notebook import SPEED_COLORS
+from ssscoring.notebook import graphAltitude
+from ssscoring.notebook import graphAngle
+from ssscoring.notebook import graphJumpResult
+from ssscoring.notebook import initializeExtraYRanges
+from ssscoring.notebook import initializePlot
 
 import os
 import psutil
 
+# import bokeh.models as bm
+# import bokeh.plotting as bp
 import pandas as pd
 import streamlit as st
 
@@ -51,25 +59,22 @@ def _initDropZonesFrom(fileName: str) -> pd.DataFrame:
 def _setSideBarAndMain():
     dropZones = _initDropZonesFrom(DZ_DIRECTORY)
     st.sidebar.title('SSScoring %s α' % __VERSION__)
-    processInvalidJumps = st.sidebar.checkbox('Process invalid jumps', value=True, help='Display results from jumps below or above ISC altitudes')
+    st.session_state.processBadJump = st.sidebar.checkbox('Process bad jump', value=True, help='Display results from invalid jumps')
     dropZone = st.sidebar.selectbox('Select drop zone:', dropZones.dropZone, index=None)
     if dropZone:
-        elevation = dropZones[dropZones.dropZone == dropZone ].iloc[0].elevation
-        st.session_state.elevation = elevation
+        st.session_state.elevation = dropZones[dropZones.dropZone == dropZone ].iloc[0].elevation
     else:
-        elevation = 0.0
         st.session_state.elevation = None
-    st.session_state.processInvalidJumps = processInvalidJumps
-    st.sidebar.metric('Elevation', value='%.1f m' % elevation)
-    trackFile = st.sidebar.file_uploader('SMD file', [ 'CSV' ], disabled=(st.session_state.elevation == None))
-    return trackFile
+        st.session_state.trackFile = None
+    st.sidebar.metric('Elevation', value='%.1f m' % (0.0 if st.session_state.elevation == None else st.session_state.elevation))
+    st.session_state.trackFile = st.sidebar.file_uploader('Track file', [ 'CSV' ], disabled=st.session_state.elevation == None)
 
 
 def _getJumpDataFrom(trackFile: str) -> pd.DataFrame:
-    dropZoneAltMSLMeters = st.session_state.elevation
+    dropZoneAltMSLMeters = 0.0 if st.session_state.elevation == None else st.session_state.elevation
     data = None
     tag = None
-    if dropZoneAltMSLMeters:
+    if dropZoneAltMSLMeters is not None:
         rawData, tag = getFlySightDataFromCSVFileName(trackFile)
         data = convertFlySight2SSScoring(rawData, altitudeDZMeters=dropZoneAltMSLMeters)
     return data, tag
@@ -93,39 +98,57 @@ def _closeWindow():
     </script>
     """ % js
     st.html(temp)
+    processID = os.getpid()
+    p = psutil.Process(processID)
+    p.terminate()
 
 
 def main():
     st.set_page_config(layout = 'wide')
     _init()
-    trackFile = _setSideBarAndMain()
+    _setSideBarAndMain()
 
-    if trackFile:
-        trackFileName = trackFile.name
-        data, tag = _getJumpDataFrom(DEFAULT_DATA_LAKE+'/'+trackFileName)
+    col0, col1 = st.columns([ 0.4, 0.6, ])
+    if st.session_state.trackFile:
+        trackFileName = st.session_state.trackFile.name
+        data, tag = _getJumpDataFrom(DEFAULT_DATA_LAKE+'/'+trackFileName) # TODO: make this nicer
         jumpResult = processJump(data)
-        if jumpResult.status == JumpStatus.OK:
-            validJumpStatus = '<hr><h1><span style="color: %s">%s jump - %s - score = %.01f km/h</span></h1>' % ('green', tag, 'VALID', jumpResult.score)
         maxSpeed = jumpResult.maxSpeed
         window = jumpResult.window
-        if jumpResult.status == JumpStatus.OK:
+        jumpStatus = jumpResult.status
+        scoringInfo = 'Max speed = {0:,.0f}; '.format(maxSpeed)+('exit at %d m (%d ft)<br>End scoring window at %d m (%d ft)<br>'%(window.start, 3.2808*window.start, window.end, 3.2808*window.end))
+        if jumpStatus == JumpStatus.OK:
+            jumpStatusInfo = '<span style="color: %s">%s jump - %s - %.02f km/h</span><br>' % ('green', tag, 'VALID', jumpResult.score)
             belowMaxAltitude = isValidMaximumAltitude(jumpResult.data.altitudeAGL.max())
             badJumpLegend = None
             if not isValidMinimumAltitude(jumpResult.data.altitudeAGL.max()):
-                badJumpLegend = '<h3><span style="color: yellow"><span style="font-weight: bold">Warning:</span> exit altitude AGL was lower than the minimum scoring altitude according to IPC and USPA.</h3>'
+                badJumpLegend = '<span style="color: yellow"><span style="font-weight: bold">Warning:</span> exit altitude AGL was lower than the minimum scoring altitude<br>'
+                jumpStatus = JumpStatus.ALTITUDE_EXCEEDS_MINIMUM
             if not belowMaxAltitude:
-                badJumpLegend = '<h3><span style="color: red"><span style="font-weight: bold">RE-JUMP:</span> exit altitude AGL exceeds the maximum altitude according to IPC and USPA.</h3>'
-                validJumpStatus = '<hr><h1><span style="color: %s">%s jump - %s - %s</span></h1>' % ('red', tag, 'INVALID', JumpStatus.ALTITUDE_EXCEEDS_MAXIMUM)
-            st.html(validJumpStatus)
-            st.html('<h3>Max speed = {0:,.0f}; '.format(maxSpeed)+('exit at %d m (%d ft), end scoring window at %d m (%d ft)</h3?'%(window.start, 3.2808*window.start, window.end, 3.2808*window.end)))
-            if badJumpLegend:
-                st.html(badJumpLegend)
-            _displayJumpDataIn(jumpResult.table)
+                jumpStatusInfo = '<span style="color: %s">%s jump - %s - %.02f km/h</span><br>' % ('red', tag, 'INVALID', jumpResult.score)
+                badJumpLegend = '<span style="color: red"><span style="font-weight: bold">RE-JUMP:</span> exit altitude AGL exceeds the maximum altitude<br>'
+                jumpStatus = JumpStatus.ALTITUDE_EXCEEDS_MAXIMUM
+        elif jumpStatus == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT:
+            badJumpLegend = '<span style="color: red"><span style="font-weight: bold">RE-JUMP:</span> exit altitude AGL exceeds the maximum altitude<br>'
+
+
+        jumpStatus = JumpStatus.OK if jumpStatus != JumpStatus.OK and st.session_state.processBadJump else jumpStatus
+        plot = initializePlot(tag)
+        plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
+        graphAltitude(plot, jumpResult)
+        graphAngle(plot, jumpResult)
+        graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
+        with col0:
+            st.html('<h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend if badJumpLegend else '')+'</h3>')
+        if jumpStatus == JumpStatus.OK:
+            with col0:
+                _displayJumpDataIn(jumpResult.table)
+            with col1:
+                st.bokeh_chart(plot, use_container_width=True)
+                st.map(jumpResult.data, size=10)
+
     if st.sidebar.button('Exit'):
         _closeWindow()
-        processID = os.getpid()
-        p = psutil.Process(processID)
-        p.terminate()
 
 
 if '__main__' == __name__:
