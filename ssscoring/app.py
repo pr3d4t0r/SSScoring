@@ -116,7 +116,12 @@ def main():
         maxSpeed = jumpResult.maxSpeed
         window = jumpResult.window
         jumpStatus = jumpResult.status
-        scoringInfo = 'Max speed = {0:,.0f}; '.format(maxSpeed)+('exit at %d m (%d ft)<br>End scoring window at %d m (%d ft)<br>'%(window.start, 3.2808*window.start, window.end, 3.2808*window.end))
+        if jumpResult.status == JumpStatus.WARM_UP_FILE:
+            jumpStatusInfo = ''
+            badJumpLegend = '<span style="color: red">Warm up file - nothing to do<br>'
+            scoringInfo = ''
+        else:
+            scoringInfo = 'Max speed = {0:,.0f}; '.format(maxSpeed)+('exit at %d m (%d ft)<br>End scoring window at %d m (%d ft)<br>'%(window.start, 3.2808*window.start, window.end, 3.2808*window.end))
         if jumpStatus == JumpStatus.OK:
             jumpStatusInfo = '<span style="color: %s">%s jump - %s - %.02f km/h</span><br>' % ('green', tag, 'VALID', jumpResult.score)
             belowMaxAltitude = isValidMaximumAltitude(jumpResult.data.altitudeAGL.max())
@@ -132,17 +137,17 @@ def main():
             badJumpLegend = '<span style="color: red"><span style="font-weight: bold">RE-JUMP:</span> exit altitude AGL exceeds the maximum altitude<br>'
 
 
-        jumpStatus = JumpStatus.OK if jumpStatus != JumpStatus.OK and st.session_state.processBadJump else jumpStatus
-        plot = initializePlot(tag)
-        plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
-        graphAltitude(plot, jumpResult)
-        graphAngle(plot, jumpResult)
-        graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
+        jumpStatus = JumpStatus.OK if jumpStatus != JumpStatus.OK and st.session_state.processBadJump and jumpStatus != JumpStatus.WARM_UP_FILE else jumpStatus
         with col0:
             st.html('<h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend if badJumpLegend else '')+'</h3>')
         if jumpStatus == JumpStatus.OK:
             with col0:
                 _displayJumpDataIn(jumpResult.table)
+                plot = initializePlot(tag)
+                plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
+                graphAltitude(plot, jumpResult)
+                graphAngle(plot, jumpResult)
+                graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
             with col1:
                 st.bokeh_chart(plot, use_container_width=True)
                 st.map(jumpResult.data, size=10)
