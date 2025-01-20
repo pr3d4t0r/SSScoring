@@ -23,7 +23,7 @@ from ssscoring.notebook import initializePlot
 import os
 import psutil
 
-# import bokeh.models as bm
+import bokeh.models as bm
 # import bokeh.plotting as bp
 import pandas as pd
 import streamlit as st
@@ -147,10 +147,12 @@ def main():
                 plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
                 graphAltitude(plot, jumpResult)
                 graphAngle(plot, jumpResult)
+                hoverValue = bm.HoverTool(tooltips=[('Y-val', '@y{0.00}',),])
+                plot.add_tools(hoverValue)
                 graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
             with col1:
                 st.bokeh_chart(plot, use_container_width=True)
-                st.map(jumpResult.data, size=10)
+                st.map(jumpResult.data, size=2)
 
     if st.sidebar.button('Exit'):
         _closeWindow()

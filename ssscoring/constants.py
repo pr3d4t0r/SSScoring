@@ -16,6 +16,13 @@ BREAKOFF_ALTITUDE = 1707.0
 Breakoff altitude or hard deck.
 """
 
+DEFAULT_AXIS_COLOR_BOKEH = 'lightsteelblue'
+"""
+CSS color name for the axis colors used in notebooks and Streamlit
+with Bokeh.
+"""
+
+
 DEG_IN_RADIANS = math.pi/180.0
 """
 π/180º

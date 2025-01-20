@@ -8,6 +8,7 @@
 from bokeh.models import LinearAxis
 from bokeh.models import Range1d
 
+from ssscoring.constants import DEFAULT_AXIS_COLOR_BOKEH
 from ssscoring.constants import MAX_ALTITUDE_FT
 
 import bokeh.io as bi
@@ -34,7 +35,8 @@ def initializePlot(jumpTitle: str,
                    xLabel='seconds from exit',
                    yLabel='km/h',
                    xMax=35.0,
-                   yMax=550.0):
+                   yMax=550.0,
+                   colorName=DEFAULT_AXIS_COLOR_BOKEH):
     """
     Initiialize a plotting area for notebook output.
 
@@ -60,6 +62,9 @@ def initializePlot(jumpTitle: str,
 
         yMax: float
     The maximum range for the Y axis.  Default = 550
+
+        colorName
+    A valid CSS color string.
     """
     bi.curdoc().theme = 'dark_minimal'
     plot = bp.figure(title=jumpTitle,
@@ -71,19 +76,17 @@ def initializePlot(jumpTitle: str,
                      y_range=(0.0, yMax),
                      background_fill_color='#1a1a1a',
                      border_fill_color='#1a1a1a')
-    # TODO:  Make this a separate function because it'll be done
-    #        in many places in the code.
-    plot.xaxis.axis_label_text_color='lightsteelblue'
-    plot.xaxis.major_label_text_color='lightsteelblue'
-    plot.xaxis.axis_line_color='lightsteelblue'
-    plot.xaxis.major_tick_line_color='lightsteelblue'
-    plot.xaxis.minor_tick_line_color='lightsteelblue'
-    plot.yaxis.axis_label_text_color='lightsteelblue'
-    plot.yaxis.major_label_text_color='lightsteelblue'
-    plot.yaxis.axis_line_color='lightsteelblue'
-    plot.yaxis.major_tick_line_color='lightsteelblue'
-    plot.yaxis.minor_tick_line_color='lightsteelblue'
-    plot.title.text_color = 'lightsteelblue'
+    plot.xaxis.axis_label_text_color=colorName
+    plot.xaxis.major_label_text_color=colorName
+    plot.xaxis.axis_line_color=colorName
+    plot.xaxis.major_tick_line_color=colorName
+    plot.xaxis.minor_tick_line_color=colorName
+    plot.yaxis.axis_label_text_color=colorName
+    plot.yaxis.major_label_text_color=colorName
+    plot.yaxis.axis_line_color=colorName
+    plot.yaxis.major_tick_line_color=colorName
+    plot.yaxis.minor_tick_line_color=colorName
+    plot.title.text_color = colorName
     return plot
 
 
@@ -100,6 +103,40 @@ def _graphSegment(plot,
                  y1=[ y1, ],
                  line_width=lineWidth,
                  color=color)
+
+
+def _initLinearAxis(label: str,
+                    rangeName: str,
+                    colorName: str=DEFAULT_AXIS_COLOR_BOKEH) -> LinearAxis:
+    """
+    Make a linear initialized to use standard colors with Bokeh plots.
+
+    Arguments
+    ---------
+
+        label: str
+    The axis label, text string.
+
+        rangeName
+    The range name, often used for specifying the measurment units.
+
+        colorName
+    A valid CSS color string.
+
+    Return
+    ------
+    An instance of `bokeh.models.LinearAxis`.
+    """
+    linearAxis = LinearAxis(
+            axis_label = label,
+            axis_label_text_color = colorName,
+            axis_line_color = colorName,
+            major_label_text_color = colorName,
+            major_tick_line_color=colorName,
+            minor_tick_line_color=colorName,
+            y_range_name = rangeName,
+    )
+    return linearAxis
 
 
 def initializeExtraYRanges(plot,
@@ -128,26 +165,8 @@ def initializeExtraYRanges(plot,
         'altitudeFt': Range1d(start = startY, end = endY),
         'angle': Range1d(start = 0.0, end = 90.0),
     }
-    # TODO:  Make this a separate function because it'll be done
-    #        in many places in the code.
-    plot.add_layout(LinearAxis(
-            axis_label = 'Alt (ft)',
-            axis_label_text_color = 'lightsteelblue',
-            axis_line_color = 'lightsteelblue',
-            major_label_text_color = 'lightsteelblue',
-            major_tick_line_color='lightsteelblue',
-            minor_tick_line_color='lightsteelblue',
-            y_range_name = 'altitudeFt',
-        ), 'left')
-    plot.add_layout(LinearAxis(
-            axis_label = 'angle',
-            axis_label_text_color = 'lightsteelblue',
-            axis_line_color = 'lightsteelblue',
-            major_label_text_color = 'lightsteelblue',
-            major_tick_line_color='lightsteelblue',
-            minor_tick_line_color='lightsteelblue',
-            y_range_name = 'angle',
-        ), 'left')
+    plot.add_layout(_initLinearAxis('Alt (ft)', 'altitudeFt', colorName=DEFAULT_AXIS_COLOR_BOKEH), 'left')
+    plot.add_layout(_initLinearAxis('angle', 'angle', colorName=DEFAULT_AXIS_COLOR_BOKEH), 'left')
 
     return plot
 
