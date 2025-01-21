@@ -10,5 +10,5 @@ import streamlit as st
 
 if '__main__' == __name__:
     st.write(os.environ)
-    main()
+    # main()
 
