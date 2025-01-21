@@ -4,14 +4,17 @@
 Streamlit-based application.
 """
 
+from importlib_resources import files
+from io import StringIO
 from pathlib import Path
 
 from ssscoring import __VERSION__
 from ssscoring.calc import convertFlySight2SSScoring
-from ssscoring.calc import getFlySightDataFromCSVFileName
+from ssscoring.calc import getFlySightDataFromCSVBuffer
 from ssscoring.calc import isValidMaximumAltitude
 from ssscoring.calc import isValidMinimumAltitude
 from ssscoring.calc import processJump
+from ssscoring.constants import FLYSIGHT_FILE_ENCODING
 from ssscoring.datatypes import JumpStatus
 from ssscoring.notebook import SPEED_COLORS
 from ssscoring.notebook import graphAltitude
@@ -32,7 +35,8 @@ import streamlit as st
 # *** constants ***
 
 DEFAULT_DATA_LAKE = './data'
-DZ_DIRECTORY = './resources/drop-zones-loc-elev.csv'
+DZ_DIRECTORY = 'drop-zones-loc-elev.csv'
+RESOURCES = 'ssscoring.resources'
 
 
 # *** globals ***
@@ -51,13 +55,14 @@ def _init():
 
 
 @st.cache_data
-def _initDropZonesFrom(fileName: str) -> pd.DataFrame:
-    dropZones = pd.read_csv(fileName, sep=',')
+def _initDropZonesFromResource(resourceName: str) -> pd.DataFrame:
+    buffer = StringIO(files(RESOURCES).joinpath(resourceName).read_bytes().decode(FLYSIGHT_FILE_ENCODING))
+    dropZones = pd.read_csv(buffer, sep=',')
     return dropZones
 
 
 def _setSideBarAndMain():
-    dropZones = _initDropZonesFrom(DZ_DIRECTORY)
+    dropZones = _initDropZonesFromResource(DZ_DIRECTORY)
     st.sidebar.title('SSScoring %s α' % __VERSION__)
     st.session_state.processBadJump = st.sidebar.checkbox('Process bad jump', value=True, help='Display results from invalid jumps')
     dropZone = st.sidebar.selectbox('Select drop zone:', dropZones.dropZone, index=None)
@@ -70,12 +75,12 @@ def _setSideBarAndMain():
     st.session_state.trackFile = st.sidebar.file_uploader('Track file', [ 'CSV' ], disabled=st.session_state.elevation == None)
 
 
-def _getJumpDataFrom(trackFile: str) -> pd.DataFrame:
+def _getJumpDataFrom(trackFileBuffer: str) -> pd.DataFrame:
     dropZoneAltMSLMeters = 0.0 if st.session_state.elevation == None else st.session_state.elevation
     data = None
     tag = None
     if dropZoneAltMSLMeters is not None:
-        rawData, tag = getFlySightDataFromCSVFileName(trackFile)
+        rawData, tag = getFlySightDataFromCSVBuffer(trackFileBuffer, st.session_state.trackFile.name)
         data = convertFlySight2SSScoring(rawData, altitudeDZMeters=dropZoneAltMSLMeters)
     return data, tag
 
@@ -110,8 +115,7 @@ def main():
 
     col0, col1 = st.columns([ 0.4, 0.6, ])
     if st.session_state.trackFile:
-        trackFileName = st.session_state.trackFile.name
-        data, tag = _getJumpDataFrom(DEFAULT_DATA_LAKE+'/'+trackFileName) # TODO: make this nicer
+        data, tag = _getJumpDataFrom(st.session_state.trackFile.getvalue())
         jumpResult = processJump(data)
         maxSpeed = jumpResult.maxSpeed
         window = jumpResult.window
@@ -143,6 +147,7 @@ def main():
         if jumpStatus == JumpStatus.OK:
             with col0:
                 _displayJumpDataIn(jumpResult.table)
+            with col1:
                 plot = initializePlot(tag)
                 plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
                 graphAltitude(plot, jumpResult)
@@ -150,7 +155,6 @@ def main():
                 hoverValue = bm.HoverTool(tooltips=[('Y-val', '@y{0.00}',),])
                 plot.add_tools(hoverValue)
                 graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
-            with col1:
                 st.bokeh_chart(plot, use_container_width=True)
                 st.map(jumpResult.data, size=2)
 
@@ -160,4 +164,3 @@ def main():
 
 if '__main__' == __name__:
     main()
-

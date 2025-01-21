@@ -87,6 +87,9 @@ def test_validFlySightHeaderIn(_badDelimitersCSV, _missingColumnInCSV, _invalidM
     assert not validFlySightHeaderIn(_badDelimitersCSV)
     assert not validFlySightHeaderIn(_missingColumnInCSV)
     assert validFlySightHeaderIn(_invalidMaxAltitude)
+    with open(TEST_FLYSIGHT_1_DATA, 'rb') as inputFile:
+        buffer = inputFile.read()
+    assert validFlySightHeaderIn(buffer)
 
 
 def test_getAllSpeedJumpFilesFrom(_tooSmallCSV):
@@ -119,6 +122,11 @@ def test_detectFlySightFileVersionOf(_missingColumnInCSV):
 
     assert detectFlySightFileVersionOf(TEST_FLYSIGHT_1_DATA.as_posix()) == FlySightVersion.V1
     assert detectFlySightFileVersionOf(TEST_FLYSIGHT_2_DATA.as_posix()) == FlySightVersion.V2
+
+    with open(TEST_FLYSIGHT_1_DATA, 'rb') as inputFile:
+        buffer = inputFile.read()
+
+    x = detectFlySightFileVersionOf(buffer)
 
 
 def test_isCRMangledCSV():

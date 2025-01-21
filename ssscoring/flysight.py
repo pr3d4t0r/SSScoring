@@ -9,10 +9,12 @@ local or cloud-based).
 
 
 from collections import OrderedDict
+from io import StringIO
 from pathlib import Path
 
 from ssscoring.constants import FLYSIGHT_1_HEADER
 from ssscoring.constants import FLYSIGHT_2_HEADER
+from ssscoring.constants import FLYSIGHT_FILE_ENCODING
 from ssscoring.constants import IGNORE_LIST
 from ssscoring.constants import MIN_JUMP_FILE_SIZE
 from ssscoring.datatypes import FlySightVersion
@@ -97,7 +99,7 @@ def skipOverFS2MetadataRowsIn(data: pd.DataFrame) -> pd.DataFrame:
     return data.iloc[ref:]
 
 
-def validFlySightHeaderIn(fileCSV) -> bool:
+def validFlySightHeaderIn(fileThingCSV) -> bool:
     """
     Checks if a file is a CSV in FlySight 1 or FlySight 2 formats.  The checks
     include:
@@ -108,27 +110,32 @@ def validFlySightHeaderIn(fileCSV) -> bool:
 
     Arguments
     ---------
-        fileCSV
-    A file name to verify as a valid FlySight file; can be a string or an
-    instance of `libpath.Path`
+        fileThingCSV
+    A file thing to verify as a valid FlySight file; can be a string, an
+    instance of `libpath.Path`, or a buffer of `bytes`.
 
     Returns
     -------
-    `True` if `fileCSV` is a FlySight CSV file, otherwise `False`.
+    `True` if `fileThingCSV` is a FlySight CSV file, otherwise `False`.
     """
     delimiters =  [',', ]
     hasAllHeaders = False
-    with open(fileCSV, 'r') as inputFile:
-        try:
-            dialect = csv.Sniffer().sniff(inputFile.readline(), delimiters = delimiters)
-        except:
-            return False
-        if dialect.delimiter in delimiters:
-            inputFile.seek(0)
-            header = next(csv.reader(inputFile))
-        else:
-            return False
-        hasAllHeaders = True if header[0] == '$FLYS' else FLYSIGHT_1_HEADER.issubset(header)
+    stream = None
+    if isinstance(fileThingCSV, bytes):
+        stream = StringIO(fileThingCSV.decode(FLYSIGHT_FILE_ENCODING))
+    else:
+        stream = open(fileThingCSV, 'r')
+
+    try:
+        dialect = csv.Sniffer().sniff(stream.readline(), delimiters = delimiters)
+    except:
+        return False
+    if dialect.delimiter in delimiters:
+        stream.seek(0)
+        header = next(csv.reader(stream))
+    else:
+        return False
+    hasAllHeaders = True if header[0] == '$FLYS' else FLYSIGHT_1_HEADER.issubset(header)
     return hasAllHeaders
 
 
@@ -187,7 +194,8 @@ def detectFlySightFileVersionOf(fileThing) -> FlySightVersion:
     Arguments
     ---------
         fileThing
-    A string or `pathlib.Path` object corresponding to the file name.
+    A string, `bytes` buffer or `pathlib.Path` object corresponding to track
+    file.  If string or `pathlib.Path`, it'll be treated as a file.
 
     Returns
     -------
@@ -204,26 +212,33 @@ def detectFlySightFileVersionOf(fileThing) -> FlySightVersion:
     elif isinstance(fileThing, str):
         fileName = fileThing
         fileThing = Path(fileThing)
+    elif isinstance(fileThing, bytes):
+        fileName = '00-00-00.CSV'
 
+    delimiters =  [',', ]
+    stream = None
     if not '.CSV' in fileName.upper():
         raise SSScoringError('Invalid file extension type')
     if any(x in fileName for x in ('EVENT.CSV', 'SENSOR.CSV')):
         raise SSScoringError('Only TRACK.CSV v2 files can be processed at this time')
-    if not fileThing.is_file():
-        raise SSScoringError('%s - file not found in data lake' % fileName)
-    if not validFlySightHeaderIn(fileName):
-        raise SSScoringError('CSV is not a valid FlySight file')
-    delimiters =  [',', ]
-    with open(fileName, 'r') as inputFile:
-        try:
-            dialect = csv.Sniffer().sniff(inputFile.readline(), delimiters = delimiters)
-        except:
-            raise SSScoringError('Error while trying to validate %s file format' % fileName)
-        if dialect.delimiter in delimiters:
-            inputFile.seek(0)
-            header = next(csv.reader(inputFile))
-        else:
-            raise SSScoringError('CSV uses a different delimiter from FlySigh')
+    if isinstance(fileThing, Path) or isinstance(fileThing, str):
+        if not fileThing.is_file():
+            raise SSScoringError('%s - file not found in data lake' % fileName)
+        if not validFlySightHeaderIn(fileName):
+            raise SSScoringError('CSV is not a valid FlySight file')
+        stream = open(fileName, 'r')
+    elif isinstance(fileThing, bytes):
+        stream = StringIO(fileThing.decode(FLYSIGHT_FILE_ENCODING))
+
+    try:
+        dialect = csv.Sniffer().sniff(stream.readline(), delimiters = delimiters)
+    except:
+        raise SSScoringError('Error while trying to validate %s file format' % fileName)
+    if dialect.delimiter in delimiters:
+        stream.seek(0)
+        header = next(csv.reader(stream))
+    else:
+        raise SSScoringError('CSV uses a different delimiter from FlySigh')
     if header[0] == '$FLYS':
         return FlySightVersion.V2
     elif FLYSIGHT_1_HEADER.issubset(header):

@@ -6,6 +6,7 @@ from ssscoring.calc import calcScoreMeanVelocity
 from ssscoring.calc import calculateDistance
 from ssscoring.calc import convertFlySight2SSScoring
 from ssscoring.calc import dropNonSkydiveDataFrom
+from ssscoring.calc import getFlySightDataFromCSVBuffer
 from ssscoring.calc import getFlySightDataFromCSVFileName
 from ssscoring.calc import getSpeedSkydiveFrom
 from ssscoring.calc import isValidJumpISC
@@ -190,6 +191,20 @@ def test_processJump_WarmUpFile():
     assert jumpResults.status == JumpStatus.WARM_UP_FILE
 
 
+def test_getFlySightDataFromBuffer():
+    rawData = None
+    tag = None
+    with open(TEST_FLYSIGHT_DATA, 'rb') as inputFile:
+        buffer = inputFile.read()
+    rawData, tag = getFlySightDataFromCSVBuffer(buffer, TEST_FLYSIGHT_DATA.as_posix())
+    assert isinstance(rawData, pd.DataFrame)
+    assert 'v1' in tag
+    with pytest.raises(SSScoringError):
+        with open(TEST_FLYSIGHT_DATA_BAD_HEADERS, 'rb') as inputFile:
+            buffer = inputFile.read()
+        rawData, tag = getFlySightDataFromCSVBuffer(buffer, TEST_FLYSIGHT_DATA_BAD_HEADERS.as_posix())
+
+
 def test_getFlySightDataFromCSVFileName():
     rawData = None
     tag = None
@@ -260,10 +275,10 @@ def test_totalResultsFrom():
 # test_getSpeedSkydiveFrom()
 # test_jumpAnalysisTable()
 # test_isValidMinimumAltitude(_invalidAltFileName)
-test_isValidMaximumAltitude()
+# test_isValidMaximumAltitude()
 # test_calcScoreMeanVelocity()
 # test_calcScoreISC()
-
+# test_getFlySightDataFromBuffer()
 # test_getFlySightDataFromCSVFileName()
 # test_processJump()
 # test_processAllJumpFiles()

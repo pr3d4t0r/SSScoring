@@ -44,10 +44,18 @@ FlySight v1 CSV file headers.  Unlike other constants, this is a `tuple` instead
 of a `set` because the code manipulates the headers/columns during file ingress.
 """
 
+
+FLYSIGHT_FILE_ENCODING = 'utf-8'
+"""
+File encoding as it comes raw from the FlySight device.
+"""
+
+
 FT_IN_M = 3.2808
 """
 Number of feet in a meter.
 """
+
 
 IGNORE_LIST = [ '.ipynb_checkpoints', ]
 """
@@ -55,11 +63,13 @@ Internal use - list of files to be ignored during bulk file processing in the
 data lake (e.g. `./data`).
 """
 
+
 LAST_TIME_TRANCHE = 25.0
 """
 Times > 25 s are irrelevant because it means that the speed skydiver flew at
 vSpeed < 400 km/h.
 """
+
 
 MAX_ALTITUDE_FT = 14000.0
 """
@@ -75,10 +85,12 @@ Maximum exit altitude AGL according to FAI Competition Rules Speed Skydiving
 section 5.3.
 """
 
+
 MAX_SPEED_ACCURACY = 3.0
 """
 Speed accuracy for the FlySight device.
 """
+
 
 MIN_JUMP_FILE_SIZE = 1024*512
 MIN_JUMP_FILE_SIZE = 1024*64
@@ -87,6 +99,7 @@ FlySight v1 files smaller than `MIN_JUMP_FILE_SIZE` are ignored because they
 lack the minimum number of data points to contain a valid speed skydive.
 **TODO:** Revise for FlySight v2.
 """
+
 
 MPS_2_KMH = 3.6
 """
@@ -99,10 +112,12 @@ s = mps * 60 * 60 / 1000
 ```
 """
 
+
 PERFORMANCE_WINDOW_LENGTH = 2256.0
 """
 Performance window length as defined by ISSA/IPC/USPA.
 """
+
 
 SCORING_INTERVAL = 3.0
 """
@@ -111,10 +126,12 @@ as the average speed during a sliding window of SCORING_INTERVAL seconds.  The
 value is set by governing bodies like ISC and USPA.
 """
 
+
 SKYTRAX_1_HEADER = set([ 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 'hAcc', 'vAcc', 'sAcc', 'heading', 'cAcc', 'gpsFix', 'numSV', ])
 """
 SkyTraX GPS + barometric SMD v1 CSV file headers.
 """
+
 
 VALIDATION_WINDOW_LENGTH = 1006.0
 """
