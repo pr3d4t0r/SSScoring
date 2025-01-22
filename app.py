@@ -5,7 +5,8 @@ import os
 import pathlib
 
 dirPath = pathlib.Path('.')
-os.environ['PYTHONPATH'] = dirPath.absolute()
+# This doesn't work because streamlit.io's os package is locekd.
+# os.environ['PYTHONPATH'] = dirPath.absolute()
 
 import streamlit as st
 
@@ -18,5 +19,5 @@ if '__main__' == __name__:
     for entry in dirPath.iterdir():
         st.write(entry)
 
-    # main()
+    main()
 
