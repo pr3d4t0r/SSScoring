@@ -2,6 +2,9 @@
 
 """
 Streamlit-based application.
+
+Issue deploying to Streamlit.io:
+https://discuss.streamlit.io/t/pythonpath-issue-modulenotfounderror-in-same-package-where-app-is-defined/91170
 """
 
 from importlib_resources import files
@@ -37,6 +40,8 @@ import streamlit as st
 DEFAULT_DATA_LAKE = './data'
 DZ_DIRECTORY = 'drop-zones-loc-elev.csv'
 RESOURCES = 'ssscoring.resources'
+STREAMLIT_SIG_KEY = 'HOSTNAME'
+STREAMLIT_SIG_VALUE = 'streamlit'
 
 
 # *** globals ***
@@ -45,6 +50,14 @@ _session = st.session_state
 
 
 # *** implementation ***
+
+def _isStreamlitHostedApp() -> bool:
+    keys = tuple(os.environ.keys())
+    if STREAMLIT_SIG_KEY not in keys:
+        return False
+    if os.environ[STREAMLIT_SIG_KEY] == STREAMLIT_SIG_VALUE:
+        return True
+    return False
 
 
 def _init():
@@ -109,7 +122,9 @@ def _closeWindow():
 
 
 def main():
-    st.set_page_config(layout = 'wide')
+    if not _isStreamlitHostedApp():
+        st.set_page_config(layout = 'wide')
+        st.write('STARTED WIDE')
     _init()
     _setSideBarAndMain()
 
