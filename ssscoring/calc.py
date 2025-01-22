@@ -5,6 +5,7 @@ Functions and logic for analyzing and manipulating FlySight dataframes.
 """
 
 
+from io import StringIO
 from pathlib import Path
 
 from haversine import haversine
@@ -13,6 +14,7 @@ from haversine import Unit
 from ssscoring.constants import BREAKOFF_ALTITUDE
 from ssscoring.constants import DEG_IN_RADIANS
 from ssscoring.constants import EXIT_SPEED
+from ssscoring.constants import FLYSIGHT_FILE_ENCODING
 from ssscoring.constants import FT_IN_M
 from ssscoring.constants import LAST_TIME_TRANCHE
 from ssscoring.constants import MAX_ALTITUDE_METERS
@@ -393,6 +395,13 @@ def calcScoreMeanVelocity(data: pd.DataFrame) -> tuple:
     A `tuple` with the best score throughout the speed run, and a dicitionary
     of the meanVSpeed:spotInTime used in determining the exact scoring speed
     at every datat point during the speed run.
+
+    Notes
+    -----
+    This implementation uses iteration instead of binning/factorization because
+    some implementers may be unfamiliar with data manipulation in dataframes
+    and this is a critical function that may be under heavy review.  Future
+    versions may revert to dataframe and series/np.array factorization.
     """
     scores = dict()
     for spot in data.plotTime[::1]:
@@ -480,16 +489,12 @@ def processJump(data: pd.DataFrame) -> JumpResults:
         scores = None
         table = None
         if validJump:
-    #         color = '#0f0'
-    #         result = '🟢 valid'
             table = None
             maxSpeed, table = jumpAnalysisTable(data)
             baseTime = data.iloc[0].timeUnix
             data['plotTime'] = round(data.timeUnix-baseTime, 2)
             score, scores = calcScoreISC(data)
         else:
-    #         color = '#f00'
-    #         result = '🔴 invalid'
             maxSpeed = -1
             if len(data):
                 jumpStatus = JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT
@@ -498,16 +503,19 @@ def processJump(data: pd.DataFrame) -> JumpResults:
     return JumpResults(data, maxSpeed, score, scores, table, window, jumpStatus)
 
 
-def _readVersion1CSV(jumpFile: str) -> pd.DataFrame:
-    return pd.read_csv(jumpFile, skiprows = (1, 1), index_col = False)
+def _readVersion1CSV(fileThing: str) -> pd.DataFrame:
+    return pd.read_csv(fileThing, skiprows = (1, 1), index_col = False)
 
 
-def _tagVersion1From(jumpFile: str) -> str:
-    return jumpFile.replace('CSV', '').replace('csv', '').replace('.', '').replace('/data', '').replace('/', ' ').strip()+':v1'
+def _tagVersion1From(fileThing: str) -> str:
+    return fileThing.replace('.CSV', '').replace('.csv', '').replace('/data', '').replace('/', ' ').strip()+':v1'
 
 
-def _tagVersion2From(jumpFile: str) -> str:
-    return jumpFile.split('/')[-2]+':v2'
+def _tagVersion2From(fileThing: str) -> str:
+    if '/' in fileThing:
+        return fileThing.split('/')[-2]+':v2'
+    else:
+        return fileThing.replace('.CSV', '').replace('.csv', '')+':v2'
 
 
 
@@ -521,7 +529,50 @@ def _readVersion2CSV(jumpFile: str) -> pd.DataFrame:
     return rawData
 
 
-def getFlySightDataFromCSV(jumpFile) -> tuple:
+def getFlySightDataFromCSVBuffer(buffer:bytes, bufferName:str) -> tuple:
+    """
+    Ingress a buffer with known FlySight or SkyTrax file data for SSScoring
+    processing.
+
+    Arguments
+    ---------
+        buffer
+    A binary data buffer, bag of bytes, containing a known FlySight track file.
+
+        bufferName
+    An arbitrary name for the buffer of type `str`.  It's used for constructing
+    the full buffer tag value for human identification.
+
+    Returns
+    -------
+    A `tuple` with two items:
+        - `rawData` - a dataframe representation of the CSV with the original
+          headers but without the data type header
+        - `tag` - a string with an identifying tag derived from the path name
+          and file version in the form `some name:vX`.  It uses the current
+          path as metadata to infer the name.  There's no semantics enforcement.
+
+    Raises
+    ------
+    `SSScoringError` if the CSV file is invalid in any way.
+    """
+    if not isinstance(buffer, bytes):
+        raise SSScoringError('buffer must be an instance of bytes, a bytes buffer')
+    try:
+        stringIO = StringIO(buffer.decode(FLYSIGHT_FILE_ENCODING))
+    except Exception as e:
+        raise SSScoringError('invalid buffer endcoding - %s' % str(e))
+    version = detectFlySightFileVersionOf(buffer)
+    if version == FlySightVersion.V1:
+        rawData = _readVersion1CSV(stringIO)
+        tag = _tagVersion1From(bufferName)
+    elif version == FlySightVersion.V2:
+        rawData = _readVersion2CSV(stringIO)
+        tag = _tagVersion2From(bufferName)
+    return (rawData, tag)
+
+
+def getFlySightDataFromCSVFileName(jumpFile) -> tuple:
     """
     Ingress a known FlySight or SkyTrax file into memory for SSScoring
     processing.
@@ -587,7 +638,7 @@ def processAllJumpFiles(jumpFiles: list, altitudeDZMeters = 0.0) -> dict:
     """
     jumpResults = dict()
     for jumpFile in jumpFiles.keys():
-        rawData, tag = getFlySightDataFromCSV(jumpFile)
+        rawData, tag = getFlySightDataFromCSVFileName(jumpFile)
         jumpResult = processJump(convertFlySight2SSScoring(rawData, altitudeDZMeters = altitudeDZMeters))
         if JumpStatus.OK == jumpResult.status:
             jumpResults[tag] = jumpResult

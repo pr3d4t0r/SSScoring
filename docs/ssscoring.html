@@ -32,6 +32,7 @@
 
             <h2>Submodules</h2>
             <ul>
+                    <li><a href="ssscoring/app.html">app</a></li>
                     <li><a href="ssscoring/calc.html">calc</a></li>
                     <li><a href="ssscoring/cli.html">cli</a></li>
                     <li><a href="ssscoring/constants.html">constants</a></li>
@@ -65,12 +66,8 @@ ssscoring    </h1>
                         <div class="docstring"><p>Speed Skydiving Scoring tools package for processing FlySight v1 and v2 CSV data
 files.</p>
 
-<p>This library relies on NumPy and pandas.  When running in a Lucyfer notebook,
-it also requires the Bokeh plotting library.</p>
-
-<p>The documentation for each module in this package is linked from the navigation
-bar.  The <strong>fs1</strong> module contains functions that process v1 files.  The v2
-implementation is in progress in a private Git branch.</p>
+<p>This library relies on NumPy and pandas.  When running in a Lucyfer notebook or
+in Streamlit.io, it also requires the Bokeh plotting library.</p>
 
 <h2 id="installation">Installation</h2>
 
@@ -100,38 +97,34 @@ requirements.</p>
 </span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="sd">Speed Skydiving Scoring tools package for processing FlySight v1 and v2 CSV data</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="sd">files.</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">This library relies on NumPy and pandas.  When running in a Lucyfer notebook,</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="sd">it also requires the Bokeh plotting library.</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">This library relies on NumPy and pandas.  When running in a Lucyfer notebook or</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="sd">in Streamlit.io, it also requires the Bokeh plotting library.</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="sd">The documentation for each module in this package is linked from the navigation</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="sd">bar.  The **fs1** module contains functions that process v1 files.  The v2</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">implementation is in progress in a private Git branch.</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">## Installation</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="sd">## Installation</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="sd">```bash</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="sd">pip install -U ssscoring</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">```</span>
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="sd">```bash</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="sd">pip install -U ssscoring</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="sd">```</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="sd">## Source code</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="sd">## Source code</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="sd">You are welcome to **&lt;a href=&#39;https://github.com/pr3d4t0r/SSScoring&#39; target=&#39;_new&#39;&gt;fork SSScoring&lt;/a&gt;**</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="sd">on GitHub.  You will need Python 3.9 or later, pandas, and NumPy as minimum</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="sd">requirements.</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="sd">You are welcome to **&lt;a href=&#39;https://github.com/pr3d4t0r/SSScoring&#39; target=&#39;_new&#39;&gt;fork SSScoring&lt;/a&gt;**</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a><span class="sd">on GitHub.  You will need Python 3.9 or later, pandas, and NumPy as minimum</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a><span class="sd">requirements.</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a><span class="sd">You may study or download the latest stable source files at:</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a><span class="sd">&lt;a href=&#39;https://github.com/pr3d4t0r/SSScoring/tree/master/ssscoring&#39; target=&#39;_new&#39;&gt;https://github.com/pr3d4t0r/SSScoring/tree/master/ssscoring&lt;/a&gt;</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>
-</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="kn">import</span> <span class="nn">importlib.metadata</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a><span class="n">__VERSION__</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="s1">&#39;ssscoring&#39;</span><span class="p">)</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="sd">@public</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="sd">You may study or download the latest stable source files at:</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a><span class="sd">&lt;a href=&#39;https://github.com/pr3d4t0r/SSScoring/tree/master/ssscoring&#39; target=&#39;_new&#39;&gt;https://github.com/pr3d4t0r/SSScoring/tree/master/ssscoring&lt;/a&gt;</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="kn">import</span> <span class="nn">importlib.metadata</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a><span class="n">__VERSION__</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="s1">&#39;ssscoring&#39;</span><span class="p">)</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a><span class="sd">@public</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span></pre></div>
 
 
@@ -139,7 +132,7 @@ requirements.</p>
                 <section id="__VERSION__">
                     <div class="attr variable">
             <span class="name">__VERSION__</span>        =
-<span class="default_value">&#39;1.9.0&#39;</span>
+<span class="default_value">&#39;2.0.0&#39;</span>
 
         
     </div>

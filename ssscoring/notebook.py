@@ -8,6 +8,7 @@
 from bokeh.models import LinearAxis
 from bokeh.models import Range1d
 
+from ssscoring.constants import DEFAULT_AXIS_COLOR_BOKEH
 from ssscoring.constants import MAX_ALTITUDE_FT
 
 import bokeh.io as bi
@@ -29,14 +30,13 @@ bi.curdoc().theme = 'dark_minimal'
 # *** functions ***
 
 def initializePlot(jumpTitle: str,
-                   height = 500,
-                   width = 900,
-                   xLabel = 'seconds from exit',
-                   yLabel = 'km/h',
-                   # TODO: roll back to 40.0?
-                   # xMax = 40.0,
-                   xMax = 35.0,
-                   yMax = 550.0):
+                   height=500,
+                   width=900,
+                   xLabel='seconds from exit',
+                   yLabel='km/h',
+                   xMax=35.0,
+                   yMax=550.0,
+                   colorName=DEFAULT_AXIS_COLOR_BOKEH):
     """
     Initiialize a plotting area for notebook output.
 
@@ -62,29 +62,81 @@ def initializePlot(jumpTitle: str,
 
         yMax: float
     The maximum range for the Y axis.  Default = 550
+
+        colorName
+    A valid CSS color string.
     """
-    return bp.figure(title = jumpTitle,
-                     height = height,
-                     width = width,
-                     x_axis_label = xLabel,
-                     y_axis_label = yLabel,
-                     x_range = (0.0, xMax),
-                     y_range = (0.0, yMax))
+    bi.curdoc().theme = 'dark_minimal'
+    plot = bp.figure(title=jumpTitle,
+                     height=height,
+                     width=width,
+                     x_axis_label=xLabel,
+                     y_axis_label=yLabel,
+                     x_range=(0.0, xMax),
+                     y_range=(0.0, yMax),
+                     background_fill_color='#1a1a1a',
+                     border_fill_color='#1a1a1a')
+    plot.xaxis.axis_label_text_color=colorName
+    plot.xaxis.major_label_text_color=colorName
+    plot.xaxis.axis_line_color=colorName
+    plot.xaxis.major_tick_line_color=colorName
+    plot.xaxis.minor_tick_line_color=colorName
+    plot.yaxis.axis_label_text_color=colorName
+    plot.yaxis.major_label_text_color=colorName
+    plot.yaxis.axis_line_color=colorName
+    plot.yaxis.major_tick_line_color=colorName
+    plot.yaxis.minor_tick_line_color=colorName
+    plot.title.text_color = colorName
+    return plot
 
 
 def _graphSegment(plot,
-                  x0 = 0.0,
-                  y0 = 0.0,
-                  x1 = 0.0,
-                  y1 = 0.0,
-                  lineWidth = 1,
-                  color = 'black'):
-    plot.segment(x0 = [ x0, ],
-                 y0 = [ y0, ],
-                 x1 = [ x1, ],
-                 y1 = [ y1, ],
-                 line_width = lineWidth,
-                 color = color)
+                  x0=0.0,
+                  y0=0.0,
+                  x1=0.0,
+                  y1=0.0,
+                  lineWidth=1,
+                  color='black'):
+    plot.segment(x0=[ x0, ],
+                 y0=[ y0, ],
+                 x1=[ x1, ],
+                 y1=[ y1, ],
+                 line_width=lineWidth,
+                 color=color)
+
+
+def _initLinearAxis(label: str,
+                    rangeName: str,
+                    colorName: str=DEFAULT_AXIS_COLOR_BOKEH) -> LinearAxis:
+    """
+    Make a linear initialized to use standard colors with Bokeh plots.
+
+    Arguments
+    ---------
+
+        label: str
+    The axis label, text string.
+
+        rangeName
+    The range name, often used for specifying the measurment units.
+
+        colorName
+    A valid CSS color string.
+
+    Return
+    ------
+    An instance of `bokeh.models.LinearAxis`.
+    """
+    linearAxis = LinearAxis(
+            axis_label = label,
+            axis_label_text_color = colorName,
+            axis_line_color = colorName,
+            major_label_text_color = colorName,
+            major_tick_line_color=colorName,
+            minor_tick_line_color=colorName,
+            y_range_name = rangeName,
+    )
+    return linearAxis
 
 
 def initializeExtraYRanges(plot,
@@ -113,8 +165,8 @@ def initializeExtraYRanges(plot,
         'altitudeFt': Range1d(start = startY, end = endY),
         'angle': Range1d(start = 0.0, end = 90.0),
     }
-    plot.add_layout(LinearAxis(y_range_name = 'altitudeFt', axis_label = 'Alt (ft)'), 'left')
-    plot.add_layout(LinearAxis(y_range_name = 'angle', axis_label = 'angle'), 'left')
+    plot.add_layout(_initLinearAxis('Alt (ft)', 'altitudeFt', colorName=DEFAULT_AXIS_COLOR_BOKEH), 'left')
+    plot.add_layout(_initLinearAxis('angle', 'angle', colorName=DEFAULT_AXIS_COLOR_BOKEH), 'left')
 
     return plot
 
@@ -155,11 +207,19 @@ def graphJumpResult(plot,
         graphJumpResult(plot, result, showIt = False)
 
     bp.show(plot)
+    ```
+
+    Another alternative use is in Streamlit.io applications:
+
+    ```python
+    graphJumpResult(plot, result, showIt = False)
+
+    st.bokeh_chart(plot, use_container_width=True)
+    ```
 
     Returns
     -------
     `None`.
-    ```
     """
     data = jumpResult.data
     scores = jumpResult.scores

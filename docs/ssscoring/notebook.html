@@ -88,35 +88,35 @@
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="kn">import</span> <span class="n">LinearAxis</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="kn">import</span> <span class="n">Range1d</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a>
-</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="kn">from</span> <span class="nn">ssscoring.constants</span> <span class="kn">import</span> <span class="n">MAX_ALTITUDE_FT</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a>
-</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="kn">import</span> <span class="nn">bokeh.io</span> <span class="k">as</span> <span class="nn">bi</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="kn">import</span> <span class="nn">bokeh.plotting</span> <span class="k">as</span> <span class="nn">bp</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>
+</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="kn">from</span> <span class="nn">ssscoring.constants</span> <span class="kn">import</span> <span class="n">DEFAULT_AXIS_COLOR_BOKEH</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="kn">from</span> <span class="nn">ssscoring.constants</span> <span class="kn">import</span> <span class="n">MAX_ALTITUDE_FT</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>
+</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="kn">import</span> <span class="nn">bokeh.io</span> <span class="k">as</span> <span class="nn">bi</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="kn">import</span> <span class="nn">bokeh.plotting</span> <span class="k">as</span> <span class="nn">bp</span>
 </span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a>
-</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="c1"># *** constants ***</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="n">DATA_LAKE_ROOT</span> <span class="o">=</span> <span class="s1">&#39;./data&#39;</span> <span class="c1"># Lucyfer default</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="n">SPEED_COLORS</span> <span class="o">=</span> <span class="n">colors</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;limegreen&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;tomato&#39;</span><span class="p">,</span> <span class="s1">&#39;turquoise&#39;</span><span class="p">,</span> <span class="s1">&#39;deepskyblue&#39;</span><span class="p">,</span> <span class="s1">&#39;forestgreen&#39;</span><span class="p">,</span> <span class="s1">&#39;coral&#39;</span><span class="p">,</span> <span class="s1">&#39;darkcyan&#39;</span><span class="p">,)</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>
+</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>
+</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="c1"># *** constants ***</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="n">DATA_LAKE_ROOT</span> <span class="o">=</span> <span class="s1">&#39;./data&#39;</span> <span class="c1"># Lucyfer default</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="n">SPEED_COLORS</span> <span class="o">=</span> <span class="n">colors</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;limegreen&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;tomato&#39;</span><span class="p">,</span> <span class="s1">&#39;turquoise&#39;</span><span class="p">,</span> <span class="s1">&#39;deepskyblue&#39;</span><span class="p">,</span> <span class="s1">&#39;forestgreen&#39;</span><span class="p">,</span> <span class="s1">&#39;coral&#39;</span><span class="p">,</span> <span class="s1">&#39;darkcyan&#39;</span><span class="p">,)</span>
 </span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a>
-</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="c1"># *** global initialization ***</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>
-</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="n">bp</span><span class="o">.</span><span class="n">output_notebook</span><span class="p">(</span><span class="n">hide_banner</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="c1"># TODO: make this configurable:</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="n">bi</span><span class="o">.</span><span class="n">curdoc</span><span class="p">()</span><span class="o">.</span><span class="n">theme</span> <span class="o">=</span> <span class="s1">&#39;dark_minimal&#39;</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>
+</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>
+</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="c1"># *** global initialization ***</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>
+</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="n">bp</span><span class="o">.</span><span class="n">output_notebook</span><span class="p">(</span><span class="n">hide_banner</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="c1"># TODO: make this configurable:</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="n">bi</span><span class="o">.</span><span class="n">curdoc</span><span class="p">()</span><span class="o">.</span><span class="n">theme</span> <span class="o">=</span> <span class="s1">&#39;dark_minimal&#39;</span>
 </span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="c1"># *** functions ***</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a>
-</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="k">def</span> <span class="nf">initializePlot</span><span class="p">(</span><span class="n">jumpTitle</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>                   <span class="n">height</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>                   <span class="n">width</span> <span class="o">=</span> <span class="mi">900</span><span class="p">,</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>                   <span class="n">xLabel</span> <span class="o">=</span> <span class="s1">&#39;seconds from exit&#39;</span><span class="p">,</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>                   <span class="n">yLabel</span> <span class="o">=</span> <span class="s1">&#39;km/h&#39;</span><span class="p">,</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>                   <span class="c1"># TODO: roll back to 40.0?</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>                   <span class="c1"># xMax = 40.0,</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>                   <span class="n">xMax</span> <span class="o">=</span> <span class="mf">35.0</span><span class="p">,</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>                   <span class="n">yMax</span> <span class="o">=</span> <span class="mf">550.0</span><span class="p">):</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>
+</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="c1"># *** functions ***</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="k">def</span> <span class="nf">initializePlot</span><span class="p">(</span><span class="n">jumpTitle</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>                   <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>                   <span class="n">width</span><span class="o">=</span><span class="mi">900</span><span class="p">,</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>                   <span class="n">xLabel</span><span class="o">=</span><span class="s1">&#39;seconds from exit&#39;</span><span class="p">,</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>                   <span class="n">yLabel</span><span class="o">=</span><span class="s1">&#39;km/h&#39;</span><span class="p">,</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>                   <span class="n">xMax</span><span class="o">=</span><span class="mf">35.0</span><span class="p">,</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>                   <span class="n">yMax</span><span class="o">=</span><span class="mf">550.0</span><span class="p">,</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>                   <span class="n">colorName</span><span class="o">=</span><span class="n">DEFAULT_AXIS_COLOR_BOKEH</span><span class="p">):</span>
 </span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a><span class="sd">    Initiialize a plotting area for notebook output.</span>
 </span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>
@@ -142,186 +142,246 @@
 </span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>
 </span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="sd">        yMax: float</span>
 </span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="sd">    The maximum range for the Y axis.  Default = 550</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>    <span class="k">return</span> <span class="n">bp</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="n">jumpTitle</span><span class="p">,</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>                     <span class="n">height</span> <span class="o">=</span> <span class="n">height</span><span class="p">,</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>                     <span class="n">width</span> <span class="o">=</span> <span class="n">width</span><span class="p">,</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>                     <span class="n">x_axis_label</span> <span class="o">=</span> <span class="n">xLabel</span><span class="p">,</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>                     <span class="n">y_axis_label</span> <span class="o">=</span> <span class="n">yLabel</span><span class="p">,</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>                     <span class="n">x_range</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">xMax</span><span class="p">),</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>                     <span class="n">y_range</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">yMax</span><span class="p">))</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="k">def</span> <span class="nf">_graphSegment</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>                  <span class="n">x0</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>                  <span class="n">y0</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>                  <span class="n">x1</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>                  <span class="n">y1</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>                  <span class="n">lineWidth</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>                  <span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span><span class="p">):</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span><span class="n">x0</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x0</span><span class="p">,</span> <span class="p">],</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>                 <span class="n">y0</span> <span class="o">=</span> <span class="p">[</span> <span class="n">y0</span><span class="p">,</span> <span class="p">],</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>                 <span class="n">x1</span> <span class="o">=</span> <span class="p">[</span> <span class="n">x1</span><span class="p">,</span> <span class="p">],</span>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>                 <span class="n">y1</span> <span class="o">=</span> <span class="p">[</span> <span class="n">y1</span><span class="p">,</span> <span class="p">],</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>                 <span class="n">line_width</span> <span class="o">=</span> <span class="n">lineWidth</span><span class="p">,</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>                 <span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">)</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="k">def</span> <span class="nf">initializeExtraYRanges</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>                           <span class="n">startY</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>                           <span class="n">endY</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MAX_ALTITUDE_FT</span><span class="p">):</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="sd">    Initialize an extra Y range for reporting other data trend (e.g. altitude)</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="sd">    in the plot.</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">    Arguments</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="sd">    ---------</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="sd">        plot</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">    A valid instance of `bp.figure` with an existing plot defined for it</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="sd">        startY: float</span>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="sd">    The Y range starting value</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a><span class="sd">        endY: float</span>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="sd">    The Y range ending value</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">        colorName</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="sd">    A valid CSS color string.</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>    <span class="n">bi</span><span class="o">.</span><span class="n">curdoc</span><span class="p">()</span><span class="o">.</span><span class="n">theme</span> <span class="o">=</span> <span class="s1">&#39;dark_minimal&#39;</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>    <span class="n">plot</span> <span class="o">=</span> <span class="n">bp</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">jumpTitle</span><span class="p">,</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>                     <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>                     <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>                     <span class="n">x_axis_label</span><span class="o">=</span><span class="n">xLabel</span><span class="p">,</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>                     <span class="n">y_axis_label</span><span class="o">=</span><span class="n">yLabel</span><span class="p">,</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>                     <span class="n">x_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">xMax</span><span class="p">),</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>                     <span class="n">y_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">yMax</span><span class="p">),</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>                     <span class="n">background_fill_color</span><span class="o">=</span><span class="s1">&#39;#1a1a1a&#39;</span><span class="p">,</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>                     <span class="n">border_fill_color</span><span class="o">=</span><span class="s1">&#39;#1a1a1a&#39;</span><span class="p">)</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label_text_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_text_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_line_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_tick_line_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">minor_tick_line_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label_text_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">major_label_text_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_line_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">major_tick_line_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">minor_tick_line_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text_color</span> <span class="o">=</span> <span class="n">colorName</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>    <span class="k">return</span> <span class="n">plot</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="k">def</span> <span class="nf">_graphSegment</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>                  <span class="n">x0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>                  <span class="n">y0</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>                  <span class="n">x1</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>                  <span class="n">y1</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>                  <span class="n">lineWidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>                  <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">):</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">segment</span><span class="p">(</span><span class="n">x0</span><span class="o">=</span><span class="p">[</span> <span class="n">x0</span><span class="p">,</span> <span class="p">],</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a>                 <span class="n">y0</span><span class="o">=</span><span class="p">[</span> <span class="n">y0</span><span class="p">,</span> <span class="p">],</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>                 <span class="n">x1</span><span class="o">=</span><span class="p">[</span> <span class="n">x1</span><span class="p">,</span> <span class="p">],</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>                 <span class="n">y1</span><span class="o">=</span><span class="p">[</span> <span class="n">y1</span><span class="p">,</span> <span class="p">],</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>                 <span class="n">line_width</span><span class="o">=</span><span class="n">lineWidth</span><span class="p">,</span>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>                 <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>
 </span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="sd">    Returns</span>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="sd">    -------</span>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a><span class="sd">    An instance of `bp.figure` updated to report an additional Y axis.</span>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">extra_y_ranges</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>        <span class="s1">&#39;altitudeFt&#39;</span><span class="p">:</span> <span class="n">Range1d</span><span class="p">(</span><span class="n">start</span> <span class="o">=</span> <span class="n">startY</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">endY</span><span class="p">),</span>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>        <span class="s1">&#39;angle&#39;</span><span class="p">:</span> <span class="n">Range1d</span><span class="p">(</span><span class="n">start</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="mf">90.0</span><span class="p">),</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>    <span class="p">}</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">LinearAxis</span><span class="p">(</span><span class="n">y_range_name</span> <span class="o">=</span> <span class="s1">&#39;altitudeFt&#39;</span><span class="p">,</span> <span class="n">axis_label</span> <span class="o">=</span> <span class="s1">&#39;Alt (ft)&#39;</span><span class="p">),</span> <span class="s1">&#39;left&#39;</span><span class="p">)</span>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">LinearAxis</span><span class="p">(</span><span class="n">y_range_name</span> <span class="o">=</span> <span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="n">axis_label</span> <span class="o">=</span> <span class="s1">&#39;angle&#39;</span><span class="p">),</span> <span class="s1">&#39;left&#39;</span><span class="p">)</span>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>    <span class="k">return</span> <span class="n">plot</span>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>
-</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>
-</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="k">def</span> <span class="nf">graphJumpResult</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span>
-</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>                    <span class="n">jumpResult</span><span class="p">,</span>
-</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>                    <span class="n">lineColor</span> <span class="o">=</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span>
-</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>                    <span class="n">legend</span> <span class="o">=</span> <span class="s1">&#39;speed&#39;</span><span class="p">,</span>
-</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>                    <span class="n">showIt</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
-</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="sd">    Graph the jump results using the initialized plot.</span>
-</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>
-</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a><span class="sd">    Arguments</span>
-</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a><span class="sd">    ---------</span>
-</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a><span class="sd">        plot: bp.figure</span>
-</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a><span class="sd">    A Bokeh figure where to render the plot.</span>
-</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>
-</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a><span class="sd">        jumpResult: ssscoring.JumpResults</span>
-</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a><span class="sd">    A jump results named tuple with score, max speed, scores, data, etc.</span>
-</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>
-</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a><span class="sd">        lineColor: str</span>
-</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a><span class="sd">    A valid color from the Bokeh palette:  https://docs.bokeh.org/en/2.1.1/docs/reference/colors.html</span>
-</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a><span class="sd">    This module defines 8 colors for rendering a competition&#39;s results.  See:</span>
-</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a><span class="sd">    `ssscoring.notebook.SPEED_COLORS` for the list.</span>
-</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>
-</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a><span class="sd">        leged: str</span>
-</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a><span class="sd">    A title for the plot.</span>
-</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>
-</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a><span class="sd">        showIt: bool</span>
-</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a><span class="sd">    A boolean flag for whether the call should render the plot upon the function</span>
-</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a><span class="sd">    call.  This flag is used for combining two or more jumps on the same plot.</span>
-</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a><span class="sd">    In that case, a call to this function is made with a different `jumpResult`</span>
-</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a><span class="sd">    and the `showIt` flag set to `False`.  When the user is ready to view the</span>
-</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a><span class="sd">    combined plot, issue a call to `bp.show(plot)`.  Example:</span>
-</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>
-</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a><span class="sd">    ```python</span>
-</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a><span class="sd">    for result in jumpResults:</span>
-</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a><span class="sd">        graphJumpResult(plot, result, showIt = False)</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="k">def</span> <span class="nf">_initLinearAxis</span><span class="p">(</span><span class="n">label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>                    <span class="n">rangeName</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>                    <span class="n">colorName</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="n">DEFAULT_AXIS_COLOR_BOKEH</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearAxis</span><span class="p">:</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="sd">    Make a linear initialized to use standard colors with Bokeh plots.</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="sd">    Arguments</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="sd">    ---------</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="sd">        label: str</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="sd">    The axis label, text string.</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="sd">        rangeName</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="sd">    The range name, often used for specifying the measurment units.</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="sd">        colorName</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="sd">    A valid CSS color string.</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="sd">    Return</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a><span class="sd">    ------</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="sd">    An instance of `bokeh.models.LinearAxis`.</span>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>    <span class="n">linearAxis</span> <span class="o">=</span> <span class="n">LinearAxis</span><span class="p">(</span>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>            <span class="n">axis_label</span> <span class="o">=</span> <span class="n">label</span><span class="p">,</span>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>            <span class="n">axis_label_text_color</span> <span class="o">=</span> <span class="n">colorName</span><span class="p">,</span>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a>            <span class="n">axis_line_color</span> <span class="o">=</span> <span class="n">colorName</span><span class="p">,</span>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>            <span class="n">major_label_text_color</span> <span class="o">=</span> <span class="n">colorName</span><span class="p">,</span>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>            <span class="n">major_tick_line_color</span><span class="o">=</span><span class="n">colorName</span><span class="p">,</span>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>            <span class="n">minor_tick_line_color</span><span class="o">=</span><span class="n">colorName</span><span class="p">,</span>
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>            <span class="n">y_range_name</span> <span class="o">=</span> <span class="n">rangeName</span><span class="p">,</span>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>    <span class="p">)</span>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>    <span class="k">return</span> <span class="n">linearAxis</span>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>
+</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>
+</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a><span class="k">def</span> <span class="nf">initializeExtraYRanges</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>                           <span class="n">startY</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>                           <span class="n">endY</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MAX_ALTITUDE_FT</span><span class="p">):</span>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a><span class="sd">    Initialize an extra Y range for reporting other data trend (e.g. altitude)</span>
+</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a><span class="sd">    in the plot.</span>
+</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>
+</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a><span class="sd">    Arguments</span>
+</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a><span class="sd">    ---------</span>
+</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a><span class="sd">        plot</span>
+</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a><span class="sd">    A valid instance of `bp.figure` with an existing plot defined for it</span>
+</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>
+</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a><span class="sd">        startY: float</span>
+</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a><span class="sd">    The Y range starting value</span>
 </span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>
-</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a><span class="sd">    bp.show(plot)</span>
-</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a>
-</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a><span class="sd">    Returns</span>
-</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a><span class="sd">    -------</span>
-</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a><span class="sd">    `None`.</span>
-</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a><span class="sd">    ```</span>
+</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a><span class="sd">        endY: float</span>
+</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a><span class="sd">    The Y range ending value</span>
+</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>
+</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a><span class="sd">    Returns</span>
+</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a><span class="sd">    -------</span>
+</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a><span class="sd">    An instance of `bp.figure` updated to report an additional Y axis.</span>
 </span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">data</span>
-</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a>    <span class="n">scores</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">scores</span>
-</span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a>    <span class="n">score</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">score</span>
-</span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">plotTime</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">vKMh</span><span class="p">,</span> <span class="n">legend_label</span> <span class="o">=</span> <span class="n">legend</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span> <span class="o">=</span> <span class="n">lineColor</span><span class="p">)</span>
-</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a>
-</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a>    <span class="k">if</span> <span class="n">showIt</span><span class="p">:</span>
-</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>        <span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">plotTime</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">hKMh</span><span class="p">,</span> <span class="n">legend_label</span> <span class="o">=</span> <span class="s1">&#39;H-speed&#39;</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span> <span class="o">=</span> <span class="s1">&#39;red&#39;</span><span class="p">)</span>
-</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a>        <span class="n">_graphSegment</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">],</span> <span class="n">score</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;lightblue&#39;</span><span class="p">)</span>
-</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a>        <span class="n">_graphSegment</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">]</span><span class="o">+</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">]</span><span class="o">+</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;darkseagreen&#39;</span><span class="p">)</span>
-</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a>        <span class="n">_graphSegment</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">]</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">]</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;darkseagreen&#39;</span><span class="p">)</span>
-</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a>        <span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="p">[</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">],</span> <span class="p">],</span> <span class="n">y</span> <span class="o">=</span> <span class="p">[</span> <span class="n">score</span><span class="p">,</span> <span class="p">],</span> <span class="n">marker</span> <span class="o">=</span> <span class="s1">&#39;square_cross&#39;</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">20</span><span class="p">,</span> <span class="p">],</span> <span class="n">line_color</span> <span class="o">=</span> <span class="s1">&#39;lightblue&#39;</span><span class="p">,</span> <span class="n">fill_color</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
-</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a>        <span class="n">bp</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
-</span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a>
-</span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a>
-</span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a><span class="k">def</span> <span class="nf">graphAltitude</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span>
-</span><span id="L-179"><a href="#L-179"><span class="linenos">179</span></a>                  <span class="n">jumpResult</span><span class="p">,</span>
-</span><span id="L-180"><a href="#L-180"><span class="linenos">180</span></a>                  <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Alt (ft)&#39;</span><span class="p">,</span>
-</span><span id="L-181"><a href="#L-181"><span class="linenos">181</span></a>                  <span class="n">lineColor</span> <span class="o">=</span> <span class="s1">&#39;palegoldenrod&#39;</span><span class="p">,</span>
-</span><span id="L-182"><a href="#L-182"><span class="linenos">182</span></a>                  <span class="n">rangeName</span> <span class="o">=</span> <span class="s1">&#39;altitudeFt&#39;</span><span class="p">):</span>
-</span><span id="L-183"><a href="#L-183"><span class="linenos">183</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-184"><a href="#L-184"><span class="linenos">184</span></a><span class="sd">    Graph a vertical axis with additional data, often used for altitude in ft</span>
-</span><span id="L-185"><a href="#L-185"><span class="linenos">185</span></a><span class="sd">    ASL.</span>
+</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">extra_y_ranges</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a>        <span class="s1">&#39;altitudeFt&#39;</span><span class="p">:</span> <span class="n">Range1d</span><span class="p">(</span><span class="n">start</span> <span class="o">=</span> <span class="n">startY</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">endY</span><span class="p">),</span>
+</span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a>        <span class="s1">&#39;angle&#39;</span><span class="p">:</span> <span class="n">Range1d</span><span class="p">(</span><span class="n">start</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="mf">90.0</span><span class="p">),</span>
+</span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a>    <span class="p">}</span>
+</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">_initLinearAxis</span><span class="p">(</span><span class="s1">&#39;Alt (ft)&#39;</span><span class="p">,</span> <span class="s1">&#39;altitudeFt&#39;</span><span class="p">,</span> <span class="n">colorName</span><span class="o">=</span><span class="n">DEFAULT_AXIS_COLOR_BOKEH</span><span class="p">),</span> <span class="s1">&#39;left&#39;</span><span class="p">)</span>
+</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">_initLinearAxis</span><span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="n">colorName</span><span class="o">=</span><span class="n">DEFAULT_AXIS_COLOR_BOKEH</span><span class="p">),</span> <span class="s1">&#39;left&#39;</span><span class="p">)</span>
+</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>
+</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a>    <span class="k">return</span> <span class="n">plot</span>
+</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a>
+</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a>
+</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a><span class="k">def</span> <span class="nf">graphJumpResult</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span>
+</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a>                    <span class="n">jumpResult</span><span class="p">,</span>
+</span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a>                    <span class="n">lineColor</span> <span class="o">=</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span>
+</span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a>                    <span class="n">legend</span> <span class="o">=</span> <span class="s1">&#39;speed&#39;</span><span class="p">,</span>
+</span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a>                    <span class="n">showIt</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+</span><span id="L-179"><a href="#L-179"><span class="linenos">179</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-180"><a href="#L-180"><span class="linenos">180</span></a><span class="sd">    Graph the jump results using the initialized plot.</span>
+</span><span id="L-181"><a href="#L-181"><span class="linenos">181</span></a>
+</span><span id="L-182"><a href="#L-182"><span class="linenos">182</span></a><span class="sd">    Arguments</span>
+</span><span id="L-183"><a href="#L-183"><span class="linenos">183</span></a><span class="sd">    ---------</span>
+</span><span id="L-184"><a href="#L-184"><span class="linenos">184</span></a><span class="sd">        plot: bp.figure</span>
+</span><span id="L-185"><a href="#L-185"><span class="linenos">185</span></a><span class="sd">    A Bokeh figure where to render the plot.</span>
 </span><span id="L-186"><a href="#L-186"><span class="linenos">186</span></a>
-</span><span id="L-187"><a href="#L-187"><span class="linenos">187</span></a><span class="sd">    Arguments</span>
-</span><span id="L-188"><a href="#L-188"><span class="linenos">188</span></a><span class="sd">    ---------</span>
-</span><span id="L-189"><a href="#L-189"><span class="linenos">189</span></a><span class="sd">        plot: pb.figure</span>
-</span><span id="L-190"><a href="#L-190"><span class="linenos">190</span></a><span class="sd">    A Bokeh figure where to render the plot.</span>
-</span><span id="L-191"><a href="#L-191"><span class="linenos">191</span></a>
-</span><span id="L-192"><a href="#L-192"><span class="linenos">192</span></a><span class="sd">        jumpResult: ssscoring.JumpResults</span>
-</span><span id="L-193"><a href="#L-193"><span class="linenos">193</span></a><span class="sd">    A jump results named tuple with score, max speed, scores, data, etc.</span>
+</span><span id="L-187"><a href="#L-187"><span class="linenos">187</span></a><span class="sd">        jumpResult: ssscoring.JumpResults</span>
+</span><span id="L-188"><a href="#L-188"><span class="linenos">188</span></a><span class="sd">    A jump results named tuple with score, max speed, scores, data, etc.</span>
+</span><span id="L-189"><a href="#L-189"><span class="linenos">189</span></a>
+</span><span id="L-190"><a href="#L-190"><span class="linenos">190</span></a><span class="sd">        lineColor: str</span>
+</span><span id="L-191"><a href="#L-191"><span class="linenos">191</span></a><span class="sd">    A valid color from the Bokeh palette:  https://docs.bokeh.org/en/2.1.1/docs/reference/colors.html</span>
+</span><span id="L-192"><a href="#L-192"><span class="linenos">192</span></a><span class="sd">    This module defines 8 colors for rendering a competition&#39;s results.  See:</span>
+</span><span id="L-193"><a href="#L-193"><span class="linenos">193</span></a><span class="sd">    `ssscoring.notebook.SPEED_COLORS` for the list.</span>
 </span><span id="L-194"><a href="#L-194"><span class="linenos">194</span></a>
-</span><span id="L-195"><a href="#L-195"><span class="linenos">195</span></a><span class="sd">        label: str</span>
-</span><span id="L-196"><a href="#L-196"><span class="linenos">196</span></a><span class="sd">    The legend label for the new Y axis.</span>
+</span><span id="L-195"><a href="#L-195"><span class="linenos">195</span></a><span class="sd">        leged: str</span>
+</span><span id="L-196"><a href="#L-196"><span class="linenos">196</span></a><span class="sd">    A title for the plot.</span>
 </span><span id="L-197"><a href="#L-197"><span class="linenos">197</span></a>
-</span><span id="L-198"><a href="#L-198"><span class="linenos">198</span></a><span class="sd">        lineColor: str</span>
-</span><span id="L-199"><a href="#L-199"><span class="linenos">199</span></a><span class="sd">    A color name from the Bokeh palette.</span>
-</span><span id="L-200"><a href="#L-200"><span class="linenos">200</span></a>
-</span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a><span class="sd">        rangeName: str</span>
-</span><span id="L-202"><a href="#L-202"><span class="linenos">202</span></a><span class="sd">    The range name to associate the `LinearAxis` layout with the data for</span>
-</span><span id="L-203"><a href="#L-203"><span class="linenos">203</span></a><span class="sd">    plotting.</span>
+</span><span id="L-198"><a href="#L-198"><span class="linenos">198</span></a><span class="sd">        showIt: bool</span>
+</span><span id="L-199"><a href="#L-199"><span class="linenos">199</span></a><span class="sd">    A boolean flag for whether the call should render the plot upon the function</span>
+</span><span id="L-200"><a href="#L-200"><span class="linenos">200</span></a><span class="sd">    call.  This flag is used for combining two or more jumps on the same plot.</span>
+</span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a><span class="sd">    In that case, a call to this function is made with a different `jumpResult`</span>
+</span><span id="L-202"><a href="#L-202"><span class="linenos">202</span></a><span class="sd">    and the `showIt` flag set to `False`.  When the user is ready to view the</span>
+</span><span id="L-203"><a href="#L-203"><span class="linenos">203</span></a><span class="sd">    combined plot, issue a call to `bp.show(plot)`.  Example:</span>
 </span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a>
-</span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a><span class="sd">    Returns</span>
-</span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a><span class="sd">    -------</span>
-</span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a><span class="sd">    `None`.</span>
-</span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">data</span>
-</span><span id="L-210"><a href="#L-210"><span class="linenos">210</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">plotTime</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">altitudeAGLFt</span><span class="p">,</span> <span class="n">legend_label</span> <span class="o">=</span> <span class="n">label</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span> <span class="o">=</span> <span class="n">lineColor</span><span class="p">,</span> <span class="n">y_range_name</span> <span class="o">=</span> <span class="n">rangeName</span><span class="p">)</span>
+</span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a><span class="sd">    ```python</span>
+</span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a><span class="sd">    for result in jumpResults:</span>
+</span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a><span class="sd">        graphJumpResult(plot, result, showIt = False)</span>
+</span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a>
+</span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a><span class="sd">    bp.show(plot)</span>
+</span><span id="L-210"><a href="#L-210"><span class="linenos">210</span></a><span class="sd">    ```</span>
 </span><span id="L-211"><a href="#L-211"><span class="linenos">211</span></a>
-</span><span id="L-212"><a href="#L-212"><span class="linenos">212</span></a>
-</span><span id="L-213"><a href="#L-213"><span class="linenos">213</span></a><span class="k">def</span> <span class="nf">graphAngle</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span>
-</span><span id="L-214"><a href="#L-214"><span class="linenos">214</span></a>               <span class="n">jumpResult</span><span class="p">,</span>
-</span><span id="L-215"><a href="#L-215"><span class="linenos">215</span></a>               <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;angle&#39;</span><span class="p">,</span>
-</span><span id="L-216"><a href="#L-216"><span class="linenos">216</span></a>               <span class="n">lineColor</span> <span class="o">=</span> <span class="s1">&#39;deepskyblue&#39;</span><span class="p">,</span>
-</span><span id="L-217"><a href="#L-217"><span class="linenos">217</span></a>               <span class="n">rangeName</span> <span class="o">=</span> <span class="s1">&#39;angle&#39;</span><span class="p">):</span>
-</span><span id="L-218"><a href="#L-218"><span class="linenos">218</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-219"><a href="#L-219"><span class="linenos">219</span></a><span class="sd">    Graph the flight angle</span>
-</span><span id="L-220"><a href="#L-220"><span class="linenos">220</span></a>
-</span><span id="L-221"><a href="#L-221"><span class="linenos">221</span></a><span class="sd">    Arguments</span>
-</span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a><span class="sd">    ---------</span>
-</span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a><span class="sd">        plot: pb.figure</span>
-</span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a><span class="sd">    A Bokeh figure where to render the plot.</span>
-</span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a>
-</span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a><span class="sd">        jumpResult: ssscoring.JumpResults</span>
-</span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a><span class="sd">    A jump results named tuple with score, max speed, scores, data, etc.</span>
+</span><span id="L-212"><a href="#L-212"><span class="linenos">212</span></a><span class="sd">    Another alternative use is in Streamlit.io applications:</span>
+</span><span id="L-213"><a href="#L-213"><span class="linenos">213</span></a>
+</span><span id="L-214"><a href="#L-214"><span class="linenos">214</span></a><span class="sd">    ```python</span>
+</span><span id="L-215"><a href="#L-215"><span class="linenos">215</span></a><span class="sd">    graphJumpResult(plot, result, showIt = False)</span>
+</span><span id="L-216"><a href="#L-216"><span class="linenos">216</span></a>
+</span><span id="L-217"><a href="#L-217"><span class="linenos">217</span></a><span class="sd">    st.bokeh_chart(plot, use_container_width=True)</span>
+</span><span id="L-218"><a href="#L-218"><span class="linenos">218</span></a><span class="sd">    ```</span>
+</span><span id="L-219"><a href="#L-219"><span class="linenos">219</span></a>
+</span><span id="L-220"><a href="#L-220"><span class="linenos">220</span></a><span class="sd">    Returns</span>
+</span><span id="L-221"><a href="#L-221"><span class="linenos">221</span></a><span class="sd">    -------</span>
+</span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a><span class="sd">    `None`.</span>
+</span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">data</span>
+</span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a>    <span class="n">scores</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">scores</span>
+</span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a>    <span class="n">score</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">score</span>
+</span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">plotTime</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">vKMh</span><span class="p">,</span> <span class="n">legend_label</span> <span class="o">=</span> <span class="n">legend</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span> <span class="o">=</span> <span class="n">lineColor</span><span class="p">)</span>
 </span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a>
-</span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a><span class="sd">        label: str</span>
-</span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a><span class="sd">    The legend label for the new Y axis.</span>
-</span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a>
-</span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a><span class="sd">        lineColor: str</span>
-</span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a><span class="sd">    A color name from the Bokeh palette.</span>
-</span><span id="L-234"><a href="#L-234"><span class="linenos">234</span></a>
-</span><span id="L-235"><a href="#L-235"><span class="linenos">235</span></a><span class="sd">        rangeName: str</span>
-</span><span id="L-236"><a href="#L-236"><span class="linenos">236</span></a><span class="sd">    The range name to associate the `LinearAxis` layout with the data for</span>
-</span><span id="L-237"><a href="#L-237"><span class="linenos">237</span></a><span class="sd">    plotting.</span>
-</span><span id="L-238"><a href="#L-238"><span class="linenos">238</span></a>
-</span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a><span class="sd">    Returns</span>
-</span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a><span class="sd">    -------</span>
-</span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a><span class="sd">    `None`.</span>
-</span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">data</span>
-</span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">plotTime</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">speedAngle</span><span class="p">,</span> <span class="n">legend_label</span> <span class="o">=</span> <span class="n">label</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span> <span class="o">=</span> <span class="n">lineColor</span><span class="p">,</span> <span class="n">y_range_name</span> <span class="o">=</span> <span class="n">rangeName</span><span class="p">)</span>
+</span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a>    <span class="k">if</span> <span class="n">showIt</span><span class="p">:</span>
+</span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a>        <span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">plotTime</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">hKMh</span><span class="p">,</span> <span class="n">legend_label</span> <span class="o">=</span> <span class="s1">&#39;H-speed&#39;</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span> <span class="o">=</span> <span class="s1">&#39;red&#39;</span><span class="p">)</span>
+</span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a>        <span class="n">_graphSegment</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">],</span> <span class="n">score</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;lightblue&#39;</span><span class="p">)</span>
+</span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a>        <span class="n">_graphSegment</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">]</span><span class="o">+</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">]</span><span class="o">+</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;darkseagreen&#39;</span><span class="p">)</span>
+</span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a>        <span class="n">_graphSegment</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">]</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">]</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;darkseagreen&#39;</span><span class="p">)</span>
+</span><span id="L-234"><a href="#L-234"><span class="linenos">234</span></a>        <span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="p">[</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">],</span> <span class="p">],</span> <span class="n">y</span> <span class="o">=</span> <span class="p">[</span> <span class="n">score</span><span class="p">,</span> <span class="p">],</span> <span class="n">marker</span> <span class="o">=</span> <span class="s1">&#39;square_cross&#39;</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">20</span><span class="p">,</span> <span class="p">],</span> <span class="n">line_color</span> <span class="o">=</span> <span class="s1">&#39;lightblue&#39;</span><span class="p">,</span> <span class="n">fill_color</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+</span><span id="L-235"><a href="#L-235"><span class="linenos">235</span></a>        <span class="n">bp</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
+</span><span id="L-236"><a href="#L-236"><span class="linenos">236</span></a>
+</span><span id="L-237"><a href="#L-237"><span class="linenos">237</span></a>
+</span><span id="L-238"><a href="#L-238"><span class="linenos">238</span></a><span class="k">def</span> <span class="nf">graphAltitude</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span>
+</span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a>                  <span class="n">jumpResult</span><span class="p">,</span>
+</span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a>                  <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Alt (ft)&#39;</span><span class="p">,</span>
+</span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a>                  <span class="n">lineColor</span> <span class="o">=</span> <span class="s1">&#39;palegoldenrod&#39;</span><span class="p">,</span>
+</span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a>                  <span class="n">rangeName</span> <span class="o">=</span> <span class="s1">&#39;altitudeFt&#39;</span><span class="p">):</span>
+</span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a><span class="sd">    Graph a vertical axis with additional data, often used for altitude in ft</span>
+</span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a><span class="sd">    ASL.</span>
+</span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a>
+</span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a><span class="sd">    Arguments</span>
+</span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a><span class="sd">    ---------</span>
+</span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a><span class="sd">        plot: pb.figure</span>
+</span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a><span class="sd">    A Bokeh figure where to render the plot.</span>
+</span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a>
+</span><span id="L-252"><a href="#L-252"><span class="linenos">252</span></a><span class="sd">        jumpResult: ssscoring.JumpResults</span>
+</span><span id="L-253"><a href="#L-253"><span class="linenos">253</span></a><span class="sd">    A jump results named tuple with score, max speed, scores, data, etc.</span>
+</span><span id="L-254"><a href="#L-254"><span class="linenos">254</span></a>
+</span><span id="L-255"><a href="#L-255"><span class="linenos">255</span></a><span class="sd">        label: str</span>
+</span><span id="L-256"><a href="#L-256"><span class="linenos">256</span></a><span class="sd">    The legend label for the new Y axis.</span>
+</span><span id="L-257"><a href="#L-257"><span class="linenos">257</span></a>
+</span><span id="L-258"><a href="#L-258"><span class="linenos">258</span></a><span class="sd">        lineColor: str</span>
+</span><span id="L-259"><a href="#L-259"><span class="linenos">259</span></a><span class="sd">    A color name from the Bokeh palette.</span>
+</span><span id="L-260"><a href="#L-260"><span class="linenos">260</span></a>
+</span><span id="L-261"><a href="#L-261"><span class="linenos">261</span></a><span class="sd">        rangeName: str</span>
+</span><span id="L-262"><a href="#L-262"><span class="linenos">262</span></a><span class="sd">    The range name to associate the `LinearAxis` layout with the data for</span>
+</span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a><span class="sd">    plotting.</span>
+</span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a>
+</span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a><span class="sd">    Returns</span>
+</span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a><span class="sd">    -------</span>
+</span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a><span class="sd">    `None`.</span>
+</span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">data</span>
+</span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">plotTime</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">altitudeAGLFt</span><span class="p">,</span> <span class="n">legend_label</span> <span class="o">=</span> <span class="n">label</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span> <span class="o">=</span> <span class="n">lineColor</span><span class="p">,</span> <span class="n">y_range_name</span> <span class="o">=</span> <span class="n">rangeName</span><span class="p">)</span>
+</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a>
+</span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a>
+</span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a><span class="k">def</span> <span class="nf">graphAngle</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span>
+</span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a>               <span class="n">jumpResult</span><span class="p">,</span>
+</span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a>               <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;angle&#39;</span><span class="p">,</span>
+</span><span id="L-276"><a href="#L-276"><span class="linenos">276</span></a>               <span class="n">lineColor</span> <span class="o">=</span> <span class="s1">&#39;deepskyblue&#39;</span><span class="p">,</span>
+</span><span id="L-277"><a href="#L-277"><span class="linenos">277</span></a>               <span class="n">rangeName</span> <span class="o">=</span> <span class="s1">&#39;angle&#39;</span><span class="p">):</span>
+</span><span id="L-278"><a href="#L-278"><span class="linenos">278</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-279"><a href="#L-279"><span class="linenos">279</span></a><span class="sd">    Graph the flight angle</span>
+</span><span id="L-280"><a href="#L-280"><span class="linenos">280</span></a>
+</span><span id="L-281"><a href="#L-281"><span class="linenos">281</span></a><span class="sd">    Arguments</span>
+</span><span id="L-282"><a href="#L-282"><span class="linenos">282</span></a><span class="sd">    ---------</span>
+</span><span id="L-283"><a href="#L-283"><span class="linenos">283</span></a><span class="sd">        plot: pb.figure</span>
+</span><span id="L-284"><a href="#L-284"><span class="linenos">284</span></a><span class="sd">    A Bokeh figure where to render the plot.</span>
+</span><span id="L-285"><a href="#L-285"><span class="linenos">285</span></a>
+</span><span id="L-286"><a href="#L-286"><span class="linenos">286</span></a><span class="sd">        jumpResult: ssscoring.JumpResults</span>
+</span><span id="L-287"><a href="#L-287"><span class="linenos">287</span></a><span class="sd">    A jump results named tuple with score, max speed, scores, data, etc.</span>
+</span><span id="L-288"><a href="#L-288"><span class="linenos">288</span></a>
+</span><span id="L-289"><a href="#L-289"><span class="linenos">289</span></a><span class="sd">        label: str</span>
+</span><span id="L-290"><a href="#L-290"><span class="linenos">290</span></a><span class="sd">    The legend label for the new Y axis.</span>
+</span><span id="L-291"><a href="#L-291"><span class="linenos">291</span></a>
+</span><span id="L-292"><a href="#L-292"><span class="linenos">292</span></a><span class="sd">        lineColor: str</span>
+</span><span id="L-293"><a href="#L-293"><span class="linenos">293</span></a><span class="sd">    A color name from the Bokeh palette.</span>
+</span><span id="L-294"><a href="#L-294"><span class="linenos">294</span></a>
+</span><span id="L-295"><a href="#L-295"><span class="linenos">295</span></a><span class="sd">        rangeName: str</span>
+</span><span id="L-296"><a href="#L-296"><span class="linenos">296</span></a><span class="sd">    The range name to associate the `LinearAxis` layout with the data for</span>
+</span><span id="L-297"><a href="#L-297"><span class="linenos">297</span></a><span class="sd">    plotting.</span>
+</span><span id="L-298"><a href="#L-298"><span class="linenos">298</span></a>
+</span><span id="L-299"><a href="#L-299"><span class="linenos">299</span></a><span class="sd">    Returns</span>
+</span><span id="L-300"><a href="#L-300"><span class="linenos">300</span></a><span class="sd">    -------</span>
+</span><span id="L-301"><a href="#L-301"><span class="linenos">301</span></a><span class="sd">    `None`.</span>
+</span><span id="L-302"><a href="#L-302"><span class="linenos">302</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-303"><a href="#L-303"><span class="linenos">303</span></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">data</span>
+</span><span id="L-304"><a href="#L-304"><span class="linenos">304</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">plotTime</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">speedAngle</span><span class="p">,</span> <span class="n">legend_label</span> <span class="o">=</span> <span class="n">label</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span> <span class="o">=</span> <span class="n">lineColor</span><span class="p">,</span> <span class="n">y_range_name</span> <span class="o">=</span> <span class="n">rangeName</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -343,21 +403,20 @@
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">initializePlot</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">jumpTitle</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">height</span><span class="o">=</span><span class="mi">500</span>,</span><span class="param">	<span class="n">width</span><span class="o">=</span><span class="mi">900</span>,</span><span class="param">	<span class="n">xLabel</span><span class="o">=</span><span class="s1">&#39;seconds from exit&#39;</span>,</span><span class="param">	<span class="n">yLabel</span><span class="o">=</span><span class="s1">&#39;km/h&#39;</span>,</span><span class="param">	<span class="n">xMax</span><span class="o">=</span><span class="mf">35.0</span>,</span><span class="param">	<span class="n">yMax</span><span class="o">=</span><span class="mf">550.0</span></span><span class="return-annotation">):</span></span>
+        <span class="name">initializePlot</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">jumpTitle</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">height</span><span class="o">=</span><span class="mi">500</span>,</span><span class="param">	<span class="n">width</span><span class="o">=</span><span class="mi">900</span>,</span><span class="param">	<span class="n">xLabel</span><span class="o">=</span><span class="s1">&#39;seconds from exit&#39;</span>,</span><span class="param">	<span class="n">yLabel</span><span class="o">=</span><span class="s1">&#39;km/h&#39;</span>,</span><span class="param">	<span class="n">xMax</span><span class="o">=</span><span class="mf">35.0</span>,</span><span class="param">	<span class="n">yMax</span><span class="o">=</span><span class="mf">550.0</span>,</span><span class="param">	<span class="n">colorName</span><span class="o">=</span><span class="s1">&#39;lightsteelblue&#39;</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="initializePlot-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#initializePlot"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="initializePlot-32"><a href="#initializePlot-32"><span class="linenos">32</span></a><span class="k">def</span> <span class="nf">initializePlot</span><span class="p">(</span><span class="n">jumpTitle</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="initializePlot-33"><a href="#initializePlot-33"><span class="linenos">33</span></a>                   <span class="n">height</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
-</span><span id="initializePlot-34"><a href="#initializePlot-34"><span class="linenos">34</span></a>                   <span class="n">width</span> <span class="o">=</span> <span class="mi">900</span><span class="p">,</span>
-</span><span id="initializePlot-35"><a href="#initializePlot-35"><span class="linenos">35</span></a>                   <span class="n">xLabel</span> <span class="o">=</span> <span class="s1">&#39;seconds from exit&#39;</span><span class="p">,</span>
-</span><span id="initializePlot-36"><a href="#initializePlot-36"><span class="linenos">36</span></a>                   <span class="n">yLabel</span> <span class="o">=</span> <span class="s1">&#39;km/h&#39;</span><span class="p">,</span>
-</span><span id="initializePlot-37"><a href="#initializePlot-37"><span class="linenos">37</span></a>                   <span class="c1"># TODO: roll back to 40.0?</span>
-</span><span id="initializePlot-38"><a href="#initializePlot-38"><span class="linenos">38</span></a>                   <span class="c1"># xMax = 40.0,</span>
-</span><span id="initializePlot-39"><a href="#initializePlot-39"><span class="linenos">39</span></a>                   <span class="n">xMax</span> <span class="o">=</span> <span class="mf">35.0</span><span class="p">,</span>
-</span><span id="initializePlot-40"><a href="#initializePlot-40"><span class="linenos">40</span></a>                   <span class="n">yMax</span> <span class="o">=</span> <span class="mf">550.0</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="initializePlot-33"><a href="#initializePlot-33"><span class="linenos">33</span></a><span class="k">def</span> <span class="nf">initializePlot</span><span class="p">(</span><span class="n">jumpTitle</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="initializePlot-34"><a href="#initializePlot-34"><span class="linenos">34</span></a>                   <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+</span><span id="initializePlot-35"><a href="#initializePlot-35"><span class="linenos">35</span></a>                   <span class="n">width</span><span class="o">=</span><span class="mi">900</span><span class="p">,</span>
+</span><span id="initializePlot-36"><a href="#initializePlot-36"><span class="linenos">36</span></a>                   <span class="n">xLabel</span><span class="o">=</span><span class="s1">&#39;seconds from exit&#39;</span><span class="p">,</span>
+</span><span id="initializePlot-37"><a href="#initializePlot-37"><span class="linenos">37</span></a>                   <span class="n">yLabel</span><span class="o">=</span><span class="s1">&#39;km/h&#39;</span><span class="p">,</span>
+</span><span id="initializePlot-38"><a href="#initializePlot-38"><span class="linenos">38</span></a>                   <span class="n">xMax</span><span class="o">=</span><span class="mf">35.0</span><span class="p">,</span>
+</span><span id="initializePlot-39"><a href="#initializePlot-39"><span class="linenos">39</span></a>                   <span class="n">yMax</span><span class="o">=</span><span class="mf">550.0</span><span class="p">,</span>
+</span><span id="initializePlot-40"><a href="#initializePlot-40"><span class="linenos">40</span></a>                   <span class="n">colorName</span><span class="o">=</span><span class="n">DEFAULT_AXIS_COLOR_BOKEH</span><span class="p">):</span>
 </span><span id="initializePlot-41"><a href="#initializePlot-41"><span class="linenos">41</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="initializePlot-42"><a href="#initializePlot-42"><span class="linenos">42</span></a><span class="sd">    Initiialize a plotting area for notebook output.</span>
 </span><span id="initializePlot-43"><a href="#initializePlot-43"><span class="linenos">43</span></a>
@@ -383,14 +442,32 @@
 </span><span id="initializePlot-63"><a href="#initializePlot-63"><span class="linenos">63</span></a>
 </span><span id="initializePlot-64"><a href="#initializePlot-64"><span class="linenos">64</span></a><span class="sd">        yMax: float</span>
 </span><span id="initializePlot-65"><a href="#initializePlot-65"><span class="linenos">65</span></a><span class="sd">    The maximum range for the Y axis.  Default = 550</span>
-</span><span id="initializePlot-66"><a href="#initializePlot-66"><span class="linenos">66</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="initializePlot-67"><a href="#initializePlot-67"><span class="linenos">67</span></a>    <span class="k">return</span> <span class="n">bp</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="n">jumpTitle</span><span class="p">,</span>
-</span><span id="initializePlot-68"><a href="#initializePlot-68"><span class="linenos">68</span></a>                     <span class="n">height</span> <span class="o">=</span> <span class="n">height</span><span class="p">,</span>
-</span><span id="initializePlot-69"><a href="#initializePlot-69"><span class="linenos">69</span></a>                     <span class="n">width</span> <span class="o">=</span> <span class="n">width</span><span class="p">,</span>
-</span><span id="initializePlot-70"><a href="#initializePlot-70"><span class="linenos">70</span></a>                     <span class="n">x_axis_label</span> <span class="o">=</span> <span class="n">xLabel</span><span class="p">,</span>
-</span><span id="initializePlot-71"><a href="#initializePlot-71"><span class="linenos">71</span></a>                     <span class="n">y_axis_label</span> <span class="o">=</span> <span class="n">yLabel</span><span class="p">,</span>
-</span><span id="initializePlot-72"><a href="#initializePlot-72"><span class="linenos">72</span></a>                     <span class="n">x_range</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">xMax</span><span class="p">),</span>
-</span><span id="initializePlot-73"><a href="#initializePlot-73"><span class="linenos">73</span></a>                     <span class="n">y_range</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">yMax</span><span class="p">))</span>
+</span><span id="initializePlot-66"><a href="#initializePlot-66"><span class="linenos">66</span></a>
+</span><span id="initializePlot-67"><a href="#initializePlot-67"><span class="linenos">67</span></a><span class="sd">        colorName</span>
+</span><span id="initializePlot-68"><a href="#initializePlot-68"><span class="linenos">68</span></a><span class="sd">    A valid CSS color string.</span>
+</span><span id="initializePlot-69"><a href="#initializePlot-69"><span class="linenos">69</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="initializePlot-70"><a href="#initializePlot-70"><span class="linenos">70</span></a>    <span class="n">bi</span><span class="o">.</span><span class="n">curdoc</span><span class="p">()</span><span class="o">.</span><span class="n">theme</span> <span class="o">=</span> <span class="s1">&#39;dark_minimal&#39;</span>
+</span><span id="initializePlot-71"><a href="#initializePlot-71"><span class="linenos">71</span></a>    <span class="n">plot</span> <span class="o">=</span> <span class="n">bp</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">jumpTitle</span><span class="p">,</span>
+</span><span id="initializePlot-72"><a href="#initializePlot-72"><span class="linenos">72</span></a>                     <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+</span><span id="initializePlot-73"><a href="#initializePlot-73"><span class="linenos">73</span></a>                     <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span>
+</span><span id="initializePlot-74"><a href="#initializePlot-74"><span class="linenos">74</span></a>                     <span class="n">x_axis_label</span><span class="o">=</span><span class="n">xLabel</span><span class="p">,</span>
+</span><span id="initializePlot-75"><a href="#initializePlot-75"><span class="linenos">75</span></a>                     <span class="n">y_axis_label</span><span class="o">=</span><span class="n">yLabel</span><span class="p">,</span>
+</span><span id="initializePlot-76"><a href="#initializePlot-76"><span class="linenos">76</span></a>                     <span class="n">x_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">xMax</span><span class="p">),</span>
+</span><span id="initializePlot-77"><a href="#initializePlot-77"><span class="linenos">77</span></a>                     <span class="n">y_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">yMax</span><span class="p">),</span>
+</span><span id="initializePlot-78"><a href="#initializePlot-78"><span class="linenos">78</span></a>                     <span class="n">background_fill_color</span><span class="o">=</span><span class="s1">&#39;#1a1a1a&#39;</span><span class="p">,</span>
+</span><span id="initializePlot-79"><a href="#initializePlot-79"><span class="linenos">79</span></a>                     <span class="n">border_fill_color</span><span class="o">=</span><span class="s1">&#39;#1a1a1a&#39;</span><span class="p">)</span>
+</span><span id="initializePlot-80"><a href="#initializePlot-80"><span class="linenos">80</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label_text_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="initializePlot-81"><a href="#initializePlot-81"><span class="linenos">81</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_label_text_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="initializePlot-82"><a href="#initializePlot-82"><span class="linenos">82</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_line_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="initializePlot-83"><a href="#initializePlot-83"><span class="linenos">83</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">major_tick_line_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="initializePlot-84"><a href="#initializePlot-84"><span class="linenos">84</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">minor_tick_line_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="initializePlot-85"><a href="#initializePlot-85"><span class="linenos">85</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label_text_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="initializePlot-86"><a href="#initializePlot-86"><span class="linenos">86</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">major_label_text_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="initializePlot-87"><a href="#initializePlot-87"><span class="linenos">87</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_line_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="initializePlot-88"><a href="#initializePlot-88"><span class="linenos">88</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">major_tick_line_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="initializePlot-89"><a href="#initializePlot-89"><span class="linenos">89</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">minor_tick_line_color</span><span class="o">=</span><span class="n">colorName</span>
+</span><span id="initializePlot-90"><a href="#initializePlot-90"><span class="linenos">90</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">text_color</span> <span class="o">=</span> <span class="n">colorName</span>
+</span><span id="initializePlot-91"><a href="#initializePlot-91"><span class="linenos">91</span></a>    <span class="k">return</span> <span class="n">plot</span>
 </span></pre></div>
 
 
@@ -432,6 +509,11 @@
 </code></pre>
 
 <p>The maximum range for the Y axis.  Default = 550</p>
+
+<pre><code>colorName
+</code></pre>
+
+<p>A valid CSS color string.</p>
 </div>
 
 
@@ -447,36 +529,36 @@
 
     </div>
     <a class="headerlink" href="#initializeExtraYRanges"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="initializeExtraYRanges-91"><a href="#initializeExtraYRanges-91"><span class="linenos"> 91</span></a><span class="k">def</span> <span class="nf">initializeExtraYRanges</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span>
-</span><span id="initializeExtraYRanges-92"><a href="#initializeExtraYRanges-92"><span class="linenos"> 92</span></a>                           <span class="n">startY</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="initializeExtraYRanges-93"><a href="#initializeExtraYRanges-93"><span class="linenos"> 93</span></a>                           <span class="n">endY</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MAX_ALTITUDE_FT</span><span class="p">):</span>
-</span><span id="initializeExtraYRanges-94"><a href="#initializeExtraYRanges-94"><span class="linenos"> 94</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="initializeExtraYRanges-95"><a href="#initializeExtraYRanges-95"><span class="linenos"> 95</span></a><span class="sd">    Initialize an extra Y range for reporting other data trend (e.g. altitude)</span>
-</span><span id="initializeExtraYRanges-96"><a href="#initializeExtraYRanges-96"><span class="linenos"> 96</span></a><span class="sd">    in the plot.</span>
-</span><span id="initializeExtraYRanges-97"><a href="#initializeExtraYRanges-97"><span class="linenos"> 97</span></a>
-</span><span id="initializeExtraYRanges-98"><a href="#initializeExtraYRanges-98"><span class="linenos"> 98</span></a><span class="sd">    Arguments</span>
-</span><span id="initializeExtraYRanges-99"><a href="#initializeExtraYRanges-99"><span class="linenos"> 99</span></a><span class="sd">    ---------</span>
-</span><span id="initializeExtraYRanges-100"><a href="#initializeExtraYRanges-100"><span class="linenos">100</span></a><span class="sd">        plot</span>
-</span><span id="initializeExtraYRanges-101"><a href="#initializeExtraYRanges-101"><span class="linenos">101</span></a><span class="sd">    A valid instance of `bp.figure` with an existing plot defined for it</span>
-</span><span id="initializeExtraYRanges-102"><a href="#initializeExtraYRanges-102"><span class="linenos">102</span></a>
-</span><span id="initializeExtraYRanges-103"><a href="#initializeExtraYRanges-103"><span class="linenos">103</span></a><span class="sd">        startY: float</span>
-</span><span id="initializeExtraYRanges-104"><a href="#initializeExtraYRanges-104"><span class="linenos">104</span></a><span class="sd">    The Y range starting value</span>
-</span><span id="initializeExtraYRanges-105"><a href="#initializeExtraYRanges-105"><span class="linenos">105</span></a>
-</span><span id="initializeExtraYRanges-106"><a href="#initializeExtraYRanges-106"><span class="linenos">106</span></a><span class="sd">        endY: float</span>
-</span><span id="initializeExtraYRanges-107"><a href="#initializeExtraYRanges-107"><span class="linenos">107</span></a><span class="sd">    The Y range ending value</span>
-</span><span id="initializeExtraYRanges-108"><a href="#initializeExtraYRanges-108"><span class="linenos">108</span></a>
-</span><span id="initializeExtraYRanges-109"><a href="#initializeExtraYRanges-109"><span class="linenos">109</span></a><span class="sd">    Returns</span>
-</span><span id="initializeExtraYRanges-110"><a href="#initializeExtraYRanges-110"><span class="linenos">110</span></a><span class="sd">    -------</span>
-</span><span id="initializeExtraYRanges-111"><a href="#initializeExtraYRanges-111"><span class="linenos">111</span></a><span class="sd">    An instance of `bp.figure` updated to report an additional Y axis.</span>
-</span><span id="initializeExtraYRanges-112"><a href="#initializeExtraYRanges-112"><span class="linenos">112</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="initializeExtraYRanges-113"><a href="#initializeExtraYRanges-113"><span class="linenos">113</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">extra_y_ranges</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="initializeExtraYRanges-114"><a href="#initializeExtraYRanges-114"><span class="linenos">114</span></a>        <span class="s1">&#39;altitudeFt&#39;</span><span class="p">:</span> <span class="n">Range1d</span><span class="p">(</span><span class="n">start</span> <span class="o">=</span> <span class="n">startY</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">endY</span><span class="p">),</span>
-</span><span id="initializeExtraYRanges-115"><a href="#initializeExtraYRanges-115"><span class="linenos">115</span></a>        <span class="s1">&#39;angle&#39;</span><span class="p">:</span> <span class="n">Range1d</span><span class="p">(</span><span class="n">start</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="mf">90.0</span><span class="p">),</span>
-</span><span id="initializeExtraYRanges-116"><a href="#initializeExtraYRanges-116"><span class="linenos">116</span></a>    <span class="p">}</span>
-</span><span id="initializeExtraYRanges-117"><a href="#initializeExtraYRanges-117"><span class="linenos">117</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">LinearAxis</span><span class="p">(</span><span class="n">y_range_name</span> <span class="o">=</span> <span class="s1">&#39;altitudeFt&#39;</span><span class="p">,</span> <span class="n">axis_label</span> <span class="o">=</span> <span class="s1">&#39;Alt (ft)&#39;</span><span class="p">),</span> <span class="s1">&#39;left&#39;</span><span class="p">)</span>
-</span><span id="initializeExtraYRanges-118"><a href="#initializeExtraYRanges-118"><span class="linenos">118</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">LinearAxis</span><span class="p">(</span><span class="n">y_range_name</span> <span class="o">=</span> <span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="n">axis_label</span> <span class="o">=</span> <span class="s1">&#39;angle&#39;</span><span class="p">),</span> <span class="s1">&#39;left&#39;</span><span class="p">)</span>
-</span><span id="initializeExtraYRanges-119"><a href="#initializeExtraYRanges-119"><span class="linenos">119</span></a>
-</span><span id="initializeExtraYRanges-120"><a href="#initializeExtraYRanges-120"><span class="linenos">120</span></a>    <span class="k">return</span> <span class="n">plot</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="initializeExtraYRanges-143"><a href="#initializeExtraYRanges-143"><span class="linenos">143</span></a><span class="k">def</span> <span class="nf">initializeExtraYRanges</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span>
+</span><span id="initializeExtraYRanges-144"><a href="#initializeExtraYRanges-144"><span class="linenos">144</span></a>                           <span class="n">startY</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="initializeExtraYRanges-145"><a href="#initializeExtraYRanges-145"><span class="linenos">145</span></a>                           <span class="n">endY</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MAX_ALTITUDE_FT</span><span class="p">):</span>
+</span><span id="initializeExtraYRanges-146"><a href="#initializeExtraYRanges-146"><span class="linenos">146</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="initializeExtraYRanges-147"><a href="#initializeExtraYRanges-147"><span class="linenos">147</span></a><span class="sd">    Initialize an extra Y range for reporting other data trend (e.g. altitude)</span>
+</span><span id="initializeExtraYRanges-148"><a href="#initializeExtraYRanges-148"><span class="linenos">148</span></a><span class="sd">    in the plot.</span>
+</span><span id="initializeExtraYRanges-149"><a href="#initializeExtraYRanges-149"><span class="linenos">149</span></a>
+</span><span id="initializeExtraYRanges-150"><a href="#initializeExtraYRanges-150"><span class="linenos">150</span></a><span class="sd">    Arguments</span>
+</span><span id="initializeExtraYRanges-151"><a href="#initializeExtraYRanges-151"><span class="linenos">151</span></a><span class="sd">    ---------</span>
+</span><span id="initializeExtraYRanges-152"><a href="#initializeExtraYRanges-152"><span class="linenos">152</span></a><span class="sd">        plot</span>
+</span><span id="initializeExtraYRanges-153"><a href="#initializeExtraYRanges-153"><span class="linenos">153</span></a><span class="sd">    A valid instance of `bp.figure` with an existing plot defined for it</span>
+</span><span id="initializeExtraYRanges-154"><a href="#initializeExtraYRanges-154"><span class="linenos">154</span></a>
+</span><span id="initializeExtraYRanges-155"><a href="#initializeExtraYRanges-155"><span class="linenos">155</span></a><span class="sd">        startY: float</span>
+</span><span id="initializeExtraYRanges-156"><a href="#initializeExtraYRanges-156"><span class="linenos">156</span></a><span class="sd">    The Y range starting value</span>
+</span><span id="initializeExtraYRanges-157"><a href="#initializeExtraYRanges-157"><span class="linenos">157</span></a>
+</span><span id="initializeExtraYRanges-158"><a href="#initializeExtraYRanges-158"><span class="linenos">158</span></a><span class="sd">        endY: float</span>
+</span><span id="initializeExtraYRanges-159"><a href="#initializeExtraYRanges-159"><span class="linenos">159</span></a><span class="sd">    The Y range ending value</span>
+</span><span id="initializeExtraYRanges-160"><a href="#initializeExtraYRanges-160"><span class="linenos">160</span></a>
+</span><span id="initializeExtraYRanges-161"><a href="#initializeExtraYRanges-161"><span class="linenos">161</span></a><span class="sd">    Returns</span>
+</span><span id="initializeExtraYRanges-162"><a href="#initializeExtraYRanges-162"><span class="linenos">162</span></a><span class="sd">    -------</span>
+</span><span id="initializeExtraYRanges-163"><a href="#initializeExtraYRanges-163"><span class="linenos">163</span></a><span class="sd">    An instance of `bp.figure` updated to report an additional Y axis.</span>
+</span><span id="initializeExtraYRanges-164"><a href="#initializeExtraYRanges-164"><span class="linenos">164</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="initializeExtraYRanges-165"><a href="#initializeExtraYRanges-165"><span class="linenos">165</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">extra_y_ranges</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="initializeExtraYRanges-166"><a href="#initializeExtraYRanges-166"><span class="linenos">166</span></a>        <span class="s1">&#39;altitudeFt&#39;</span><span class="p">:</span> <span class="n">Range1d</span><span class="p">(</span><span class="n">start</span> <span class="o">=</span> <span class="n">startY</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">endY</span><span class="p">),</span>
+</span><span id="initializeExtraYRanges-167"><a href="#initializeExtraYRanges-167"><span class="linenos">167</span></a>        <span class="s1">&#39;angle&#39;</span><span class="p">:</span> <span class="n">Range1d</span><span class="p">(</span><span class="n">start</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="mf">90.0</span><span class="p">),</span>
+</span><span id="initializeExtraYRanges-168"><a href="#initializeExtraYRanges-168"><span class="linenos">168</span></a>    <span class="p">}</span>
+</span><span id="initializeExtraYRanges-169"><a href="#initializeExtraYRanges-169"><span class="linenos">169</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">_initLinearAxis</span><span class="p">(</span><span class="s1">&#39;Alt (ft)&#39;</span><span class="p">,</span> <span class="s1">&#39;altitudeFt&#39;</span><span class="p">,</span> <span class="n">colorName</span><span class="o">=</span><span class="n">DEFAULT_AXIS_COLOR_BOKEH</span><span class="p">),</span> <span class="s1">&#39;left&#39;</span><span class="p">)</span>
+</span><span id="initializeExtraYRanges-170"><a href="#initializeExtraYRanges-170"><span class="linenos">170</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">_initLinearAxis</span><span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="n">colorName</span><span class="o">=</span><span class="n">DEFAULT_AXIS_COLOR_BOKEH</span><span class="p">),</span> <span class="s1">&#39;left&#39;</span><span class="p">)</span>
+</span><span id="initializeExtraYRanges-171"><a href="#initializeExtraYRanges-171"><span class="linenos">171</span></a>
+</span><span id="initializeExtraYRanges-172"><a href="#initializeExtraYRanges-172"><span class="linenos">172</span></a>    <span class="k">return</span> <span class="n">plot</span>
 </span></pre></div>
 
 
@@ -518,60 +600,68 @@ in the plot.</p>
 
     </div>
     <a class="headerlink" href="#graphJumpResult"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="graphJumpResult-123"><a href="#graphJumpResult-123"><span class="linenos">123</span></a><span class="k">def</span> <span class="nf">graphJumpResult</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span>
-</span><span id="graphJumpResult-124"><a href="#graphJumpResult-124"><span class="linenos">124</span></a>                    <span class="n">jumpResult</span><span class="p">,</span>
-</span><span id="graphJumpResult-125"><a href="#graphJumpResult-125"><span class="linenos">125</span></a>                    <span class="n">lineColor</span> <span class="o">=</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span>
-</span><span id="graphJumpResult-126"><a href="#graphJumpResult-126"><span class="linenos">126</span></a>                    <span class="n">legend</span> <span class="o">=</span> <span class="s1">&#39;speed&#39;</span><span class="p">,</span>
-</span><span id="graphJumpResult-127"><a href="#graphJumpResult-127"><span class="linenos">127</span></a>                    <span class="n">showIt</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
-</span><span id="graphJumpResult-128"><a href="#graphJumpResult-128"><span class="linenos">128</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="graphJumpResult-129"><a href="#graphJumpResult-129"><span class="linenos">129</span></a><span class="sd">    Graph the jump results using the initialized plot.</span>
-</span><span id="graphJumpResult-130"><a href="#graphJumpResult-130"><span class="linenos">130</span></a>
-</span><span id="graphJumpResult-131"><a href="#graphJumpResult-131"><span class="linenos">131</span></a><span class="sd">    Arguments</span>
-</span><span id="graphJumpResult-132"><a href="#graphJumpResult-132"><span class="linenos">132</span></a><span class="sd">    ---------</span>
-</span><span id="graphJumpResult-133"><a href="#graphJumpResult-133"><span class="linenos">133</span></a><span class="sd">        plot: bp.figure</span>
-</span><span id="graphJumpResult-134"><a href="#graphJumpResult-134"><span class="linenos">134</span></a><span class="sd">    A Bokeh figure where to render the plot.</span>
-</span><span id="graphJumpResult-135"><a href="#graphJumpResult-135"><span class="linenos">135</span></a>
-</span><span id="graphJumpResult-136"><a href="#graphJumpResult-136"><span class="linenos">136</span></a><span class="sd">        jumpResult: ssscoring.JumpResults</span>
-</span><span id="graphJumpResult-137"><a href="#graphJumpResult-137"><span class="linenos">137</span></a><span class="sd">    A jump results named tuple with score, max speed, scores, data, etc.</span>
-</span><span id="graphJumpResult-138"><a href="#graphJumpResult-138"><span class="linenos">138</span></a>
-</span><span id="graphJumpResult-139"><a href="#graphJumpResult-139"><span class="linenos">139</span></a><span class="sd">        lineColor: str</span>
-</span><span id="graphJumpResult-140"><a href="#graphJumpResult-140"><span class="linenos">140</span></a><span class="sd">    A valid color from the Bokeh palette:  https://docs.bokeh.org/en/2.1.1/docs/reference/colors.html</span>
-</span><span id="graphJumpResult-141"><a href="#graphJumpResult-141"><span class="linenos">141</span></a><span class="sd">    This module defines 8 colors for rendering a competition&#39;s results.  See:</span>
-</span><span id="graphJumpResult-142"><a href="#graphJumpResult-142"><span class="linenos">142</span></a><span class="sd">    `ssscoring.notebook.SPEED_COLORS` for the list.</span>
-</span><span id="graphJumpResult-143"><a href="#graphJumpResult-143"><span class="linenos">143</span></a>
-</span><span id="graphJumpResult-144"><a href="#graphJumpResult-144"><span class="linenos">144</span></a><span class="sd">        leged: str</span>
-</span><span id="graphJumpResult-145"><a href="#graphJumpResult-145"><span class="linenos">145</span></a><span class="sd">    A title for the plot.</span>
-</span><span id="graphJumpResult-146"><a href="#graphJumpResult-146"><span class="linenos">146</span></a>
-</span><span id="graphJumpResult-147"><a href="#graphJumpResult-147"><span class="linenos">147</span></a><span class="sd">        showIt: bool</span>
-</span><span id="graphJumpResult-148"><a href="#graphJumpResult-148"><span class="linenos">148</span></a><span class="sd">    A boolean flag for whether the call should render the plot upon the function</span>
-</span><span id="graphJumpResult-149"><a href="#graphJumpResult-149"><span class="linenos">149</span></a><span class="sd">    call.  This flag is used for combining two or more jumps on the same plot.</span>
-</span><span id="graphJumpResult-150"><a href="#graphJumpResult-150"><span class="linenos">150</span></a><span class="sd">    In that case, a call to this function is made with a different `jumpResult`</span>
-</span><span id="graphJumpResult-151"><a href="#graphJumpResult-151"><span class="linenos">151</span></a><span class="sd">    and the `showIt` flag set to `False`.  When the user is ready to view the</span>
-</span><span id="graphJumpResult-152"><a href="#graphJumpResult-152"><span class="linenos">152</span></a><span class="sd">    combined plot, issue a call to `bp.show(plot)`.  Example:</span>
-</span><span id="graphJumpResult-153"><a href="#graphJumpResult-153"><span class="linenos">153</span></a>
-</span><span id="graphJumpResult-154"><a href="#graphJumpResult-154"><span class="linenos">154</span></a><span class="sd">    ```python</span>
-</span><span id="graphJumpResult-155"><a href="#graphJumpResult-155"><span class="linenos">155</span></a><span class="sd">    for result in jumpResults:</span>
-</span><span id="graphJumpResult-156"><a href="#graphJumpResult-156"><span class="linenos">156</span></a><span class="sd">        graphJumpResult(plot, result, showIt = False)</span>
-</span><span id="graphJumpResult-157"><a href="#graphJumpResult-157"><span class="linenos">157</span></a>
-</span><span id="graphJumpResult-158"><a href="#graphJumpResult-158"><span class="linenos">158</span></a><span class="sd">    bp.show(plot)</span>
-</span><span id="graphJumpResult-159"><a href="#graphJumpResult-159"><span class="linenos">159</span></a>
-</span><span id="graphJumpResult-160"><a href="#graphJumpResult-160"><span class="linenos">160</span></a><span class="sd">    Returns</span>
-</span><span id="graphJumpResult-161"><a href="#graphJumpResult-161"><span class="linenos">161</span></a><span class="sd">    -------</span>
-</span><span id="graphJumpResult-162"><a href="#graphJumpResult-162"><span class="linenos">162</span></a><span class="sd">    `None`.</span>
-</span><span id="graphJumpResult-163"><a href="#graphJumpResult-163"><span class="linenos">163</span></a><span class="sd">    ```</span>
-</span><span id="graphJumpResult-164"><a href="#graphJumpResult-164"><span class="linenos">164</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="graphJumpResult-165"><a href="#graphJumpResult-165"><span class="linenos">165</span></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">data</span>
-</span><span id="graphJumpResult-166"><a href="#graphJumpResult-166"><span class="linenos">166</span></a>    <span class="n">scores</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">scores</span>
-</span><span id="graphJumpResult-167"><a href="#graphJumpResult-167"><span class="linenos">167</span></a>    <span class="n">score</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">score</span>
-</span><span id="graphJumpResult-168"><a href="#graphJumpResult-168"><span class="linenos">168</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">plotTime</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">vKMh</span><span class="p">,</span> <span class="n">legend_label</span> <span class="o">=</span> <span class="n">legend</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span> <span class="o">=</span> <span class="n">lineColor</span><span class="p">)</span>
-</span><span id="graphJumpResult-169"><a href="#graphJumpResult-169"><span class="linenos">169</span></a>
-</span><span id="graphJumpResult-170"><a href="#graphJumpResult-170"><span class="linenos">170</span></a>    <span class="k">if</span> <span class="n">showIt</span><span class="p">:</span>
-</span><span id="graphJumpResult-171"><a href="#graphJumpResult-171"><span class="linenos">171</span></a>        <span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">plotTime</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">hKMh</span><span class="p">,</span> <span class="n">legend_label</span> <span class="o">=</span> <span class="s1">&#39;H-speed&#39;</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span> <span class="o">=</span> <span class="s1">&#39;red&#39;</span><span class="p">)</span>
-</span><span id="graphJumpResult-172"><a href="#graphJumpResult-172"><span class="linenos">172</span></a>        <span class="n">_graphSegment</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">],</span> <span class="n">score</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;lightblue&#39;</span><span class="p">)</span>
-</span><span id="graphJumpResult-173"><a href="#graphJumpResult-173"><span class="linenos">173</span></a>        <span class="n">_graphSegment</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">]</span><span class="o">+</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">]</span><span class="o">+</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;darkseagreen&#39;</span><span class="p">)</span>
-</span><span id="graphJumpResult-174"><a href="#graphJumpResult-174"><span class="linenos">174</span></a>        <span class="n">_graphSegment</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">]</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">]</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;darkseagreen&#39;</span><span class="p">)</span>
-</span><span id="graphJumpResult-175"><a href="#graphJumpResult-175"><span class="linenos">175</span></a>        <span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="p">[</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">],</span> <span class="p">],</span> <span class="n">y</span> <span class="o">=</span> <span class="p">[</span> <span class="n">score</span><span class="p">,</span> <span class="p">],</span> <span class="n">marker</span> <span class="o">=</span> <span class="s1">&#39;square_cross&#39;</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">20</span><span class="p">,</span> <span class="p">],</span> <span class="n">line_color</span> <span class="o">=</span> <span class="s1">&#39;lightblue&#39;</span><span class="p">,</span> <span class="n">fill_color</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
-</span><span id="graphJumpResult-176"><a href="#graphJumpResult-176"><span class="linenos">176</span></a>        <span class="n">bp</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="graphJumpResult-175"><a href="#graphJumpResult-175"><span class="linenos">175</span></a><span class="k">def</span> <span class="nf">graphJumpResult</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span>
+</span><span id="graphJumpResult-176"><a href="#graphJumpResult-176"><span class="linenos">176</span></a>                    <span class="n">jumpResult</span><span class="p">,</span>
+</span><span id="graphJumpResult-177"><a href="#graphJumpResult-177"><span class="linenos">177</span></a>                    <span class="n">lineColor</span> <span class="o">=</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span>
+</span><span id="graphJumpResult-178"><a href="#graphJumpResult-178"><span class="linenos">178</span></a>                    <span class="n">legend</span> <span class="o">=</span> <span class="s1">&#39;speed&#39;</span><span class="p">,</span>
+</span><span id="graphJumpResult-179"><a href="#graphJumpResult-179"><span class="linenos">179</span></a>                    <span class="n">showIt</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+</span><span id="graphJumpResult-180"><a href="#graphJumpResult-180"><span class="linenos">180</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="graphJumpResult-181"><a href="#graphJumpResult-181"><span class="linenos">181</span></a><span class="sd">    Graph the jump results using the initialized plot.</span>
+</span><span id="graphJumpResult-182"><a href="#graphJumpResult-182"><span class="linenos">182</span></a>
+</span><span id="graphJumpResult-183"><a href="#graphJumpResult-183"><span class="linenos">183</span></a><span class="sd">    Arguments</span>
+</span><span id="graphJumpResult-184"><a href="#graphJumpResult-184"><span class="linenos">184</span></a><span class="sd">    ---------</span>
+</span><span id="graphJumpResult-185"><a href="#graphJumpResult-185"><span class="linenos">185</span></a><span class="sd">        plot: bp.figure</span>
+</span><span id="graphJumpResult-186"><a href="#graphJumpResult-186"><span class="linenos">186</span></a><span class="sd">    A Bokeh figure where to render the plot.</span>
+</span><span id="graphJumpResult-187"><a href="#graphJumpResult-187"><span class="linenos">187</span></a>
+</span><span id="graphJumpResult-188"><a href="#graphJumpResult-188"><span class="linenos">188</span></a><span class="sd">        jumpResult: ssscoring.JumpResults</span>
+</span><span id="graphJumpResult-189"><a href="#graphJumpResult-189"><span class="linenos">189</span></a><span class="sd">    A jump results named tuple with score, max speed, scores, data, etc.</span>
+</span><span id="graphJumpResult-190"><a href="#graphJumpResult-190"><span class="linenos">190</span></a>
+</span><span id="graphJumpResult-191"><a href="#graphJumpResult-191"><span class="linenos">191</span></a><span class="sd">        lineColor: str</span>
+</span><span id="graphJumpResult-192"><a href="#graphJumpResult-192"><span class="linenos">192</span></a><span class="sd">    A valid color from the Bokeh palette:  https://docs.bokeh.org/en/2.1.1/docs/reference/colors.html</span>
+</span><span id="graphJumpResult-193"><a href="#graphJumpResult-193"><span class="linenos">193</span></a><span class="sd">    This module defines 8 colors for rendering a competition&#39;s results.  See:</span>
+</span><span id="graphJumpResult-194"><a href="#graphJumpResult-194"><span class="linenos">194</span></a><span class="sd">    `ssscoring.notebook.SPEED_COLORS` for the list.</span>
+</span><span id="graphJumpResult-195"><a href="#graphJumpResult-195"><span class="linenos">195</span></a>
+</span><span id="graphJumpResult-196"><a href="#graphJumpResult-196"><span class="linenos">196</span></a><span class="sd">        leged: str</span>
+</span><span id="graphJumpResult-197"><a href="#graphJumpResult-197"><span class="linenos">197</span></a><span class="sd">    A title for the plot.</span>
+</span><span id="graphJumpResult-198"><a href="#graphJumpResult-198"><span class="linenos">198</span></a>
+</span><span id="graphJumpResult-199"><a href="#graphJumpResult-199"><span class="linenos">199</span></a><span class="sd">        showIt: bool</span>
+</span><span id="graphJumpResult-200"><a href="#graphJumpResult-200"><span class="linenos">200</span></a><span class="sd">    A boolean flag for whether the call should render the plot upon the function</span>
+</span><span id="graphJumpResult-201"><a href="#graphJumpResult-201"><span class="linenos">201</span></a><span class="sd">    call.  This flag is used for combining two or more jumps on the same plot.</span>
+</span><span id="graphJumpResult-202"><a href="#graphJumpResult-202"><span class="linenos">202</span></a><span class="sd">    In that case, a call to this function is made with a different `jumpResult`</span>
+</span><span id="graphJumpResult-203"><a href="#graphJumpResult-203"><span class="linenos">203</span></a><span class="sd">    and the `showIt` flag set to `False`.  When the user is ready to view the</span>
+</span><span id="graphJumpResult-204"><a href="#graphJumpResult-204"><span class="linenos">204</span></a><span class="sd">    combined plot, issue a call to `bp.show(plot)`.  Example:</span>
+</span><span id="graphJumpResult-205"><a href="#graphJumpResult-205"><span class="linenos">205</span></a>
+</span><span id="graphJumpResult-206"><a href="#graphJumpResult-206"><span class="linenos">206</span></a><span class="sd">    ```python</span>
+</span><span id="graphJumpResult-207"><a href="#graphJumpResult-207"><span class="linenos">207</span></a><span class="sd">    for result in jumpResults:</span>
+</span><span id="graphJumpResult-208"><a href="#graphJumpResult-208"><span class="linenos">208</span></a><span class="sd">        graphJumpResult(plot, result, showIt = False)</span>
+</span><span id="graphJumpResult-209"><a href="#graphJumpResult-209"><span class="linenos">209</span></a>
+</span><span id="graphJumpResult-210"><a href="#graphJumpResult-210"><span class="linenos">210</span></a><span class="sd">    bp.show(plot)</span>
+</span><span id="graphJumpResult-211"><a href="#graphJumpResult-211"><span class="linenos">211</span></a><span class="sd">    ```</span>
+</span><span id="graphJumpResult-212"><a href="#graphJumpResult-212"><span class="linenos">212</span></a>
+</span><span id="graphJumpResult-213"><a href="#graphJumpResult-213"><span class="linenos">213</span></a><span class="sd">    Another alternative use is in Streamlit.io applications:</span>
+</span><span id="graphJumpResult-214"><a href="#graphJumpResult-214"><span class="linenos">214</span></a>
+</span><span id="graphJumpResult-215"><a href="#graphJumpResult-215"><span class="linenos">215</span></a><span class="sd">    ```python</span>
+</span><span id="graphJumpResult-216"><a href="#graphJumpResult-216"><span class="linenos">216</span></a><span class="sd">    graphJumpResult(plot, result, showIt = False)</span>
+</span><span id="graphJumpResult-217"><a href="#graphJumpResult-217"><span class="linenos">217</span></a>
+</span><span id="graphJumpResult-218"><a href="#graphJumpResult-218"><span class="linenos">218</span></a><span class="sd">    st.bokeh_chart(plot, use_container_width=True)</span>
+</span><span id="graphJumpResult-219"><a href="#graphJumpResult-219"><span class="linenos">219</span></a><span class="sd">    ```</span>
+</span><span id="graphJumpResult-220"><a href="#graphJumpResult-220"><span class="linenos">220</span></a>
+</span><span id="graphJumpResult-221"><a href="#graphJumpResult-221"><span class="linenos">221</span></a><span class="sd">    Returns</span>
+</span><span id="graphJumpResult-222"><a href="#graphJumpResult-222"><span class="linenos">222</span></a><span class="sd">    -------</span>
+</span><span id="graphJumpResult-223"><a href="#graphJumpResult-223"><span class="linenos">223</span></a><span class="sd">    `None`.</span>
+</span><span id="graphJumpResult-224"><a href="#graphJumpResult-224"><span class="linenos">224</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="graphJumpResult-225"><a href="#graphJumpResult-225"><span class="linenos">225</span></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">data</span>
+</span><span id="graphJumpResult-226"><a href="#graphJumpResult-226"><span class="linenos">226</span></a>    <span class="n">scores</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">scores</span>
+</span><span id="graphJumpResult-227"><a href="#graphJumpResult-227"><span class="linenos">227</span></a>    <span class="n">score</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">score</span>
+</span><span id="graphJumpResult-228"><a href="#graphJumpResult-228"><span class="linenos">228</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">plotTime</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">vKMh</span><span class="p">,</span> <span class="n">legend_label</span> <span class="o">=</span> <span class="n">legend</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span> <span class="o">=</span> <span class="n">lineColor</span><span class="p">)</span>
+</span><span id="graphJumpResult-229"><a href="#graphJumpResult-229"><span class="linenos">229</span></a>
+</span><span id="graphJumpResult-230"><a href="#graphJumpResult-230"><span class="linenos">230</span></a>    <span class="k">if</span> <span class="n">showIt</span><span class="p">:</span>
+</span><span id="graphJumpResult-231"><a href="#graphJumpResult-231"><span class="linenos">231</span></a>        <span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">plotTime</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">hKMh</span><span class="p">,</span> <span class="n">legend_label</span> <span class="o">=</span> <span class="s1">&#39;H-speed&#39;</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span> <span class="o">=</span> <span class="s1">&#39;red&#39;</span><span class="p">)</span>
+</span><span id="graphJumpResult-232"><a href="#graphJumpResult-232"><span class="linenos">232</span></a>        <span class="n">_graphSegment</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">],</span> <span class="n">score</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;lightblue&#39;</span><span class="p">)</span>
+</span><span id="graphJumpResult-233"><a href="#graphJumpResult-233"><span class="linenos">233</span></a>        <span class="n">_graphSegment</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">]</span><span class="o">+</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">]</span><span class="o">+</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;darkseagreen&#39;</span><span class="p">)</span>
+</span><span id="graphJumpResult-234"><a href="#graphJumpResult-234"><span class="linenos">234</span></a>        <span class="n">_graphSegment</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">]</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">]</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;darkseagreen&#39;</span><span class="p">)</span>
+</span><span id="graphJumpResult-235"><a href="#graphJumpResult-235"><span class="linenos">235</span></a>        <span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="p">[</span> <span class="n">scores</span><span class="p">[</span><span class="n">score</span><span class="p">],</span> <span class="p">],</span> <span class="n">y</span> <span class="o">=</span> <span class="p">[</span> <span class="n">score</span><span class="p">,</span> <span class="p">],</span> <span class="n">marker</span> <span class="o">=</span> <span class="s1">&#39;square_cross&#39;</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">20</span><span class="p">,</span> <span class="p">],</span> <span class="n">line_color</span> <span class="o">=</span> <span class="s1">&#39;lightblue&#39;</span><span class="p">,</span> <span class="n">fill_color</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+</span><span id="graphJumpResult-236"><a href="#graphJumpResult-236"><span class="linenos">236</span></a>        <span class="n">bp</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -615,12 +705,21 @@ combined plot, issue a call to <code>bp.show(plot)</code>.  Example:</p>
     <span class="n">graphJumpResult</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">showIt</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
 
 <span class="n">bp</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">plot</span><span class="p">)</span>
-
-<span class="n">Returns</span>
-<span class="o">-------</span>
-<span class="err">`</span><span class="kc">None</span><span class="err">`</span><span class="o">.</span>
 </code></pre>
 </div>
+
+<p>Another alternative use is in Streamlit.io applications:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="n">graphJumpResult</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">showIt</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+
+<span class="n">st</span><span class="o">.</span><span class="n">bokeh_chart</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<h2 id="returns">Returns</h2>
+
+<p><code>None</code>.</p>
 </div>
 
 
@@ -636,39 +735,39 @@ combined plot, issue a call to <code>bp.show(plot)</code>.  Example:</p>
 
     </div>
     <a class="headerlink" href="#graphAltitude"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="graphAltitude-179"><a href="#graphAltitude-179"><span class="linenos">179</span></a><span class="k">def</span> <span class="nf">graphAltitude</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span>
-</span><span id="graphAltitude-180"><a href="#graphAltitude-180"><span class="linenos">180</span></a>                  <span class="n">jumpResult</span><span class="p">,</span>
-</span><span id="graphAltitude-181"><a href="#graphAltitude-181"><span class="linenos">181</span></a>                  <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Alt (ft)&#39;</span><span class="p">,</span>
-</span><span id="graphAltitude-182"><a href="#graphAltitude-182"><span class="linenos">182</span></a>                  <span class="n">lineColor</span> <span class="o">=</span> <span class="s1">&#39;palegoldenrod&#39;</span><span class="p">,</span>
-</span><span id="graphAltitude-183"><a href="#graphAltitude-183"><span class="linenos">183</span></a>                  <span class="n">rangeName</span> <span class="o">=</span> <span class="s1">&#39;altitudeFt&#39;</span><span class="p">):</span>
-</span><span id="graphAltitude-184"><a href="#graphAltitude-184"><span class="linenos">184</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="graphAltitude-185"><a href="#graphAltitude-185"><span class="linenos">185</span></a><span class="sd">    Graph a vertical axis with additional data, often used for altitude in ft</span>
-</span><span id="graphAltitude-186"><a href="#graphAltitude-186"><span class="linenos">186</span></a><span class="sd">    ASL.</span>
-</span><span id="graphAltitude-187"><a href="#graphAltitude-187"><span class="linenos">187</span></a>
-</span><span id="graphAltitude-188"><a href="#graphAltitude-188"><span class="linenos">188</span></a><span class="sd">    Arguments</span>
-</span><span id="graphAltitude-189"><a href="#graphAltitude-189"><span class="linenos">189</span></a><span class="sd">    ---------</span>
-</span><span id="graphAltitude-190"><a href="#graphAltitude-190"><span class="linenos">190</span></a><span class="sd">        plot: pb.figure</span>
-</span><span id="graphAltitude-191"><a href="#graphAltitude-191"><span class="linenos">191</span></a><span class="sd">    A Bokeh figure where to render the plot.</span>
-</span><span id="graphAltitude-192"><a href="#graphAltitude-192"><span class="linenos">192</span></a>
-</span><span id="graphAltitude-193"><a href="#graphAltitude-193"><span class="linenos">193</span></a><span class="sd">        jumpResult: ssscoring.JumpResults</span>
-</span><span id="graphAltitude-194"><a href="#graphAltitude-194"><span class="linenos">194</span></a><span class="sd">    A jump results named tuple with score, max speed, scores, data, etc.</span>
-</span><span id="graphAltitude-195"><a href="#graphAltitude-195"><span class="linenos">195</span></a>
-</span><span id="graphAltitude-196"><a href="#graphAltitude-196"><span class="linenos">196</span></a><span class="sd">        label: str</span>
-</span><span id="graphAltitude-197"><a href="#graphAltitude-197"><span class="linenos">197</span></a><span class="sd">    The legend label for the new Y axis.</span>
-</span><span id="graphAltitude-198"><a href="#graphAltitude-198"><span class="linenos">198</span></a>
-</span><span id="graphAltitude-199"><a href="#graphAltitude-199"><span class="linenos">199</span></a><span class="sd">        lineColor: str</span>
-</span><span id="graphAltitude-200"><a href="#graphAltitude-200"><span class="linenos">200</span></a><span class="sd">    A color name from the Bokeh palette.</span>
-</span><span id="graphAltitude-201"><a href="#graphAltitude-201"><span class="linenos">201</span></a>
-</span><span id="graphAltitude-202"><a href="#graphAltitude-202"><span class="linenos">202</span></a><span class="sd">        rangeName: str</span>
-</span><span id="graphAltitude-203"><a href="#graphAltitude-203"><span class="linenos">203</span></a><span class="sd">    The range name to associate the `LinearAxis` layout with the data for</span>
-</span><span id="graphAltitude-204"><a href="#graphAltitude-204"><span class="linenos">204</span></a><span class="sd">    plotting.</span>
-</span><span id="graphAltitude-205"><a href="#graphAltitude-205"><span class="linenos">205</span></a>
-</span><span id="graphAltitude-206"><a href="#graphAltitude-206"><span class="linenos">206</span></a><span class="sd">    Returns</span>
-</span><span id="graphAltitude-207"><a href="#graphAltitude-207"><span class="linenos">207</span></a><span class="sd">    -------</span>
-</span><span id="graphAltitude-208"><a href="#graphAltitude-208"><span class="linenos">208</span></a><span class="sd">    `None`.</span>
-</span><span id="graphAltitude-209"><a href="#graphAltitude-209"><span class="linenos">209</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="graphAltitude-210"><a href="#graphAltitude-210"><span class="linenos">210</span></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">data</span>
-</span><span id="graphAltitude-211"><a href="#graphAltitude-211"><span class="linenos">211</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">plotTime</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">altitudeAGLFt</span><span class="p">,</span> <span class="n">legend_label</span> <span class="o">=</span> <span class="n">label</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span> <span class="o">=</span> <span class="n">lineColor</span><span class="p">,</span> <span class="n">y_range_name</span> <span class="o">=</span> <span class="n">rangeName</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="graphAltitude-239"><a href="#graphAltitude-239"><span class="linenos">239</span></a><span class="k">def</span> <span class="nf">graphAltitude</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span>
+</span><span id="graphAltitude-240"><a href="#graphAltitude-240"><span class="linenos">240</span></a>                  <span class="n">jumpResult</span><span class="p">,</span>
+</span><span id="graphAltitude-241"><a href="#graphAltitude-241"><span class="linenos">241</span></a>                  <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Alt (ft)&#39;</span><span class="p">,</span>
+</span><span id="graphAltitude-242"><a href="#graphAltitude-242"><span class="linenos">242</span></a>                  <span class="n">lineColor</span> <span class="o">=</span> <span class="s1">&#39;palegoldenrod&#39;</span><span class="p">,</span>
+</span><span id="graphAltitude-243"><a href="#graphAltitude-243"><span class="linenos">243</span></a>                  <span class="n">rangeName</span> <span class="o">=</span> <span class="s1">&#39;altitudeFt&#39;</span><span class="p">):</span>
+</span><span id="graphAltitude-244"><a href="#graphAltitude-244"><span class="linenos">244</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="graphAltitude-245"><a href="#graphAltitude-245"><span class="linenos">245</span></a><span class="sd">    Graph a vertical axis with additional data, often used for altitude in ft</span>
+</span><span id="graphAltitude-246"><a href="#graphAltitude-246"><span class="linenos">246</span></a><span class="sd">    ASL.</span>
+</span><span id="graphAltitude-247"><a href="#graphAltitude-247"><span class="linenos">247</span></a>
+</span><span id="graphAltitude-248"><a href="#graphAltitude-248"><span class="linenos">248</span></a><span class="sd">    Arguments</span>
+</span><span id="graphAltitude-249"><a href="#graphAltitude-249"><span class="linenos">249</span></a><span class="sd">    ---------</span>
+</span><span id="graphAltitude-250"><a href="#graphAltitude-250"><span class="linenos">250</span></a><span class="sd">        plot: pb.figure</span>
+</span><span id="graphAltitude-251"><a href="#graphAltitude-251"><span class="linenos">251</span></a><span class="sd">    A Bokeh figure where to render the plot.</span>
+</span><span id="graphAltitude-252"><a href="#graphAltitude-252"><span class="linenos">252</span></a>
+</span><span id="graphAltitude-253"><a href="#graphAltitude-253"><span class="linenos">253</span></a><span class="sd">        jumpResult: ssscoring.JumpResults</span>
+</span><span id="graphAltitude-254"><a href="#graphAltitude-254"><span class="linenos">254</span></a><span class="sd">    A jump results named tuple with score, max speed, scores, data, etc.</span>
+</span><span id="graphAltitude-255"><a href="#graphAltitude-255"><span class="linenos">255</span></a>
+</span><span id="graphAltitude-256"><a href="#graphAltitude-256"><span class="linenos">256</span></a><span class="sd">        label: str</span>
+</span><span id="graphAltitude-257"><a href="#graphAltitude-257"><span class="linenos">257</span></a><span class="sd">    The legend label for the new Y axis.</span>
+</span><span id="graphAltitude-258"><a href="#graphAltitude-258"><span class="linenos">258</span></a>
+</span><span id="graphAltitude-259"><a href="#graphAltitude-259"><span class="linenos">259</span></a><span class="sd">        lineColor: str</span>
+</span><span id="graphAltitude-260"><a href="#graphAltitude-260"><span class="linenos">260</span></a><span class="sd">    A color name from the Bokeh palette.</span>
+</span><span id="graphAltitude-261"><a href="#graphAltitude-261"><span class="linenos">261</span></a>
+</span><span id="graphAltitude-262"><a href="#graphAltitude-262"><span class="linenos">262</span></a><span class="sd">        rangeName: str</span>
+</span><span id="graphAltitude-263"><a href="#graphAltitude-263"><span class="linenos">263</span></a><span class="sd">    The range name to associate the `LinearAxis` layout with the data for</span>
+</span><span id="graphAltitude-264"><a href="#graphAltitude-264"><span class="linenos">264</span></a><span class="sd">    plotting.</span>
+</span><span id="graphAltitude-265"><a href="#graphAltitude-265"><span class="linenos">265</span></a>
+</span><span id="graphAltitude-266"><a href="#graphAltitude-266"><span class="linenos">266</span></a><span class="sd">    Returns</span>
+</span><span id="graphAltitude-267"><a href="#graphAltitude-267"><span class="linenos">267</span></a><span class="sd">    -------</span>
+</span><span id="graphAltitude-268"><a href="#graphAltitude-268"><span class="linenos">268</span></a><span class="sd">    `None`.</span>
+</span><span id="graphAltitude-269"><a href="#graphAltitude-269"><span class="linenos">269</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="graphAltitude-270"><a href="#graphAltitude-270"><span class="linenos">270</span></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">data</span>
+</span><span id="graphAltitude-271"><a href="#graphAltitude-271"><span class="linenos">271</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">plotTime</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">altitudeAGLFt</span><span class="p">,</span> <span class="n">legend_label</span> <span class="o">=</span> <span class="n">label</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span> <span class="o">=</span> <span class="n">lineColor</span><span class="p">,</span> <span class="n">y_range_name</span> <span class="o">=</span> <span class="n">rangeName</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -721,38 +820,38 @@ plotting.</p>
 
     </div>
     <a class="headerlink" href="#graphAngle"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="graphAngle-214"><a href="#graphAngle-214"><span class="linenos">214</span></a><span class="k">def</span> <span class="nf">graphAngle</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span>
-</span><span id="graphAngle-215"><a href="#graphAngle-215"><span class="linenos">215</span></a>               <span class="n">jumpResult</span><span class="p">,</span>
-</span><span id="graphAngle-216"><a href="#graphAngle-216"><span class="linenos">216</span></a>               <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;angle&#39;</span><span class="p">,</span>
-</span><span id="graphAngle-217"><a href="#graphAngle-217"><span class="linenos">217</span></a>               <span class="n">lineColor</span> <span class="o">=</span> <span class="s1">&#39;deepskyblue&#39;</span><span class="p">,</span>
-</span><span id="graphAngle-218"><a href="#graphAngle-218"><span class="linenos">218</span></a>               <span class="n">rangeName</span> <span class="o">=</span> <span class="s1">&#39;angle&#39;</span><span class="p">):</span>
-</span><span id="graphAngle-219"><a href="#graphAngle-219"><span class="linenos">219</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="graphAngle-220"><a href="#graphAngle-220"><span class="linenos">220</span></a><span class="sd">    Graph the flight angle</span>
-</span><span id="graphAngle-221"><a href="#graphAngle-221"><span class="linenos">221</span></a>
-</span><span id="graphAngle-222"><a href="#graphAngle-222"><span class="linenos">222</span></a><span class="sd">    Arguments</span>
-</span><span id="graphAngle-223"><a href="#graphAngle-223"><span class="linenos">223</span></a><span class="sd">    ---------</span>
-</span><span id="graphAngle-224"><a href="#graphAngle-224"><span class="linenos">224</span></a><span class="sd">        plot: pb.figure</span>
-</span><span id="graphAngle-225"><a href="#graphAngle-225"><span class="linenos">225</span></a><span class="sd">    A Bokeh figure where to render the plot.</span>
-</span><span id="graphAngle-226"><a href="#graphAngle-226"><span class="linenos">226</span></a>
-</span><span id="graphAngle-227"><a href="#graphAngle-227"><span class="linenos">227</span></a><span class="sd">        jumpResult: ssscoring.JumpResults</span>
-</span><span id="graphAngle-228"><a href="#graphAngle-228"><span class="linenos">228</span></a><span class="sd">    A jump results named tuple with score, max speed, scores, data, etc.</span>
-</span><span id="graphAngle-229"><a href="#graphAngle-229"><span class="linenos">229</span></a>
-</span><span id="graphAngle-230"><a href="#graphAngle-230"><span class="linenos">230</span></a><span class="sd">        label: str</span>
-</span><span id="graphAngle-231"><a href="#graphAngle-231"><span class="linenos">231</span></a><span class="sd">    The legend label for the new Y axis.</span>
-</span><span id="graphAngle-232"><a href="#graphAngle-232"><span class="linenos">232</span></a>
-</span><span id="graphAngle-233"><a href="#graphAngle-233"><span class="linenos">233</span></a><span class="sd">        lineColor: str</span>
-</span><span id="graphAngle-234"><a href="#graphAngle-234"><span class="linenos">234</span></a><span class="sd">    A color name from the Bokeh palette.</span>
-</span><span id="graphAngle-235"><a href="#graphAngle-235"><span class="linenos">235</span></a>
-</span><span id="graphAngle-236"><a href="#graphAngle-236"><span class="linenos">236</span></a><span class="sd">        rangeName: str</span>
-</span><span id="graphAngle-237"><a href="#graphAngle-237"><span class="linenos">237</span></a><span class="sd">    The range name to associate the `LinearAxis` layout with the data for</span>
-</span><span id="graphAngle-238"><a href="#graphAngle-238"><span class="linenos">238</span></a><span class="sd">    plotting.</span>
-</span><span id="graphAngle-239"><a href="#graphAngle-239"><span class="linenos">239</span></a>
-</span><span id="graphAngle-240"><a href="#graphAngle-240"><span class="linenos">240</span></a><span class="sd">    Returns</span>
-</span><span id="graphAngle-241"><a href="#graphAngle-241"><span class="linenos">241</span></a><span class="sd">    -------</span>
-</span><span id="graphAngle-242"><a href="#graphAngle-242"><span class="linenos">242</span></a><span class="sd">    `None`.</span>
-</span><span id="graphAngle-243"><a href="#graphAngle-243"><span class="linenos">243</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="graphAngle-244"><a href="#graphAngle-244"><span class="linenos">244</span></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">data</span>
-</span><span id="graphAngle-245"><a href="#graphAngle-245"><span class="linenos">245</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">plotTime</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">speedAngle</span><span class="p">,</span> <span class="n">legend_label</span> <span class="o">=</span> <span class="n">label</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span> <span class="o">=</span> <span class="n">lineColor</span><span class="p">,</span> <span class="n">y_range_name</span> <span class="o">=</span> <span class="n">rangeName</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="graphAngle-274"><a href="#graphAngle-274"><span class="linenos">274</span></a><span class="k">def</span> <span class="nf">graphAngle</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span>
+</span><span id="graphAngle-275"><a href="#graphAngle-275"><span class="linenos">275</span></a>               <span class="n">jumpResult</span><span class="p">,</span>
+</span><span id="graphAngle-276"><a href="#graphAngle-276"><span class="linenos">276</span></a>               <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;angle&#39;</span><span class="p">,</span>
+</span><span id="graphAngle-277"><a href="#graphAngle-277"><span class="linenos">277</span></a>               <span class="n">lineColor</span> <span class="o">=</span> <span class="s1">&#39;deepskyblue&#39;</span><span class="p">,</span>
+</span><span id="graphAngle-278"><a href="#graphAngle-278"><span class="linenos">278</span></a>               <span class="n">rangeName</span> <span class="o">=</span> <span class="s1">&#39;angle&#39;</span><span class="p">):</span>
+</span><span id="graphAngle-279"><a href="#graphAngle-279"><span class="linenos">279</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="graphAngle-280"><a href="#graphAngle-280"><span class="linenos">280</span></a><span class="sd">    Graph the flight angle</span>
+</span><span id="graphAngle-281"><a href="#graphAngle-281"><span class="linenos">281</span></a>
+</span><span id="graphAngle-282"><a href="#graphAngle-282"><span class="linenos">282</span></a><span class="sd">    Arguments</span>
+</span><span id="graphAngle-283"><a href="#graphAngle-283"><span class="linenos">283</span></a><span class="sd">    ---------</span>
+</span><span id="graphAngle-284"><a href="#graphAngle-284"><span class="linenos">284</span></a><span class="sd">        plot: pb.figure</span>
+</span><span id="graphAngle-285"><a href="#graphAngle-285"><span class="linenos">285</span></a><span class="sd">    A Bokeh figure where to render the plot.</span>
+</span><span id="graphAngle-286"><a href="#graphAngle-286"><span class="linenos">286</span></a>
+</span><span id="graphAngle-287"><a href="#graphAngle-287"><span class="linenos">287</span></a><span class="sd">        jumpResult: ssscoring.JumpResults</span>
+</span><span id="graphAngle-288"><a href="#graphAngle-288"><span class="linenos">288</span></a><span class="sd">    A jump results named tuple with score, max speed, scores, data, etc.</span>
+</span><span id="graphAngle-289"><a href="#graphAngle-289"><span class="linenos">289</span></a>
+</span><span id="graphAngle-290"><a href="#graphAngle-290"><span class="linenos">290</span></a><span class="sd">        label: str</span>
+</span><span id="graphAngle-291"><a href="#graphAngle-291"><span class="linenos">291</span></a><span class="sd">    The legend label for the new Y axis.</span>
+</span><span id="graphAngle-292"><a href="#graphAngle-292"><span class="linenos">292</span></a>
+</span><span id="graphAngle-293"><a href="#graphAngle-293"><span class="linenos">293</span></a><span class="sd">        lineColor: str</span>
+</span><span id="graphAngle-294"><a href="#graphAngle-294"><span class="linenos">294</span></a><span class="sd">    A color name from the Bokeh palette.</span>
+</span><span id="graphAngle-295"><a href="#graphAngle-295"><span class="linenos">295</span></a>
+</span><span id="graphAngle-296"><a href="#graphAngle-296"><span class="linenos">296</span></a><span class="sd">        rangeName: str</span>
+</span><span id="graphAngle-297"><a href="#graphAngle-297"><span class="linenos">297</span></a><span class="sd">    The range name to associate the `LinearAxis` layout with the data for</span>
+</span><span id="graphAngle-298"><a href="#graphAngle-298"><span class="linenos">298</span></a><span class="sd">    plotting.</span>
+</span><span id="graphAngle-299"><a href="#graphAngle-299"><span class="linenos">299</span></a>
+</span><span id="graphAngle-300"><a href="#graphAngle-300"><span class="linenos">300</span></a><span class="sd">    Returns</span>
+</span><span id="graphAngle-301"><a href="#graphAngle-301"><span class="linenos">301</span></a><span class="sd">    -------</span>
+</span><span id="graphAngle-302"><a href="#graphAngle-302"><span class="linenos">302</span></a><span class="sd">    `None`.</span>
+</span><span id="graphAngle-303"><a href="#graphAngle-303"><span class="linenos">303</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="graphAngle-304"><a href="#graphAngle-304"><span class="linenos">304</span></a>    <span class="n">data</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">data</span>
+</span><span id="graphAngle-305"><a href="#graphAngle-305"><span class="linenos">305</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">plotTime</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">speedAngle</span><span class="p">,</span> <span class="n">legend_label</span> <span class="o">=</span> <span class="n">label</span><span class="p">,</span> <span class="n">line_width</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">line_color</span> <span class="o">=</span> <span class="n">lineColor</span><span class="p">,</span> <span class="n">y_range_name</span> <span class="o">=</span> <span class="n">rangeName</span><span class="p">)</span>
 </span></pre></div>
 
 

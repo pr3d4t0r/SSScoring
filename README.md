@@ -1,4 +1,4 @@
-% ssscoring(3) Version 1.9.0 | Speed Skydiving Scoring API documentation
+% ssscoring(3) Version 2.0.0 | Speed Skydiving Scoring API documentation
 
 Name
 ====
@@ -186,6 +186,18 @@ representing all the training files for a competitive skydiver over 10 months.
   systems
 - `umountFlySight` Mac app and shell script for safe unmounting of a FlySight
   device from a Macintosh computer
+
+
+Contributors
+============
+
+| Name | GitHub |
+|------|--------|
+|Jochen Althoff|@Quadriga14193|
+|Eugene Ciurana|@pr3d4t0r|
+|Nik Daniel|n/a|
+|Alexey Galda|@alexgalda|
+|Marco Hepp|n/a|
 
 
 See Also

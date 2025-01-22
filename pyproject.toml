@@ -1,54 +1,59 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 [build-system]
-requires = [ "numpy", "pandas", "setuptools", ]
-build-backend = "setuptools.build_meta"
+requires = [ 'numpy', 'pandas', 'setuptools>=61.0', ]
+build-backend = 'setuptools.build_meta'
 
 
 [metadata]
-url = "https://github.com/pr3d4t0r/ssscoring"
+url = 'https://github.com/pr3d4t0r/ssscoring'
 
 
 [project]
 authors = [
-    {name = "Eugene Ciurana pr3d4t0r", email = "ssscoring.project@cime.net" }
+    {name = 'Eugene Ciurana pr3d4t0r', email = 'ssscoring.project@cime.net' }
 ]
 classifiers = [
-    "Intended Audience :: Other Audience",
-    "Operating System :: MacOS",
-    "Operating System :: Unix",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
+    'Intended Audience :: Other Audience',
+    'Operating System :: MacOS',
+    'Operating System :: Unix',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.9',
 ]
-description = "ssscoring - Speed Skydiving scoring tools"
+description = 'ssscoring - Speed Skydiving scoring tools'
 dynamic = [
-    "dependencies",
+    'dependencies',
 ]
 license = { text = 'BSD-3-Clause' }
-name = "ssscoring"  # $(PACKAGE) and package.txt
-readme = "README.md"
-requires-python = ">=3.9.9"
-version = '1.9.0'
+name = 'ssscoring'  # $(PACKAGE) and package.txt
+readme = 'README.md'
+requires-python = '>=3.9.9'
+version = '2.0.0'
 
 
 [project.scripts]
-ssscore = "ssscoring.cli:_ssscoreCommand"
+ssscore = 'ssscoring.cli:_ssscoreCommand'
 
 
 [tool.pytest.ini_options]
-addopts = "-sv"
+addopts = '-sv'
 testpaths = [
-    "tests"
+    'tests'
 ]
 
 
 [tool.setuptools]
 include-package-data = true
 packages = [
-    "ssscoring",
+    'ssscoring',
+    'ssscoring.resources'
 ]
 
 
 [tool.setuptools.dynamic]
-dependencies = { file = "requirements.txt" }
+dependencies = { file = 'requirements.txt' }
+
+
+[tool.setuptools.package-data]
+ssscoring = [ 'drop-zones-loc-elev.csv', ]
 
