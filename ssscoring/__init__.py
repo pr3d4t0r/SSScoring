@@ -32,9 +32,7 @@ You may study or download the latest stable source files at:
 import importlib.metadata
 
 
-# TODO:  Remove this after test if test fails:
-# __VERSION__ = importlib.metadata.version('ssscoring')
-__VERSION__ = '2.0.0'
+__VERSION__ = importlib.metadata.version('ssscoring')
 """
 @public
 """

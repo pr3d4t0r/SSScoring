@@ -28,9 +28,7 @@ license = { text = 'BSD-3-Clause' }
 name = 'ssscoring'  # $(PACKAGE) and package.txt
 readme = 'README.md'
 requires-python = '>=3.9.9'
-# TODO:  Remove this after test if test fails:
-# version = '2.0.0'
-version = '2.0.0' # awk this?
+version = '2.0.0'
 
 
 [project.scripts]
