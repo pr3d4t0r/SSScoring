@@ -4,12 +4,8 @@
 Speed Skydiving Scoring tools package for processing FlySight v1 and v2 CSV data
 files.
 
-This library relies on NumPy and pandas.  When running in a Lucyfer notebook,
-it also requires the Bokeh plotting library.
-
-The documentation for each module in this package is linked from the navigation
-bar.  The **fs1** module contains functions that process v1 files.  The v2
-implementation is in progress in a private Git branch.
+This library relies on NumPy and pandas.  When running in a Lucyfer notebook or
+in Streamlit.io, it also requires the Bokeh plotting library.
 
 
 ## Installation

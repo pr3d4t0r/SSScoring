@@ -9,7 +9,6 @@ https://discuss.streamlit.io/t/pythonpath-issue-modulenotfounderror-in-same-pack
 
 from importlib_resources import files
 from io import StringIO
-from pathlib import Path
 
 from ssscoring import __VERSION__
 from ssscoring.calc import convertFlySight2SSScoring
@@ -44,11 +43,6 @@ STREAMLIT_SIG_KEY = 'HOSTNAME'
 STREAMLIT_SIG_VALUE = 'streamlit'
 
 
-# *** globals ***
-
-_session = st.session_state
-
-
 # *** implementation ***
 
 def _isStreamlitHostedApp() -> bool:
@@ -58,13 +52,6 @@ def _isStreamlitHostedApp() -> bool:
     if os.environ[STREAMLIT_SIG_KEY] == STREAMLIT_SIG_VALUE:
         return True
     return False
-
-
-def _init():
-    global _session
-
-    if 'dataLake' not in _session:
-        _session.dataLake = Path(DEFAULT_DATA_LAKE)
 
 
 @st.cache_data
@@ -125,7 +112,6 @@ def main():
     if not _isStreamlitHostedApp():
         st.set_page_config(layout = 'wide')
         st.write('STARTED WIDE')
-    _init()
     _setSideBarAndMain()
 
     col0, col1 = st.columns([ 0.4, 0.6, ])
