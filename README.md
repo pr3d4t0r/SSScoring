@@ -1,4 +1,4 @@
-% ssscoring(3) Version 2.0.3 | Speed Skydiving Scoring API documentation
+% ssscoring(3) Version 2.0.4 | Speed Skydiving Scoring API documentation
 
 Name
 ====
@@ -47,6 +47,10 @@ device) and SkyTrax files.  It aggregates and summarizes the results.  Full
 API documentation is available at:
 
 https://pr3d4t0r.github.io/SSScoring/ssscoring.html
+
+SSScore app is available for interactive scoring from:
+
+https://ssscore.streamlit.app
 
 
 Installation and Requirements
@@ -203,6 +207,7 @@ Contributors
 See Also
 ========
 <a href='https://pr3d4t0r.github.io/SSScoring/ssscoring.html' target='_blank'>SSScoring API documentation</a> - github.io
+<a href='https://ssscore.streamlit.app' target='_blank'>SSScore app on-line</a> - Streamlit Cloud
 ssscore(1)
 https://github.com/pr3d4t0r/SSScoring/blob/master/ssscore.md
 
