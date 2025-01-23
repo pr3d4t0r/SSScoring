@@ -18,6 +18,7 @@ from ssscoring.calc import isValidMinimumAltitude
 from ssscoring.calc import processJump
 from ssscoring.constants import FLYSIGHT_FILE_ENCODING
 from ssscoring.datatypes import JumpStatus
+from ssscoring.dzdir import DROP_ZONES_LIST
 from ssscoring.notebook import SPEED_COLORS
 from ssscoring.notebook import graphAltitude
 from ssscoring.notebook import graphAngle
@@ -61,8 +62,15 @@ def _initDropZonesFromResource(resourceName: str) -> pd.DataFrame:
     return dropZones
 
 
+def _initDropZonesFromObject() -> pd.DataFrame:
+    return pd.DataFrame(DROP_ZONES_LIST)
+
+
 def _setSideBarAndMain():
-    dropZones = _initDropZonesFromResource(DZ_DIRECTORY)
+    # TODO:  Resolve this for Streamlit.io - why can't it use package resources?
+    #        https://discuss.streamlit.io/t/package-resources-result-in-filenotfounderror-under-streamlit-io/91243/1
+    # dropZones = _initDropZonesFromResource(DZ_DIRECTORY)
+    dropZones = _initDropZonesFromObject()
     st.sidebar.title('SSScoring %s α' % __VERSION__)
     st.session_state.processBadJump = st.sidebar.checkbox('Process bad jump', value=True, help='Display results from invalid jumps')
     dropZone = st.sidebar.selectbox('Select drop zone:', dropZones.dropZone, index=None)
@@ -111,7 +119,6 @@ def _closeWindow():
 def main():
     if not _isStreamlitHostedApp():
         st.set_page_config(layout = 'wide')
-        st.write('STARTED WIDE')
     _setSideBarAndMain()
 
     col0, col1 = st.columns([ 0.4, 0.6, ])
