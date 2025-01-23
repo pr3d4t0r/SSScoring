@@ -166,8 +166,9 @@ def main():
                 st.bokeh_chart(plot, use_container_width=True)
                 st.map(jumpResult.data, size=2)
 
-    if st.sidebar.button('Exit'):
-        _closeWindow()
+    if not _isStreamlitHostedApp():
+        if st.sidebar.button('Exit'):
+            _closeWindow()
 
 
 if '__main__' == __name__:
