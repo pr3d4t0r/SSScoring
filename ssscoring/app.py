@@ -81,6 +81,7 @@ def _setSideBarAndMain():
         st.session_state.trackFile = None
     st.sidebar.metric('Elevation', value='%.1f m' % (0.0 if st.session_state.elevation == None else st.session_state.elevation))
     st.session_state.trackFile = st.sidebar.file_uploader('Track file', [ 'CSV' ], disabled=st.session_state.elevation == None)
+    st.sidebar.html("<a href='https://github.com/pr3d4t0r/SSScoring/issues/new?template=Blank+issue' target='_blank'>Make a bug report or feature request</a>")
 
 
 def _getJumpDataFrom(trackFileBuffer: str) -> pd.DataFrame:
