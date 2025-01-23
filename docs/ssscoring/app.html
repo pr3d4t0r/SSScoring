@@ -244,12 +244,13 @@
 </span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a>                <span class="n">st</span><span class="o">.</span><span class="n">bokeh_chart</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a>                <span class="n">st</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">jumpResult</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a>
-</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a>    <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s1">&#39;Exit&#39;</span><span class="p">):</span>
-</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>        <span class="n">_closeWindow</span><span class="p">()</span>
-</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a>
+</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">_isStreamlitHostedApp</span><span class="p">():</span>
+</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>        <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s1">&#39;Exit&#39;</span><span class="p">):</span>
+</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a>            <span class="n">_closeWindow</span><span class="p">()</span>
 </span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a>
-</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a><span class="k">if</span> <span class="s1">&#39;__main__&#39;</span> <span class="o">==</span> <span class="vm">__name__</span><span class="p">:</span>
-</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a>    <span class="n">main</span><span class="p">()</span>
+</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a>
+</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a><span class="k">if</span> <span class="s1">&#39;__main__&#39;</span> <span class="o">==</span> <span class="vm">__name__</span><span class="p">:</span>
+</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a>    <span class="n">main</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -375,8 +376,9 @@
 </span><span id="main-167"><a href="#main-167"><span class="linenos">167</span></a>                <span class="n">st</span><span class="o">.</span><span class="n">bokeh_chart</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span><span id="main-168"><a href="#main-168"><span class="linenos">168</span></a>                <span class="n">st</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">jumpResult</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </span><span id="main-169"><a href="#main-169"><span class="linenos">169</span></a>
-</span><span id="main-170"><a href="#main-170"><span class="linenos">170</span></a>    <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s1">&#39;Exit&#39;</span><span class="p">):</span>
-</span><span id="main-171"><a href="#main-171"><span class="linenos">171</span></a>        <span class="n">_closeWindow</span><span class="p">()</span>
+</span><span id="main-170"><a href="#main-170"><span class="linenos">170</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">_isStreamlitHostedApp</span><span class="p">():</span>
+</span><span id="main-171"><a href="#main-171"><span class="linenos">171</span></a>        <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">sidebar</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s1">&#39;Exit&#39;</span><span class="p">):</span>
+</span><span id="main-172"><a href="#main-172"><span class="linenos">172</span></a>            <span class="n">_closeWindow</span><span class="p">()</span>
 </span></pre></div>
 
 
