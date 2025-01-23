@@ -1,20 +1,20 @@
 from ssscoring.calc import aggregateResults
 from ssscoring.calc import convertFlySight2SSScoring
-from ssscoring.calc import getFlySightDataFromCSV
+from ssscoring.calc import getFlySightDataFromCSVFileName
 from ssscoring.calc import processAllJumpFiles
 from ssscoring.calc import processJump
 from ssscoring.calc import roundedAggregateResults
 from ssscoring.constants import FT_IN_M
 from ssscoring.flysight import getAllSpeedJumpFilesFrom
 
-import os
+import pathlib
 
 DATA_LAKE = './resources' # can be anywhere
 
 dropZoneAltMSL = 100
 dropZoneAltMSLMeters = dropZoneAltMSL/FT_IN_M
-jumpFile = os.path.join('resources', 'test-data-00.CSV')
-rawData, tag = getFlySightDataFromCSV(jumpFile)
+jumpFile = pathlib.Path('resources') / 'test-tracks' / 'FS1' / 'test-data-00.CSV'
+rawData, tag = getFlySightDataFromCSVFileName(jumpFile.as_posix())
 
 jumpResult = processJump(
     convertFlySight2SSScoring(
