@@ -19,6 +19,7 @@ from ssscoring.calc import processJump
 from ssscoring.constants import FLYSIGHT_FILE_ENCODING
 from ssscoring.datatypes import JumpStatus
 from ssscoring.dzdir import DROP_ZONES_LIST
+from ssscoring.mapview import speedJumpTrajectory
 from ssscoring.notebook import SPEED_COLORS
 from ssscoring.notebook import graphAltitude
 from ssscoring.notebook import graphAngle
@@ -164,7 +165,8 @@ def main():
                 plot.add_tools(hoverValue)
                 graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
                 st.bokeh_chart(plot, use_container_width=True)
-                st.map(jumpResult.data, size=2)
+                st.write('Brightest point corresponds to the max speed')
+                st.pydeck_chart(speedJumpTrajectory(jumpResult))
 
     if not _isStreamlitHostedApp():
         if st.sidebar.button('Exit'):
