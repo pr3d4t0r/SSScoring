@@ -740,7 +740,9 @@ def totalResultsFrom(aggregate: pd.DataFrame) -> pd.DataFrame:
 
     - totalSpeed ::= the sum of all speeds in the aggregated results
     - meanSpeed ::= the mean of all speeds
+    - meanSpeedSTD := scored speeds standar deviation
     - maxScore ::= the max score among all the speed scores
+    - maxScoreSTD := the max scores standard deviation
 
     Raises
     ------
