@@ -71,7 +71,7 @@ def _setSideBarAndMain():
     #        https://discuss.streamlit.io/t/package-resources-result-in-filenotfounderror-under-streamlit-io/91243/1
     # dropZones = _initDropZonesFromResource(DZ_DIRECTORY)
     dropZones = _initDropZonesFromObject()
-    st.sidebar.title('SSScoring %s α' % __VERSION__)
+    st.sidebar.title('SSScore %s α' % __VERSION__)
     st.session_state.processBadJump = st.sidebar.checkbox('Process bad jump', value=True, help='Display results from invalid jumps')
     dropZone = st.sidebar.selectbox('Select drop zone:', dropZones.dropZone, index=None)
     if dropZone:

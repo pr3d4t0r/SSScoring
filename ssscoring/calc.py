@@ -752,6 +752,6 @@ def totalResultsFrom(aggregate: pd.DataFrame) -> pd.DataFrame:
     elif isinstance(aggregate, pd.DataFrame) and not len(aggregate):
         raise AttributeError('aggregate dataframe is empty')
 
-    totals = pd.DataFrame({ 'totalSpeed': [ aggregate.score.sum(), ], 'meanSpeed': [ aggregate.score.mean(), ], 'maxScore': [ aggregate.score.max(), ], }, index = [ 'totalSpeed'],)
+    totals = pd.DataFrame({ 'totalSpeed': [ aggregate.score.sum(), ], 'meanSpeed': [ aggregate.score.mean(), ], 'meanSpeedSTD': [ aggregate.score.std(), ], 'maxScore': [ aggregate.score.max(), ], 'maxScoreSTD': [ aggregate.score.std(), ], }, index = [ 'totalSpeed'],)
     return totals
 
