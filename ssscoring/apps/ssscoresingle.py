@@ -8,6 +8,7 @@ https://discuss.streamlit.io/t/pythonpath-issue-modulenotfounderror-in-same-pack
 """
 
 from ssscoring import __VERSION__
+from ssscoring.apps.common import displayJumpDataIn
 from ssscoring.apps.common import initDropZonesFromObject
 from ssscoring.apps.common import isStreamlitHostedApp
 from ssscoring.calc import convertFlySight2SSScoring
@@ -62,16 +63,6 @@ def _getJumpDataFrom(trackFileBuffer: str) -> pd.DataFrame:
     return data, tag
 
 
-def _displayJumpDataIn(resultsTable: pd.DataFrame):
-    table = resultsTable.copy()
-    table.vKMh = table.vKMh.apply(round)
-    table.hKMh = table.hKMh.apply(round)
-    table['altitude (ft)'] = table['altitude (ft)'].apply(round)
-    table.netVectorKMh = table.netVectorKMh.apply(round)
-    table.index = ['']*len(table)
-    st.dataframe(table, hide_index=True)
-
-
 def _closeWindow():
     js = 'window.open("", "_self").close();'
     temp = """
@@ -117,13 +108,12 @@ def main():
         elif jumpStatus == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT:
             badJumpLegend = '<span style="color: red"><span style="font-weight: bold">RE-JUMP:</span> exit altitude AGL exceeds the maximum altitude<br>'
 
-
         jumpStatus = JumpStatus.OK if jumpStatus != JumpStatus.OK and st.session_state.processBadJump and jumpStatus != JumpStatus.WARM_UP_FILE else jumpStatus
         with col0:
             st.html('<h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend if badJumpLegend else '')+'</h3>')
         if jumpStatus == JumpStatus.OK:
             with col0:
-                _displayJumpDataIn(jumpResult.table)
+                displayJumpDataIn(jumpResult.table)
             with col1:
                 plot = initializePlot(tag)
                 plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)

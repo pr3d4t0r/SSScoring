@@ -105,4 +105,17 @@ def initDropZonesFromObject() -> pd.DataFrame:
     return pd.DataFrame(DROP_ZONES_LIST)
 
 
+def displayJumpDataIn(resultsTable: pd.DataFrame):
+    """
+    TODO:  Documentation
+    """
+    table = resultsTable.copy()
+    table.vKMh = table.vKMh.apply(round)
+    table.hKMh = table.hKMh.apply(round)
+    table['altitude (ft)'] = table['altitude (ft)'].apply(round)
+    table.netVectorKMh = table.netVectorKMh.apply(round)
+    table.index = ['']*len(table)
+    st.dataframe(table, hide_index=True)
+
+
 
