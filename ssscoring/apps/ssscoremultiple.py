@@ -9,6 +9,9 @@ Process a group of jumps uploaded from a file uploader.
 from ssscoring import __VERSION__
 from ssscoring.apps.common import initDropZonesFromObject
 from ssscoring.apps.common import isStreamlitHostedApp
+from ssscoring.calc import processAllJumpFiles
+from ssscoring.calc import aggregateResults
+from ssscoring.calc import totalResultsFrom
 
 import pandas as pd
 import streamlit as st
@@ -43,8 +46,13 @@ def main():
 
     col0, col1 = st.columns([0.3, 0.7, ])
     if st.session_state.trackFiles:
-        with col1:
-            st.write(st.session_state.trackFiles)
+        with col0:
+            jumpResults = processAllJumpFiles(st.session_state.trackFiles, altitudeDZMeters=st.session_state.elevation)
+            aggregate = aggregateResults(jumpResults)
+            st.html('<h2>All jumps in this set</h2>')
+            st.write(aggregate)
+            st.html('<h2>Jumps set summary</h2>')
+            st.write(totalResultsFrom(aggregate))
 
 
 if '__main__' == __name__:

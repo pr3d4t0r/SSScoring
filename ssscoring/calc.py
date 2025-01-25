@@ -5,6 +5,7 @@ Functions and logic for analyzing and manipulating FlySight dataframes.
 """
 
 
+from io import BytesIO
 from io import StringIO
 from pathlib import Path
 
@@ -625,20 +626,47 @@ def processAllJumpFiles(jumpFiles: list, altitudeDZMeters = 0.0) -> dict:
     Arguments
     ---------
         jumpFiles
-    A list of relative or absolute path names to individual FlySight CSV files.
+    A list of file things that could represent one of these:
+    - file things relative or absolute path names to individual FlySight CSV
+      files.
+    - A specialization of BytesIO, such as the bags of bytes that Streamlit.io
+      generates after uploading and reading a file into the Streamlit
+      environment
 
         altitudeDZMeters : float
     Drop zone height above MSL
 
+    Returns
+    -------
         dict
     A dictionary of jump results.  The key is a human-readable version of a
     `jumpFile` name with the extension, path, and extraneous spaces eliminated
     or replaced by appropriate characters.  File names use Unicode, so accents
     and non-ANSI characters are allowed in file names.
+
+    Raises
+    ------
+    `SSScoringError` if the jumpFiles object is empty, or if the individual
+    objects in the list aren't `BytesIO`, file name strings, or `Path`
+    instances.
     """
     jumpResults = dict()
-    for jumpFile in jumpFiles.keys():
-        rawData, tag = getFlySightDataFromCSVFileName(jumpFile)
+    if not len(jumpFiles):
+        raise SSScoringError('jumpFiles must have at least one element')
+    if not isinstance(jumpFiles, dict) and not isinstance(jumpFiles, list):
+        raise SSScoringError('dict with jump file names and FS versions or list of byte bags expected')
+    if isinstance(jumpFiles, dict):
+        objectsList = sorted(list(jumpFiles.keys()))
+    elif isinstance(jumpFiles, list):
+        objectsList = jumpFiles
+    obj = objectsList[0]
+    if not isinstance(obj, Path) and not isinstance(obj, str) and not isinstance(obj, BytesIO):
+        raise SSScoringError('jumpFiles must contain file-like things or BytesIO objects')
+    for jumpFile in objectsList:
+        if isinstance(jumpFile, BytesIO):
+            rawData, tag = getFlySightDataFromCSVBuffer(jumpFile.getvalue(), jumpFile.name)
+        else:
+            rawData, tag = getFlySightDataFromCSVFileName(jumpFile)
         jumpResult = processJump(convertFlySight2SSScoring(rawData, altitudeDZMeters = altitudeDZMeters))
         if JumpStatus.OK == jumpResult.status:
             jumpResults[tag] = jumpResult
@@ -754,6 +782,6 @@ def totalResultsFrom(aggregate: pd.DataFrame) -> pd.DataFrame:
     elif isinstance(aggregate, pd.DataFrame) and not len(aggregate):
         raise AttributeError('aggregate dataframe is empty')
 
-    totals = pd.DataFrame({ 'totalSpeed': [ aggregate.score.sum(), ], 'meanSpeed': [ aggregate.score.mean(), ], 'meanSpeedSTD': [ aggregate.score.std(), ], 'maxScore': [ aggregate.score.max(), ], 'maxScoreSTD': [ aggregate.score.std(), ], }, index = [ 'totalSpeed'],)
+    totals = pd.DataFrame({ 'totalSpeed': [ aggregate.score.sum(), ], 'meanSpeed': [ aggregate.score.mean(), ], 'speedSTD': [ aggregate.score.std(), ], 'maxScore': [ aggregate.score.max(), ], }, index = [ 'totalSpeed'],)
     return totals
 

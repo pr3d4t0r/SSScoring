@@ -221,11 +221,18 @@ def test_processAllJumpFiles():
     _jumpResults = processAllJumpFiles(jumpFiles)
     assert _jumpResults
     assert '01-00-00:v2' in list(_jumpResults.keys())
+    
+    # TODO:  Implement this well - the file names should be part of an object
+    #        passed to the processAllJumpFiles() function, when using bytes
+    #        buffers.
+#     fileName = list(jumpFiles.keys())[0]
+#     with open(fileName, 'rb') as inputStream:
+#         buffer = inputStream.read()
 
     bogusDataLake = tempfile.mkdtemp()
     jumpFiles = getAllSpeedJumpFilesFrom(bogusDataLake)
-    jumpResults = processAllJumpFiles(jumpFiles)
-    assert not jumpResults
+    with pytest.raises(SSScoringError):
+         processAllJumpFiles(jumpFiles)
 
 
 def test_aggregateResults():
