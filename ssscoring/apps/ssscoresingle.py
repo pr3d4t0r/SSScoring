@@ -7,18 +7,15 @@ Issue deploying to Streamlit.io:
 https://discuss.streamlit.io/t/pythonpath-issue-modulenotfounderror-in-same-package-where-app-is-defined/91170
 """
 
-from importlib_resources import files
-from io import StringIO
-
 from ssscoring import __VERSION__
+from ssscoring.apps.common import initDropZonesFromObject
+from ssscoring.apps.common import isStreamlitHostedApp
 from ssscoring.calc import convertFlySight2SSScoring
 from ssscoring.calc import getFlySightDataFromCSVBuffer
 from ssscoring.calc import isValidMaximumAltitude
 from ssscoring.calc import isValidMinimumAltitude
 from ssscoring.calc import processJump
-from ssscoring.constants import FLYSIGHT_FILE_ENCODING
 from ssscoring.datatypes import JumpStatus
-from ssscoring.dzdir import DROP_ZONES_LIST
 from ssscoring.mapview import speedJumpTrajectory
 from ssscoring.notebook import SPEED_COLORS
 from ssscoring.notebook import graphAltitude
@@ -35,43 +32,14 @@ import pandas as pd
 import streamlit as st
 
 
-# *** constants ***
-
-DEFAULT_DATA_LAKE = './data'
-DZ_DIRECTORY = 'drop-zones-loc-elev.csv'
-RESOURCES = 'ssscoring.resources'
-STREAMLIT_SIG_KEY = 'HOSTNAME'
-STREAMLIT_SIG_VALUE = 'streamlit'
-
-
 # *** implementation ***
-
-def _isStreamlitHostedApp() -> bool:
-    keys = tuple(os.environ.keys())
-    if STREAMLIT_SIG_KEY not in keys:
-        return False
-    if os.environ[STREAMLIT_SIG_KEY] == STREAMLIT_SIG_VALUE:
-        return True
-    return False
-
-
-@st.cache_data
-def _initDropZonesFromResource(resourceName: str) -> pd.DataFrame:
-    buffer = StringIO(files(RESOURCES).joinpath(resourceName).read_bytes().decode(FLYSIGHT_FILE_ENCODING))
-    dropZones = pd.read_csv(buffer, sep=',')
-    return dropZones
-
-
-def _initDropZonesFromObject() -> pd.DataFrame:
-    return pd.DataFrame(DROP_ZONES_LIST)
-
 
 def _setSideBarAndMain():
     # TODO:  Resolve this for Streamlit.io - why can't it use package resources?
     #        https://discuss.streamlit.io/t/package-resources-result-in-filenotfounderror-under-streamlit-io/91243/1
     # dropZones = _initDropZonesFromResource(DZ_DIRECTORY)
-    dropZones = _initDropZonesFromObject()
-    st.sidebar.title('SSScore %s α' % __VERSION__)
+    dropZones = initDropZonesFromObject()
+    st.sidebar.title('1️⃣  SSScore %s α' % __VERSION__)
     st.session_state.processBadJump = st.sidebar.checkbox('Process bad jump', value=True, help='Display results from invalid jumps')
     dropZone = st.sidebar.selectbox('Select drop zone:', dropZones.dropZone, index=None)
     if dropZone:
@@ -118,7 +86,7 @@ def _closeWindow():
 
 
 def main():
-    if not _isStreamlitHostedApp():
+    if not isStreamlitHostedApp():
         st.set_page_config(layout = 'wide')
     _setSideBarAndMain()
 
@@ -168,7 +136,7 @@ def main():
                 st.write('Brightest point corresponds to the max speed')
                 st.pydeck_chart(speedJumpTrajectory(jumpResult))
 
-    if not _isStreamlitHostedApp():
+    if not isStreamlitHostedApp():
         if st.sidebar.button('Exit'):
             _closeWindow()
 
