@@ -8,12 +8,23 @@ package.
 from importlib_resources import files
 from io import StringIO
 
+from ssscoring.calc import isValidMaximumAltitude
+from ssscoring.calc import isValidMinimumAltitude
 from ssscoring.constants import FLYSIGHT_FILE_ENCODING
+from ssscoring.datatypes import JumpResults
+from ssscoring.datatypes import JumpStatus
 from ssscoring.dzdir import DROP_ZONES_LIST
 from ssscoring.errors import SSScoringError
+from ssscoring.notebook import SPEED_COLORS
+from ssscoring.notebook import graphAltitude
+from ssscoring.notebook import graphAngle
+from ssscoring.notebook import graphJumpResult
+from ssscoring.notebook import initializeExtraYRanges
+from ssscoring.notebook import initializePlot
 
 import os
 
+import bokeh.models as bm
 import pandas as pd
 import streamlit as st
 
@@ -102,12 +113,35 @@ def initDropZonesFromResource(resourceName: str) -> pd.DataFrame:
 
 
 def initDropZonesFromObject() -> pd.DataFrame:
+    """
+    Get the DZs directory from a Python object.  This was implemented as a
+    workaround to a bug (?) on how Streamlit treats resources.
+
+    Returns
+    -------
+    The global drop zones directory as a dataframe.
+
+    See
+    ---
+    `ssscoring.apps.common.initDropZonesFromResource` for alternatives.  The
+    hard-coded object is generated from the `DZ-locations-normalizer.ipynb`
+    notebook.
+    """
     return pd.DataFrame(DROP_ZONES_LIST)
 
 
 def displayJumpDataIn(resultsTable: pd.DataFrame):
     """
-    TODO:  Documentation
+    Display the individual results, as a table.
+
+    Arguments
+    ---------
+        resultsTable: pd.DataFrame
+    The results from a speed skydiving jump.
+
+    See
+    ---
+    `ssscoring.datatypes.JumpResults`
     """
     table = resultsTable.copy()
     table.vKMh = table.vKMh.apply(round)
@@ -118,4 +152,93 @@ def displayJumpDataIn(resultsTable: pd.DataFrame):
     st.dataframe(table, hide_index=True)
 
 
+def interpretJumpResult(tag: str,
+                        jumpResult: JumpResults,
+                        processBadJump: bool):
+    """
+    Interpret the jump results and generate the corresponding labels and
+    warnings if a jump is invalid, or only "somewhat valid" according to ISC
+    rules.  The caller turns results display on/off depending on training vs
+    in-competition settins.  Because heuristics are a beautiful thing.
+
+    Arguments
+    ---------
+        tag
+    A string that identifies a specific jump and the FlySight version that
+    generated the corresponding track file.  Often in the form: `HH-mm-ss:vX`
+    where `X` is the FlySight hardware version.
+
+        jumpResult
+    An instance of `ssscoring.datatypes.JumpResults` with jump data.
+
+        processBadJump
+    If `True`, generate end-user warnings as part of its results processing if
+    the jump is invalid because of ISC rules, but set the status to OK so that
+    the jump may be displayed.
+
+    Returns
+    -------
+    A `tuple` of these objects:
+
+    - `jumpStatusInfo` - the jump status, in human-readable form
+    - `scoringInfo` - Max speed, scoring window, etc.
+    - `badJumpLegend` - A warning or error if the jump is invalid according to
+      ISC rules
+    - `jumpStatus` - An instance of `JumpStatus` that may have been overriden to
+      `OK` if `processBadJump` was set to `True` and the jump was invalid.  Used
+      only for display.  Use `jumpResult.status` to determine the actual result
+      of the jump from a strict scoring perspective.  `jumpStatus` is  used
+      for display override purposes only.
+    """
+    maxSpeed = jumpResult.maxSpeed
+    window = jumpResult.window
+    jumpStatus = jumpResult.status
+    if jumpResult.status == JumpStatus.WARM_UP_FILE:
+        jumpStatusInfo = ''
+        badJumpLegend = '<span style="color: red">Warm up file - nothing to do<br>'
+        scoringInfo = ''
+    else:
+        scoringInfo = 'Max speed = {0:,.0f}; '.format(maxSpeed)+('exit at %d m (%d ft)<br>End scoring window at %d m (%d ft)<br>'%(window.start, 3.2808*window.start, window.end, 3.2808*window.end))
+    if jumpStatus == JumpStatus.OK:
+        jumpStatusInfo = '<span style="color: %s">%s jump - %s - %.02f km/h</span><br>' % ('green', tag, 'VALID', jumpResult.score)
+        belowMaxAltitude = isValidMaximumAltitude(jumpResult.data.altitudeAGL.max())
+        badJumpLegend = None
+        if not isValidMinimumAltitude(jumpResult.data.altitudeAGL.max()):
+            badJumpLegend = '<span style="color: yellow"><span style="font-weight: bold">Warning:</span> exit altitude AGL was lower than the minimum scoring altitude<br>'
+            jumpStatus = JumpStatus.ALTITUDE_EXCEEDS_MINIMUM
+        if not belowMaxAltitude:
+            jumpStatusInfo = '<span style="color: %s">%s jump - %s - %.02f km/h</span><br>' % ('red', tag, 'INVALID', jumpResult.score)
+            badJumpLegend = '<span style="color: red"><span style="font-weight: bold">RE-JUMP:</span> exit altitude AGL exceeds the maximum altitude<br>'
+            jumpStatus = JumpStatus.ALTITUDE_EXCEEDS_MAXIMUM
+    elif jumpStatus == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT:
+        badJumpLegend = '<span style="color: red"><span style="font-weight: bold">RE-JUMP:</span> exit altitude AGL exceeds the maximum altitude<br>'
+    jumpStatus = JumpStatus.OK if jumpStatus != JumpStatus.OK and processBadJump and jumpStatus != JumpStatus.WARM_UP_FILE else jumpStatus
+
+    return jumpStatusInfo, scoringInfo, badJumpLegend, jumpStatus
+
+
+def plotJumpResult(tag: str,
+                   jumpResult: JumpResults):
+    """
+    Plot the jump results including altitude, horizontal speed, time, etc. for
+    evaluation and interpretation.
+
+    Arguments
+    ---------
+        tag
+    A string that identifies a specific jump and the FlySight version that
+    generated the corresponding track file.  Often in the form: `HH-mm-ss:vX`
+    where `X` is the FlySight hardware version.
+
+        jumpResult
+    An instance of `ssscoring.datatypes.JumpResults` with jump data.
+    """
+    plot = initializePlot(tag)
+    plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
+    graphAltitude(plot, jumpResult)
+    graphAngle(plot, jumpResult)
+    hoverValue = bm.HoverTool(tooltips=[('Y-val', '@y{0.00}',),])
+    plot.add_tools(hoverValue)
+    graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
+    st.bokeh_chart(plot, use_container_width=True)
 
