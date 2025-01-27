@@ -43,13 +43,23 @@ def _setSideBarAndMain():
         disabled=st.session_state.elevation == None,
         accept_multiple_files=True
     )
+# TODO: Refine this to clear the cache AND the file_uploader() selections:
+#     if st.sidebar.button('Clear') and 'trackFiles' in st.session_state.keys():
+#         st.session_state.pop('trackFile')
+#         st.experimental_rerun()
     st.sidebar.html("<a href='https://github.com/pr3d4t0r/SSScoring/issues/new?template=Blank+issue' target='_blank'>Make a bug report or feature request</a>")
+
+
+def _styleShowMaxIn(scores: pd.Series) -> pd.DataFrame:
+    return [
+        'background-color: mediumseagreen' if v == scores.max() else \
+        '' for v in scores ]
 
 
 def _styleShowMinMaxIn(scores: pd.Series) -> pd.DataFrame:
     return [
         'background-color: green' if v == scores.max() else \
-        'background-color: orange' if v == scores.min() else \
+        'background-color: orangered' if v == scores.min() else \
         '' for v in scores ]
 
 
@@ -85,7 +95,7 @@ def main():
         with col0:
             aggregate = aggregateResults(jumpResults)
             st.html('<h2>Jumps in this set</h2>')
-            displayAggregate = aggregate.style.apply(_styleShowMinMaxIn, subset=['score']).format(precision=2)
+            displayAggregate = aggregate.style.apply(_styleShowMinMaxIn, subset=[ 'score', ]).apply(_styleShowMaxIn, subset=[ 'maxSpeed', ]).format(precision=2)
             st.dataframe(displayAggregate)
             st.html('<h2>Summary</h2>')
             st.dataframe(totalResultsFrom(aggregate), hide_index = True)
