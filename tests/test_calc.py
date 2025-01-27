@@ -221,7 +221,7 @@ def test_processAllJumpFiles():
     _jumpResults = processAllJumpFiles(jumpFiles)
     assert _jumpResults
     assert '01-00-00:v2' in list(_jumpResults.keys())
-    
+
     # TODO:  Implement this well - the file names should be part of an object
     #        passed to the processAllJumpFiles() function, when using bytes
     #        buffers.
@@ -262,7 +262,7 @@ def test_roundedAggregateResults():
 def test_totalResultsFrom():
     totals = totalResultsFrom(_speeds)
     assert len(totals)
-    assert totals.iloc[0].totalSpeed
+    assert totals.iloc[0].totalScore
 
     with pytest.raises(AttributeError):
         totalResultsFrom(pd.DataFrame())

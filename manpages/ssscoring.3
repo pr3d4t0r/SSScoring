@@ -102,6 +102,43 @@ Total score = 1291.00, mean speed = 430.33
 .EE
 .PP
 See the \f[CR]ssscore\f[R] man page for details on this quickstart tool.
+.SH Running the stand\-alone apps
+While the web\-based app shows the single and multiple jumps scoring
+functions as part of a single app, they are two distinct executables.
+During development and for local execution, it\[cq]s easier to run them
+from the command line.
+.PP
+These commands assume that the code is installed in a Python virtual
+environment and that the \f[CR]streamlit\f[R] package is installed.
+.PP
+\f[B]Prepare the local run\-time environment\f[R]
+.PP
+Installs all the required packages via \f[CR]pip \-e .\f[R] in the
+\f[CR]local\f[R] target, and it only needs to run once per session, and
+only after \f[CR]make test\f[R] or \f[CR]make clean\f[R].
+.IP
+.EX
+make local
+.EE
+.PP
+\f[B]Scoring a multiple jumps set\f[R]
+.IP
+.EX
+\f[I]# installs all the required packages via pip \-e .\f[R]
+\f[I]# it only needs to run once per session, and only after make test or make clean\f[R]
+make local
+streamlit run ssscoring/ssscoremultiple.py
+.EE
+.PP
+\f[B]Scoring and analyzing a single jump\f[R]
+.IP
+.EX
+make local
+streamlit run ssscoring/ssscoresingle.py
+.EE
+.PP
+These commands will start a new SSScore instance, current branch
+version, in the system\[cq]s default web browser.
 .SH Description
 SSScoring provides analsysis tools for individual or bulk processing of
 FlySight GPS competition data gathered during speed skydiving training
