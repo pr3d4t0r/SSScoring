@@ -768,6 +768,7 @@ def totalResultsFrom(aggregate: pd.DataFrame) -> pd.DataFrame:
 
     - totalSpeed ::= the sum of all speeds in the aggregated results
     - meanSpeed ::= the mean of all speeds
+    - maxSpeed := the absolute max speed over the speed runs set
     - meanSpeedSTD := scored speeds standar deviation
     - maxScore ::= the max score among all the speed scores
     - maxScoreSTD := the max scores standard deviation
@@ -782,6 +783,11 @@ def totalResultsFrom(aggregate: pd.DataFrame) -> pd.DataFrame:
     elif isinstance(aggregate, pd.DataFrame) and not len(aggregate):
         raise AttributeError('aggregate dataframe is empty')
 
-    totals = pd.DataFrame({ 'totalSpeed': [ aggregate.score.sum(), ], 'meanSpeed': [ aggregate.score.mean(), ], 'speedSTD': [ aggregate.score.std(), ], 'maxScore': [ aggregate.score.max(), ], }, index = [ 'totalSpeed'],)
+    totals = pd.DataFrame({
+        'totalScore': [ round(aggregate.score.sum(), 2), ],
+        'mean': [ round(aggregate.score.mean(), 2), ],
+        'deviation': [ round(aggregate.score.std(), 2), ],
+        'maxScore': [ round(aggregate.score.max(), 2), ],
+        'absMaxSpeed': [ round(aggregate.maxSpeed.max(), 2), ], }, index = [ 'totalSpeed'],)
     return totals
 

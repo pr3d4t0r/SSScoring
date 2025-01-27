@@ -20,6 +20,7 @@ from ssscoring.notebook import SPEED_COLORS
 from ssscoring.notebook import graphJumpResult
 from ssscoring.notebook import initializePlot
 
+import pandas as pd
 import streamlit as st
 
 
@@ -43,6 +44,13 @@ def _setSideBarAndMain():
         accept_multiple_files=True
     )
     st.sidebar.html("<a href='https://github.com/pr3d4t0r/SSScoring/issues/new?template=Blank+issue' target='_blank'>Make a bug report or feature request</a>")
+
+
+def _styleShowMinMaxIn(scores: pd.Series) -> pd.DataFrame:
+    return [
+        'background-color: green' if v == scores.max() else \
+        'background-color: orange' if v == scores.min() else \
+        '' for v in scores ]
 
 
 def main():
@@ -77,7 +85,8 @@ def main():
         with col0:
             aggregate = aggregateResults(jumpResults)
             st.html('<h2>Jumps in this set</h2>')
-            st.write(aggregate)
+            displayAggregate = aggregate.style.apply(_styleShowMinMaxIn, subset=['score']).format(precision=2)
+            st.dataframe(displayAggregate)
             st.html('<h2>Summary</h2>')
             st.dataframe(totalResultsFrom(aggregate), hide_index = True)
             if jumpStatus == JumpStatus.OK:

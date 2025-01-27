@@ -106,6 +106,45 @@ See the <a href='https://github.com/pr3d4t0r/SSScoring/blob/master/ssscore.md' t
 for details on this quickstart tool.
 
 
+Running the stand-alone apps
+============================
+
+While the web-based app shows the single and multiple jumps scoring functions as
+part of a single app, they are two distinct executables.  During development and
+for local execution, it's easier to run them from the command line.
+
+These commands assume that the code is installed in a Python virtual environment
+and that the `streamlit` package is installed.
+
+**Prepare the local run-time environment**
+
+Installs all the required packages via `pip -e .` in the `local` target, and
+it only needs to run once per session, and only after `make test` or `make clean`.
+
+```bash
+make local
+```
+
+**Scoring a multiple jumps set**
+
+```bash
+# installs all the required packages via pip -e .
+# it only needs to run once per session, and only after make test or make clean
+make local
+streamlit run ssscoring/ssscoremultiple.py
+```
+
+**Scoring and analyzing a single jump**
+
+```bash
+make local
+streamlit run ssscoring/ssscoresingle.py
+```
+
+These commands will start a new SSScore instance, current branch version, in the
+system's default web browser.
+
+
 Description
 ===========
 SSScoring provides analsysis tools for individual or bulk processing of FlySight
