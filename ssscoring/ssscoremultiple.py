@@ -7,11 +7,11 @@ Process a group of jumps uploaded from a file uploader.
 """
 
 from ssscoring import __VERSION__
-from ssscoring.apps.common import displayJumpDataIn
-from ssscoring.apps.common import initDropZonesFromObject
-from ssscoring.apps.common import interpretJumpResult
-from ssscoring.apps.common import isStreamlitHostedApp
-from ssscoring.apps.common import plotJumpResult
+from ssscoring.appcommon import displayJumpDataIn
+from ssscoring.appcommon import initDropZonesFromObject
+from ssscoring.appcommon import interpretJumpResult
+from ssscoring.appcommon import isStreamlitHostedApp
+from ssscoring.appcommon import plotJumpResult
 from ssscoring.calc import aggregateResults
 from ssscoring.calc import processAllJumpFiles
 from ssscoring.calc import totalResultsFrom

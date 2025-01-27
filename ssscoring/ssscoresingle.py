@@ -8,16 +8,16 @@ https://discuss.streamlit.io/t/pythonpath-issue-modulenotfounderror-in-same-pack
 """
 
 from ssscoring import __VERSION__
-from ssscoring.apps.common import displayJumpDataIn
-from ssscoring.apps.common import initDropZonesFromObject
-from ssscoring.apps.common import interpretJumpResult
-from ssscoring.apps.common import isStreamlitHostedApp
+from ssscoring.appcommon import displayJumpDataIn
+from ssscoring.appcommon import initDropZonesFromObject
+from ssscoring.appcommon import interpretJumpResult
+from ssscoring.appcommon import isStreamlitHostedApp
+from ssscoring.appcommon import plotJumpResult
 from ssscoring.calc import convertFlySight2SSScoring
 from ssscoring.calc import getFlySightDataFromCSVBuffer
 from ssscoring.calc import processJump
 from ssscoring.datatypes import JumpStatus
 from ssscoring.mapview import speedJumpTrajectory
-from ssscoring.apps.common import plotJumpResult
 
 import os
 import psutil

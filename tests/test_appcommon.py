@@ -1,12 +1,12 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 
-from ssscoring.apps.common import DZ_DIRECTORY
-from ssscoring.apps.common import STREAMLIT_SIG_KEY
-from ssscoring.apps.common import STREAMLIT_SIG_VALUE
-from ssscoring.apps.common import initDropZonesFromObject
-from ssscoring.apps.common import initDropZonesFromResource
-from ssscoring.apps.common import isStreamlitHostedApp
+from ssscoring.appcommon import DZ_DIRECTORY
+from ssscoring.appcommon import STREAMLIT_SIG_KEY
+from ssscoring.appcommon import STREAMLIT_SIG_VALUE
+from ssscoring.appcommon import initDropZonesFromObject
+from ssscoring.appcommon import initDropZonesFromResource
+from ssscoring.appcommon import isStreamlitHostedApp
 from ssscoring.errors import SSScoringError
 
 import warnings
@@ -46,4 +46,6 @@ def test_initDropZonesFromObject():
 
 
 # test_initDropZonesFromResource()
+
+# TODO:  Missing unit tests for a bunch of functions here.
 
