@@ -144,10 +144,13 @@ def displayJumpDataIn(resultsTable: pd.DataFrame):
     `ssscoring.datatypes.JumpResults`
     """
     table = resultsTable.copy()
-    table.vKMh = table.vKMh.apply(round)
-    table.hKMh = table.hKMh.apply(round)
+    table.vKMh = table.vKMh.apply(lambda x: round(x, 2))
+    table.hKMh = table.hKMh.apply(lambda x: round(x, 2))
+    table.deltaV = table.deltaV.apply(lambda x: round(x, 2))
+    table.deltaAngle = table.deltaAngle.apply(lambda x: round(x, 2))
     table['altitude (ft)'] = table['altitude (ft)'].apply(round)
-    table.netVectorKMh = table.netVectorKMh.apply(round)
+    # TODO:  Decide if we'll keep this one.  Delete after 20250401 if present.
+    # table.netVectorKMh = table.netVectorKMh.apply(round)
     table.index = ['']*len(table)
     st.dataframe(table, hide_index=True)
 

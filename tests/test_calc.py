@@ -146,9 +146,12 @@ def test_jumpAnalysisTable():
     assert maxSpeed > 400.0
     assert 'time' in table.columns
     assert 'vKMh' in table.columns
+    assert 'deltaV' in table.columns
     assert 'altitude (ft)' in table.columns
     assert 'speedAngle' in table.columns
-    assert 'netVectorKMh' in table.columns
+    assert 'deltaAngle' in table.columns
+    # TODO:  Decide if we'll keep this one.  Delete after 20250401 if present.
+    # assert 'netVectorKMh' in table.columns
 
 
 def test_calcScoreMeanVelocity():

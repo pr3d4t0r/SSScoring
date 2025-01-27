@@ -345,11 +345,14 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
     table = pd.DataFrame({
                 'time': table.time,
                 'vKMh': table.vKMh,
+                'deltaV': table.vKMh.diff().fillna(table.vKMh),
                 'hKMh': table.hKMh,
                 'speedAngle': table.speedAngle,
+                'deltaAngle': table.speedAngle.diff().fillna(table.speedAngle),
                 'distanceFromExit (m)': table.distanceFromExit,
                 'altitude (ft)': table.altitudeAGLFt,
-                'netVectorKMh': (table.vKMh**2+table.hKMh**2)**0.5,
+                # TODO:  Decide if we'll keep this one.  Delete after 20250401 if present.
+                # 'netVectorKMh': (table.vKMh**2+table.hKMh**2)**0.5,
             })
 
     return (data.vKMh.max(), table)
