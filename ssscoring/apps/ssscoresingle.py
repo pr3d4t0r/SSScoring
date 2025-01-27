@@ -17,17 +17,11 @@ from ssscoring.calc import getFlySightDataFromCSVBuffer
 from ssscoring.calc import processJump
 from ssscoring.datatypes import JumpStatus
 from ssscoring.mapview import speedJumpTrajectory
-from ssscoring.notebook import SPEED_COLORS
-from ssscoring.notebook import graphAltitude
-from ssscoring.notebook import graphAngle
-from ssscoring.notebook import graphJumpResult
-from ssscoring.notebook import initializeExtraYRanges
-from ssscoring.notebook import initializePlot
+from ssscoring.apps.common import plotJumpResult
 
 import os
 import psutil
 
-import bokeh.models as bm
 import pandas as pd
 import streamlit as st
 

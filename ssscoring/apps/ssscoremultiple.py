@@ -17,9 +17,10 @@ from ssscoring.calc import processAllJumpFiles
 from ssscoring.calc import totalResultsFrom
 from ssscoring.datatypes import JumpStatus
 from ssscoring.notebook import SPEED_COLORS
+from ssscoring.notebook import graphJumpResult
+from ssscoring.notebook import initializePlot
 
 import streamlit as st
-import bokeh.models as bm
 
 
 # +++ implementation +++
@@ -52,15 +53,12 @@ def main():
     col0, col1 = st.columns([0.5, 0.5, ])
     if st.session_state.trackFiles:
         jumpResults = processAllJumpFiles(st.session_state.trackFiles, altitudeDZMeters=st.session_state.elevation)
-        with col0:
-            aggregate = aggregateResults(jumpResults)
-            st.html('<h2>Jumps in this set</h2>')
-            st.write(aggregate)
-            st.html('<h2>Summary</h2>')
-            st.dataframe(totalResultsFrom(aggregate), hide_index = True)
-        with col1:
-            for tag in sorted(list(jumpResults.keys())):
-                jumpResult = jumpResults[tag]
+        allJumpsPlot = initializePlot('All jumps', backgroundColorName='#2c2c2c')
+        mixColor = 0
+        for tag in sorted(list(jumpResults.keys())):
+            jumpResult = jumpResults[tag]
+            mixColor = (mixColor+1)%len(SPEED_COLORS)
+            with col1:
                 jumpStatusInfo,\
                 scoringInfo,\
                 badJumpLegend,\
@@ -69,6 +67,21 @@ def main():
                 if jumpStatus == JumpStatus.OK:
                     displayJumpDataIn(jumpResult.table)
                     plotJumpResult(tag, jumpResult)
+                    graphJumpResult(
+                        allJumpsPlot,
+                        jumpResult,
+                        lineColor=SPEED_COLORS[mixColor],
+                        legend='%s = %.2f' % (tag, jumpResult.score),
+                        showIt=False
+                    )
+        with col0:
+            aggregate = aggregateResults(jumpResults)
+            st.html('<h2>Jumps in this set</h2>')
+            st.write(aggregate)
+            st.html('<h2>Summary</h2>')
+            st.dataframe(totalResultsFrom(aggregate), hide_index = True)
+            if jumpStatus == JumpStatus.OK:
+                st.bokeh_chart(allJumpsPlot, use_container_width=True)
 
 
 if '__main__' == __name__:
