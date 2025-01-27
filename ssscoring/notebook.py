@@ -8,7 +8,6 @@
 from bokeh.models import LinearAxis
 from bokeh.models import Range1d
 
-from ssscoring.constants import DEFAULT_AXIS_COLOR_BOKEH
 from ssscoring.constants import MAX_ALTITUDE_FT
 
 import bokeh.io as bi
@@ -16,8 +15,20 @@ import bokeh.plotting as bp
 
 
 # *** constants ***
-DATA_LAKE_ROOT = './data' # Lucyfer default
+
+DEFAULT_AXIS_COLOR_BOKEH = 'lightsteelblue'
+"""
+CSS color name for the axis colors used in notebooks and Streamlit
+with Bokeh.
+"""
+
+
 SPEED_COLORS = colors = ('limegreen', 'blue', 'tomato', 'turquoise', 'deepskyblue', 'forestgreen', 'coral', 'darkcyan',)
+"""
+Colors used for tracking the lines in a multi-jump plot, so that each track is
+associated with a different color and easier to visualize.  8 distinct colors,
+corresponding to each jump in a competition.
+"""
 
 
 # *** global initialization ***
@@ -36,6 +47,7 @@ def initializePlot(jumpTitle: str,
                    yLabel='km/h',
                    xMax=35.0,
                    yMax=550.0,
+                   backgroundColorName='#1a1a1a',
                    colorName=DEFAULT_AXIS_COLOR_BOKEH):
     """
     Initiialize a plotting area for notebook output.
@@ -63,6 +75,10 @@ def initializePlot(jumpTitle: str,
         yMax: float
     The maximum range for the Y axis.  Default = 550
 
+        backgroundColorName
+    A string with the CSS RGB value of the background color or its CSS color
+    string name.
+
         colorName
     A valid CSS color string.
     """
@@ -74,8 +90,8 @@ def initializePlot(jumpTitle: str,
                      y_axis_label=yLabel,
                      x_range=(0.0, xMax),
                      y_range=(0.0, yMax),
-                     background_fill_color='#1a1a1a',
-                     border_fill_color='#1a1a1a')
+                     background_fill_color=backgroundColorName,
+                     border_fill_color=backgroundColorName)
     plot.xaxis.axis_label_text_color=colorName
     plot.xaxis.major_label_text_color=colorName
     plot.xaxis.axis_line_color=colorName
