@@ -79,7 +79,7 @@ def isStreamlitHostedApp() -> bool:
     return False
 
 
-@st.cache_data
+# @st.cache_data # TODO: remove this function in a future implementation.
 def initDropZonesFromResource(resourceName: str) -> pd.DataFrame:
     """
     Get the DZs directory from a CSV enclosed in the distribution package as a
@@ -148,7 +148,7 @@ def displayJumpDataIn(resultsTable: pd.DataFrame):
     table.hKMh = table.hKMh.apply(lambda x: round(x, 2))
     table.deltaV = table.deltaV.apply(lambda x: round(x, 2))
     table.deltaAngle = table.deltaAngle.apply(lambda x: round(x, 2))
-    table['altitude (ft)'] = table['altitude (ft)'].apply(lambda x: round(x, 1)
+    table['altitude (ft)'] = table['altitude (ft)'].apply(lambda x: round(x, 1))
     # TODO:  Decide if we'll keep this one.  Delete after 20250401 if present.
     # table.netVectorKMh = table.netVectorKMh.apply(round)
     table.index = ['']*len(table)

@@ -16,6 +16,7 @@ from ssscoring.calc import aggregateResults
 from ssscoring.calc import processAllJumpFiles
 from ssscoring.calc import totalResultsFrom
 from ssscoring.datatypes import JumpStatus
+from ssscoring.mapview import speedJumpTrajectory
 from ssscoring.notebook import SPEED_COLORS
 from ssscoring.notebook import graphJumpResult
 from ssscoring.notebook import initializePlot
@@ -92,6 +93,8 @@ def main():
                         legend='%s = %.2f' % (tag, jumpResult.score),
                         showIt=False
                     )
+                    st.write('Brightest point corresponds to the max speed')
+                    st.pydeck_chart(speedJumpTrajectory(jumpResult))
         with col0:
             aggregate = aggregateResults(jumpResults)
             st.html('<h2>Jumps in this set</h2>')

@@ -9,6 +9,7 @@ from ssscoring.appcommon import initDropZonesFromResource
 from ssscoring.appcommon import isStreamlitHostedApp
 from ssscoring.errors import SSScoringError
 
+import logging
 import warnings
 import os
 
@@ -30,7 +31,7 @@ def test_isStreamlitHostedApp():
     del os.environ[STREAMLIT_SIG_KEY]
 
 
-def test_initDropZonesFromResource(capsys, caplog):
+def test_initDropZonesFromResource():
     d = initDropZonesFromResource(DZ_DIRECTORY)
     assert isinstance(d, pd.DataFrame)
     assert 'dropZone' in d.columns
