@@ -30,7 +30,7 @@ import streamlit as st
 
 def _setSideBarAndMain():
     dropZones = initDropZonesFromObject()
-    st.sidebar.title('1️⃣  SSScore %s α' % __VERSION__)
+    st.sidebar.title('1️⃣  SSScore %s β' % __VERSION__)
     st.session_state.processBadJump = st.sidebar.checkbox('Process bad jump', value=True, help='Display results from invalid jumps')
     dropZone = st.sidebar.selectbox('Select drop zone:', dropZones.dropZone, index=None)
     if dropZone:

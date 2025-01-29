@@ -29,7 +29,7 @@ import streamlit as st
 
 def _setSideBarAndMain():
     dropZones = initDropZonesFromObject()
-    st.sidebar.title('🔢 SSScore %s α' % __VERSION__)
+    st.sidebar.title('🔢 SSScore %s β' % __VERSION__)
     st.session_state.processBadJump = st.sidebar.checkbox('Process bad jumps', value=True, help='Display results from invalid jumps')
     dropZone = st.sidebar.selectbox('Select drop zone:', dropZones.dropZone, index=None)
     if dropZone:
@@ -74,6 +74,7 @@ def main():
         jumpResults = processAllJumpFiles(st.session_state.trackFiles, altitudeDZMeters=st.session_state.elevation)
         allJumpsPlot = initializePlot('All jumps', backgroundColorName='#2c2c2c')
         mixColor = 0
+        jumpResultsSubset = dict()
         for tag in sorted(list(jumpResults.keys())):
             jumpResult = jumpResults[tag]
             mixColor = (mixColor+1)%len(SPEED_COLORS)
@@ -82,6 +83,8 @@ def main():
                 scoringInfo,\
                 badJumpLegend,\
                 jumpStatus = interpretJumpResult(tag, jumpResult, st.session_state.processBadJump)
+                if jumpStatus == JumpStatus.OK:
+                    jumpResultsSubset[tag] = jumpResult
                 st.html('<hr><h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend if badJumpLegend else '')+'</h3>')
                 if jumpStatus == JumpStatus.OK:
                     displayJumpDataIn(jumpResult.table)
@@ -96,7 +99,7 @@ def main():
                     st.write('Brightest point corresponds to the max speed')
                     st.pydeck_chart(speedJumpTrajectory(jumpResult))
         with col0:
-            aggregate = aggregateResults(jumpResults)
+            aggregate = aggregateResults(jumpResultsSubset)
             st.html('<h2>Jumps in this set</h2>')
             displayAggregate = aggregate.style.apply(_styleShowMinMaxIn, subset=[ 'score', ]).apply(_styleShowMaxIn, subset=[ 'maxSpeed', ]).format(precision=2)
             st.dataframe(displayAggregate)
