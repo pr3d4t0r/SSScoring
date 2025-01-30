@@ -7,9 +7,11 @@ Issue deploying to Streamlit.io:
 https://discuss.streamlit.io/t/pythonpath-issue-modulenotfounderror-in-same-package-where-app-is-defined/91170
 """
 
+# from ssscoring.appcommon import initDropZonesFromObject
 from ssscoring import __VERSION__
+from ssscoring.appcommon import DZ_DIRECTORY
 from ssscoring.appcommon import displayJumpDataIn
-from ssscoring.appcommon import initDropZonesFromObject
+from ssscoring.appcommon import initDropZonesFromResource
 from ssscoring.appcommon import interpretJumpResult
 from ssscoring.appcommon import isStreamlitHostedApp
 from ssscoring.appcommon import plotJumpResult
@@ -29,7 +31,10 @@ import streamlit as st
 # *** implementation ***
 
 def _setSideBarAndMain():
-    dropZones = initDropZonesFromObject()
+    dropZones = initDropZonesFromResource(DZ_DIRECTORY)
+    st.write('DZ directory initialized from ssscoring.resources! Here is `dropZones.head(5)`')
+    st.dataframe(dropZones.head(5))
+    # dropZones = initDropZonesFromObject()
     st.sidebar.title('1️⃣  SSScore %s β' % __VERSION__)
     st.session_state.processBadJump = st.sidebar.checkbox('Process bad jump', value=True, help='Display results from invalid jumps')
     dropZone = st.sidebar.selectbox('Select drop zone:', dropZones.dropZone, index=None)
