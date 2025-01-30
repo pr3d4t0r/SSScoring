@@ -31,9 +31,6 @@ import streamlit as st
 
 def _setSideBarAndMain():
     dropZones = initDropZonesFromResource(DZ_DIRECTORY)
-    st.write('DZ directory initialized from ssscoring.resources! Here is `dropZones.head(5)`')
-    st.dataframe(dropZones.head(5))
-    # dropZones = initDropZonesFromObject()
     st.sidebar.title('🔢 SSScore %s β' % __VERSION__)
     st.session_state.processBadJump = st.sidebar.checkbox('Process bad jumps', value=True, help='Display results from invalid jumps')
     dropZone = st.sidebar.selectbox('Select drop zone:', dropZones.dropZone, index=None)

@@ -79,7 +79,7 @@ def isStreamlitHostedApp() -> bool:
     return False
 
 
-# @st.cache_data # TODO: remove this function in a future implementation.
+@st.cache_data
 def initDropZonesFromResource(resourceName: str) -> pd.DataFrame:
     """
     Get the DZs directory from a CSV enclosed in the distribution package as a
