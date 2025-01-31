@@ -101,13 +101,13 @@ def main():
                     st.write('Brightest point corresponds to the max speed')
                     st.pydeck_chart(speedJumpTrajectory(jumpResult))
         with col0:
-            aggregate = aggregateResults(jumpResultsSubset)
             st.html('<h2>Jumps in this set</h2>')
-            displayAggregate = aggregate.style.apply(_styleShowMinMaxIn, subset=[ 'score', ]).apply(_styleShowMaxIn, subset=[ 'maxSpeed', ]).format(precision=2)
-            st.dataframe(displayAggregate)
-            st.html('<h2>Summary</h2>')
-            st.dataframe(totalResultsFrom(aggregate), hide_index = True)
             if jumpStatus == JumpStatus.OK:
+                aggregate = aggregateResults(jumpResultsSubset)
+                displayAggregate = aggregate.style.apply(_styleShowMinMaxIn, subset=[ 'score', ]).apply(_styleShowMaxIn, subset=[ 'maxSpeed', ]).format(precision=2)
+                st.dataframe(displayAggregate)
+                st.html('<h2>Summary</h2>')
+                st.dataframe(totalResultsFrom(aggregate), hide_index = True)
                 st.bokeh_chart(allJumpsPlot, use_container_width=True)
 
 
