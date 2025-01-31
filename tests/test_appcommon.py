@@ -6,6 +6,7 @@ from ssscoring.appcommon import STREAMLIT_SIG_KEY
 from ssscoring.appcommon import STREAMLIT_SIG_VALUE
 from ssscoring.appcommon import initDropZonesFromObject
 from ssscoring.appcommon import initDropZonesFromResource
+from ssscoring.appcommon import initFileUploaderState
 from ssscoring.appcommon import isStreamlitHostedApp
 from ssscoring.errors import SSScoringError
 
@@ -50,3 +51,6 @@ def test_initDropZonesFromObject():
 
 # TODO:  Missing unit tests for a bunch of functions here.
 
+
+def test_initFileUploaderState():
+    pass

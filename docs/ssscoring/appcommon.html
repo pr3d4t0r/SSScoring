@@ -65,6 +65,9 @@
             <li>
                     <a class="function" href="#plotJumpResult">plotJumpResult</a>
             </li>
+            <li>
+                    <a class="function" href="#initFileUploaderState">initFileUploaderState</a>
+            </li>
     </ul>
 
 
@@ -335,6 +338,34 @@ package.</p>
 </span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a>    <span class="n">plot</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">hoverValue</span><span class="p">)</span>
 </span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a>    <span class="n">graphJumpResult</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">jumpResult</span><span class="p">,</span> <span class="n">lineColor</span><span class="o">=</span><span class="n">SPEED_COLORS</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a>    <span class="n">st</span><span class="o">.</span><span class="n">bokeh_chart</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">use_container_width</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a>
+</span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a>
+</span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a><span class="k">def</span> <span class="nf">initFileUploaderState</span><span class="p">(</span><span class="n">filesObject</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">uploaderKey</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span><span class="s1">&#39;uploaderKey&#39;</span><span class="p">):</span>
+</span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a><span class="sd">    Initialize the session state for the Streamlit app uploader so that</span>
+</span><span id="L-252"><a href="#L-252"><span class="linenos">252</span></a><span class="sd">    selections can be cleared in callbacks later.</span>
+</span><span id="L-253"><a href="#L-253"><span class="linenos">253</span></a>
+</span><span id="L-254"><a href="#L-254"><span class="linenos">254</span></a><span class="sd">    **Important**: `initFileUploaderState()` __must__ be called after setting the</span>
+</span><span id="L-255"><a href="#L-255"><span class="linenos">255</span></a><span class="sd">    page configuration (per Streamlit architecture rules) and before adding any</span>
+</span><span id="L-256"><a href="#L-256"><span class="linenos">256</span></a><span class="sd">    widgets to the sidebars, containers, or main application.</span>
+</span><span id="L-257"><a href="#L-257"><span class="linenos">257</span></a>
+</span><span id="L-258"><a href="#L-258"><span class="linenos">258</span></a><span class="sd">    Argument</span>
+</span><span id="L-259"><a href="#L-259"><span class="linenos">259</span></a><span class="sd">    --------</span>
+</span><span id="L-260"><a href="#L-260"><span class="linenos">260</span></a><span class="sd">        filesObject</span>
+</span><span id="L-261"><a href="#L-261"><span class="linenos">261</span></a><span class="sd">    A `str` name that is either `&#39;trackFile&#39;` for the single track file process</span>
+</span><span id="L-262"><a href="#L-262"><span class="linenos">262</span></a><span class="sd">    or `&#39;trackFiles&#39;` for the app page that handles more than one track file at</span>
+</span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a><span class="sd">    a time.</span>
+</span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a>
+</span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a><span class="sd">        uploaderKey</span>
+</span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a><span class="sd">    A unique identifier for the uploader key component, usually set to</span>
+</span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a><span class="sd">    `&#39;uploaderKey&#39;` but can be any arbitrary name.  This value must match the</span>
+</span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a><span class="sd">    `file_uploader(..., key=uploaderKey,...)` value.</span>
+</span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a>
+</span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a>    <span class="k">if</span> <span class="n">filesObject</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+</span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a>        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="n">filesObject</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a>    <span class="k">if</span> <span class="n">uploaderKey</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+</span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a>        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="n">uploaderKey</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 </span></pre></div>
 
 
@@ -796,6 +827,72 @@ where <code>X</code> is the FlySight hardware version.</p>
 </code></pre>
 
 <p>An instance of <code><a href="datatypes.html#JumpResults">ssscoring.datatypes.JumpResults</a></code> with jump data.</p>
+</div>
+
+
+                </section>
+                <section id="initFileUploaderState">
+                            <input id="initFileUploaderState-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">initFileUploaderState</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">filesObject</span><span class="p">:</span> <span class="nb">str</span>, </span><span class="param"><span class="n">uploaderKey</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;uploaderKey&#39;</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="initFileUploaderState-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#initFileUploaderState"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="initFileUploaderState-250"><a href="#initFileUploaderState-250"><span class="linenos">250</span></a><span class="k">def</span> <span class="nf">initFileUploaderState</span><span class="p">(</span><span class="n">filesObject</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">uploaderKey</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span><span class="s1">&#39;uploaderKey&#39;</span><span class="p">):</span>
+</span><span id="initFileUploaderState-251"><a href="#initFileUploaderState-251"><span class="linenos">251</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="initFileUploaderState-252"><a href="#initFileUploaderState-252"><span class="linenos">252</span></a><span class="sd">    Initialize the session state for the Streamlit app uploader so that</span>
+</span><span id="initFileUploaderState-253"><a href="#initFileUploaderState-253"><span class="linenos">253</span></a><span class="sd">    selections can be cleared in callbacks later.</span>
+</span><span id="initFileUploaderState-254"><a href="#initFileUploaderState-254"><span class="linenos">254</span></a>
+</span><span id="initFileUploaderState-255"><a href="#initFileUploaderState-255"><span class="linenos">255</span></a><span class="sd">    **Important**: `initFileUploaderState()` __must__ be called after setting the</span>
+</span><span id="initFileUploaderState-256"><a href="#initFileUploaderState-256"><span class="linenos">256</span></a><span class="sd">    page configuration (per Streamlit architecture rules) and before adding any</span>
+</span><span id="initFileUploaderState-257"><a href="#initFileUploaderState-257"><span class="linenos">257</span></a><span class="sd">    widgets to the sidebars, containers, or main application.</span>
+</span><span id="initFileUploaderState-258"><a href="#initFileUploaderState-258"><span class="linenos">258</span></a>
+</span><span id="initFileUploaderState-259"><a href="#initFileUploaderState-259"><span class="linenos">259</span></a><span class="sd">    Argument</span>
+</span><span id="initFileUploaderState-260"><a href="#initFileUploaderState-260"><span class="linenos">260</span></a><span class="sd">    --------</span>
+</span><span id="initFileUploaderState-261"><a href="#initFileUploaderState-261"><span class="linenos">261</span></a><span class="sd">        filesObject</span>
+</span><span id="initFileUploaderState-262"><a href="#initFileUploaderState-262"><span class="linenos">262</span></a><span class="sd">    A `str` name that is either `&#39;trackFile&#39;` for the single track file process</span>
+</span><span id="initFileUploaderState-263"><a href="#initFileUploaderState-263"><span class="linenos">263</span></a><span class="sd">    or `&#39;trackFiles&#39;` for the app page that handles more than one track file at</span>
+</span><span id="initFileUploaderState-264"><a href="#initFileUploaderState-264"><span class="linenos">264</span></a><span class="sd">    a time.</span>
+</span><span id="initFileUploaderState-265"><a href="#initFileUploaderState-265"><span class="linenos">265</span></a>
+</span><span id="initFileUploaderState-266"><a href="#initFileUploaderState-266"><span class="linenos">266</span></a><span class="sd">        uploaderKey</span>
+</span><span id="initFileUploaderState-267"><a href="#initFileUploaderState-267"><span class="linenos">267</span></a><span class="sd">    A unique identifier for the uploader key component, usually set to</span>
+</span><span id="initFileUploaderState-268"><a href="#initFileUploaderState-268"><span class="linenos">268</span></a><span class="sd">    `&#39;uploaderKey&#39;` but can be any arbitrary name.  This value must match the</span>
+</span><span id="initFileUploaderState-269"><a href="#initFileUploaderState-269"><span class="linenos">269</span></a><span class="sd">    `file_uploader(..., key=uploaderKey,...)` value.</span>
+</span><span id="initFileUploaderState-270"><a href="#initFileUploaderState-270"><span class="linenos">270</span></a>
+</span><span id="initFileUploaderState-271"><a href="#initFileUploaderState-271"><span class="linenos">271</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="initFileUploaderState-272"><a href="#initFileUploaderState-272"><span class="linenos">272</span></a>    <span class="k">if</span> <span class="n">filesObject</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+</span><span id="initFileUploaderState-273"><a href="#initFileUploaderState-273"><span class="linenos">273</span></a>        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="n">filesObject</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="initFileUploaderState-274"><a href="#initFileUploaderState-274"><span class="linenos">274</span></a>    <span class="k">if</span> <span class="n">uploaderKey</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+</span><span id="initFileUploaderState-275"><a href="#initFileUploaderState-275"><span class="linenos">275</span></a>        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="n">uploaderKey</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Initialize the session state for the Streamlit app uploader so that
+selections can be cleared in callbacks later.</p>
+
+<p><strong>Important</strong>: <code><a href="#initFileUploaderState">initFileUploaderState()</a></code> __must__ be called after setting the
+page configuration (per Streamlit architecture rules) and before adding any
+widgets to the sidebars, containers, or main application.</p>
+
+<h2 id="argument">Argument</h2>
+
+<pre><code>filesObject
+</code></pre>
+
+<p>A <code>str</code> name that is either <code>'trackFile'</code> for the single track file process
+or <code>'trackFiles'</code> for the app page that handles more than one track file at
+a time.</p>
+
+<pre><code>uploaderKey
+</code></pre>
+
+<p>A unique identifier for the uploader key component, usually set to
+<code>'uploaderKey'</code> but can be any arbitrary name.  This value must match the
+<code>file_uploader(..., key=uploaderKey,...)</code> value.</p>
 </div>
 
 

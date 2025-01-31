@@ -245,3 +245,31 @@ def plotJumpResult(tag: str,
     graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
     st.bokeh_chart(plot, use_container_width=True)
 
+
+def initFileUploaderState(filesObject:str, uploaderKey:str ='uploaderKey'):
+    """
+    Initialize the session state for the Streamlit app uploader so that
+    selections can be cleared in callbacks later.
+
+    **Important**: `initFileUploaderState()` __must__ be called after setting the
+    page configuration (per Streamlit architecture rules) and before adding any
+    widgets to the sidebars, containers, or main application.
+
+    Argument
+    --------
+        filesObject
+    A `str` name that is either `'trackFile'` for the single track file process
+    or `'trackFiles'` for the app page that handles more than one track file at
+    a time.
+
+        uploaderKey
+    A unique identifier for the uploader key component, usually set to
+    `'uploaderKey'` but can be any arbitrary name.  This value must match the
+    `file_uploader(..., key=uploaderKey,...)` value.
+
+    """
+    if filesObject not in st.session_state:
+        st.session_state[filesObject] = None
+    if uploaderKey not in st.session_state:
+        st.session_state[uploaderKey] = 0
+
