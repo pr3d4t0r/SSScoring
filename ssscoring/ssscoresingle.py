@@ -11,6 +11,7 @@ from ssscoring import __VERSION__
 from ssscoring.appcommon import DZ_DIRECTORY
 from ssscoring.appcommon import displayJumpDataIn
 from ssscoring.appcommon import initDropZonesFromResource
+from ssscoring.appcommon import initFileUploaderState
 from ssscoring.appcommon import interpretJumpResult
 from ssscoring.appcommon import isStreamlitHostedApp
 from ssscoring.appcommon import plotJumpResult
@@ -20,27 +21,32 @@ from ssscoring.calc import processJump
 from ssscoring.datatypes import JumpStatus
 from ssscoring.mapview import speedJumpTrajectory
 
-import os
-import psutil
-
 import pandas as pd
 import streamlit as st
 
 
 # *** implementation ***
 
+def _selectDZState(*args, **kwargs):
+    if st.session_state.elevation:
+        st.session_state.uploaderKey += 1
+        st.session_state.trackFile = None
+
+
 def _setSideBarAndMain():
     dropZones = initDropZonesFromResource(DZ_DIRECTORY)
     st.sidebar.title('1️⃣  SSScore %s β' % __VERSION__)
     st.session_state.processBadJump = st.sidebar.checkbox('Process bad jump', value=True, help='Display results from invalid jumps')
-    dropZone = st.sidebar.selectbox('Select drop zone:', dropZones.dropZone, index=None)
+    dropZone = st.sidebar.selectbox('Select drop zone:', dropZones.dropZone, index=None, on_change=_selectDZState)
     if dropZone:
         st.session_state.elevation = dropZones[dropZones.dropZone == dropZone ].iloc[0].elevation
     else:
         st.session_state.elevation = None
         st.session_state.trackFile = None
     st.sidebar.metric('Elevation', value='%.1f m' % (0.0 if st.session_state.elevation == None else st.session_state.elevation))
-    st.session_state.trackFile = st.sidebar.file_uploader('Track file', [ 'CSV' ], disabled=st.session_state.elevation == None)
+    trackFile = st.sidebar.file_uploader('Track file', [ 'CSV' ], disabled=st.session_state.elevation == None, key = st.session_state.uploaderKey)
+    if trackFile:
+        st.session_state.trackFile = trackFile
     st.sidebar.html("<a href='https://github.com/pr3d4t0r/SSScoring/issues/new?template=Blank+issue' target='_blank'>Make a bug report or feature request</a>")
 
 
@@ -54,22 +60,10 @@ def _getJumpDataFrom(trackFileBuffer: str) -> pd.DataFrame:
     return data, tag
 
 
-def _closeWindow():
-    js = 'window.open("", "_self").close();'
-    temp = """
-    <script>
-    {%s}
-    </script>
-    """ % js
-    st.html(temp)
-    processID = os.getpid()
-    p = psutil.Process(processID)
-    p.terminate()
-
-
 def main():
     if not isStreamlitHostedApp():
         st.set_page_config(layout = 'wide')
+    initFileUploaderState('trackFile')
     _setSideBarAndMain()
 
     col0, col1 = st.columns([ 0.4, 0.6, ])
@@ -89,10 +83,6 @@ def main():
                 plotJumpResult(tag, jumpResult)
                 st.write('Brightest point corresponds to the max speed')
                 st.pydeck_chart(speedJumpTrajectory(jumpResult))
-
-    if not isStreamlitHostedApp():
-        if st.sidebar.button('Exit'):
-            _closeWindow()
 
 
 if '__main__' == __name__:

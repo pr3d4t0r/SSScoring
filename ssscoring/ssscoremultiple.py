@@ -6,11 +6,11 @@
 Process a group of jumps uploaded from a file uploader.
 """
 
-# from ssscoring.appcommon import initDropZonesFromObject
 from ssscoring import __VERSION__
 from ssscoring.appcommon import DZ_DIRECTORY
 from ssscoring.appcommon import displayJumpDataIn
 from ssscoring.appcommon import initDropZonesFromResource
+from ssscoring.appcommon import initFileUploaderState
 from ssscoring.appcommon import interpretJumpResult
 from ssscoring.appcommon import isStreamlitHostedApp
 from ssscoring.appcommon import plotJumpResult
@@ -29,27 +29,32 @@ import streamlit as st
 
 # +++ implementation +++
 
+def _selectDZState(*args, **kwargs):
+    if st.session_state.elevation:
+        st.session_state.uploaderKey += 1
+        st.session_state.trackFiles = None
+
+
 def _setSideBarAndMain():
     dropZones = initDropZonesFromResource(DZ_DIRECTORY)
     st.sidebar.title('🔢 SSScore %s β' % __VERSION__)
     st.session_state.processBadJump = st.sidebar.checkbox('Process bad jumps', value=True, help='Display results from invalid jumps')
-    dropZone = st.sidebar.selectbox('Select drop zone:', dropZones.dropZone, index=None)
+    dropZone = st.sidebar.selectbox('Select drop zone:', dropZones.dropZone, index=None, on_change=_selectDZState)
     if dropZone:
         st.session_state.elevation = dropZones[dropZones.dropZone == dropZone ].iloc[0].elevation
     else:
         st.session_state.elevation = None
         st.session_state.trackFiles = None
     st.sidebar.metric('Elevation', value='%.1f m' % (0.0 if st.session_state.elevation == None else st.session_state.elevation))
-    st.session_state.trackFiles = st.sidebar.file_uploader(
+    trackFiles = st.sidebar.file_uploader(
         'Track files',
         [ 'CSV' ],
         disabled=st.session_state.elevation == None,
-        accept_multiple_files=True
+        accept_multiple_files=True,
+        key = st.session_state.uploaderKey
     )
-# TODO: Refine this to clear the cache AND the file_uploader() selections:
-#     if st.sidebar.button('Clear') and 'trackFiles' in st.session_state.keys():
-#         st.session_state.pop('trackFile')
-#         st.experimental_rerun()
+    if trackFiles:
+        st.session_state.trackFiles = trackFiles
     st.sidebar.html("<a href='https://github.com/pr3d4t0r/SSScoring/issues/new?template=Blank+issue' target='_blank'>Make a bug report or feature request</a>")
 
 
@@ -69,6 +74,7 @@ def _styleShowMinMaxIn(scores: pd.Series) -> pd.DataFrame:
 def main():
     if not isStreamlitHostedApp():
         st.set_page_config(layout = 'wide')
+    initFileUploaderState('trackFiles')
     _setSideBarAndMain()
 
     col0, col1 = st.columns([0.5, 0.5, ])
