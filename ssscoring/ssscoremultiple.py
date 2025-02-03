@@ -55,6 +55,7 @@ def _setSideBarAndMain():
     )
     if trackFiles:
         st.session_state.trackFiles = trackFiles
+    st.sidebar.button('Clear', on_click=_selectDZState)
     st.sidebar.html("<a href='https://github.com/pr3d4t0r/SSScoring/issues/new?template=Blank+issue' target='_blank'>Make a bug report or feature request</a>")
 
 
