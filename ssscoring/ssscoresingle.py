@@ -47,6 +47,7 @@ def _setSideBarAndMain():
     trackFile = st.sidebar.file_uploader('Track file', [ 'CSV' ], disabled=st.session_state.elevation == None, key = st.session_state.uploaderKey)
     if trackFile:
         st.session_state.trackFile = trackFile
+    st.sidebar.button('Clear', on_click=_selectDZState)
     st.sidebar.html("<a href='https://github.com/pr3d4t0r/SSScoring/issues/new?template=Blank+issue' target='_blank'>Make a bug report or feature request</a>")
 
 
