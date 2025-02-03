@@ -67,7 +67,7 @@ elevation,lat,lon,name,country,DZ
 739,47.83980781,10.86618125,Altenstadt,GER,
 140,29.76916902,-97.77274668,San Marcos,USA,Skydive Spaceland San Marcos
 132,38.19478125,-90.38583577,Festus,USA,Fly Free Skydiving
-628,49.46677838,20.04737735,Nowy Targ,POL,
+628,49.46677838,20.04737735,Nowy Targ,POL,Nowy Targ Skydive
 91,60.63985851,6.50203407,Voss,NOR,Skydive Voss
 16,43.82527776,13.03186655,Fano,ITA,Skydive Fano
 199,45.65325073,4.91643548,Lyon,FRA,
@@ -247,3 +247,4 @@ elevation,lat,lon,name,country,DZ
 315,33.4204167,-112.6861808,Buckeye,USA,Skydive Buckeye
 3,-28.594696,153.551102,Tyagarah,AUS,Skydive Byron Bay
 5,12.67328127,", 101.54867260682072",Rayong,THA,Dropzone Thailand
+114,52.573889,20.871667,Warszawa,POL,Skydive Warszawa
