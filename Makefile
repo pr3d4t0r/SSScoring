@@ -1,4 +1,4 @@
-# See: https://github.com/pr3d4t0r/SSSCoring/blob/master/LICENSE.txt
+# See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
 
 
 SHELL=/bin/bash
@@ -85,6 +85,7 @@ nuke: ALWAYS
 # Reference:  https://setuptools.pypa.io/en/latest/userguide/index.html
 package:
 	pip install -r $(REQUIREMENTS)
+	./dzresource
 	python -m build --wheel
 
 
