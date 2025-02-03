@@ -1,7 +1,7 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 [build-system]
-requires = [ 'numpy', 'pandas', 'setuptools>=61.0', ]
+requires = [ 'numpy', 'pandas', 'setuptools>=61.0', 'pytest', 'pytest-cov', ]
 build-backend = 'setuptools.build_meta'
 
 
