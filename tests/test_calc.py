@@ -1,5 +1,6 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
+from ssscoring.calc import _verticalAcceleration
 from ssscoring.calc import aggregateResults
 from ssscoring.calc import calcScoreISC
 from ssscoring.calc import calcScoreMeanVelocity
@@ -119,9 +120,9 @@ def test_getSpeedSkydiveFrom():
 
     _window, _data = getSpeedSkydiveFrom(_data)
 
-    assert '{0:,.2f}'.format(_window.start) == '4,149.65'
-    assert '{0:,.2f}'.format(_window.end) == '1,893.65'
-    assert '{0:,.2f}'.format(_window.validationStart) == '2,899.65'
+    assert '{0:,.2f}'.format(_window.start) == '4,142.01'
+    assert '{0:,.2f}'.format(_window.end) == '1,886.01'
+    assert '{0:,.2f}'.format(_window.validationStart) == '2,892.01'
     assert _data.iloc[-1].altitudeAGL >= _window.end
 
 
@@ -147,11 +148,18 @@ def test_jumpAnalysisTable():
     assert 'time' in table.columns
     assert 'vKMh' in table.columns
     assert 'deltaV' in table.columns
+    assert 'vAccel m/s²' in table.columns
+    assert 'angularVel º/s' in table.columns
     assert 'altitude (ft)' in table.columns
     assert 'speedAngle' in table.columns
     assert 'deltaAngle' in table.columns
-    # TODO:  Decide if we'll keep this one.  Delete after 20250401 if present.
-    # assert 'netVectorKMh' in table.columns
+
+
+def test__verticalAcceleration():
+    _, table = jumpAnalysisTable(_data)
+    vAcc = _verticalAcceleration(table.vKMh, table.time)
+    assert isinstance(vAcc, pd.Series)
+    pd.testing.assert_series_equal(vAcc, vAcc.astype(float))
 
 
 def test_calcScoreMeanVelocity():
@@ -280,10 +288,11 @@ def test_totalResultsFrom():
 
 # For symbolic debugger:
 
-# test_convertFlySight2SSScoring()
-# test_dropNonSkydiveDataFrom()
-# test_getSpeedSkydiveFrom()
+test_convertFlySight2SSScoring()
+test_dropNonSkydiveDataFrom()
+test_getSpeedSkydiveFrom()
 # test_jumpAnalysisTable()
+# test__verticalAcceleration()
 # test_isValidMinimumAltitude(_invalidAltFileName)
 # test_isValidMaximumAltitude()
 # test_calcScoreMeanVelocity()

@@ -61,6 +61,20 @@ def _getJumpDataFrom(trackFileBuffer: str) -> pd.DataFrame:
     return data, tag
 
 
+def _displayAllJumpDataIn(data: pd.DataFrame):
+    columns = [ 'plotTime' ] + [ column for column in data.columns if column != 'plotTime' and column != 'timeUnix' ]
+    st.html('<h3>All rows of jump data</h3>')
+    st.dataframe(data,
+        column_order=columns,
+        # TODO:  Decide if we apply the same format to all columns
+        column_config={
+            'plotTime': st.column_config.NumberColumn(format='%.02f'),
+            'speedAngle': st.column_config.NumberColumn(format='%.02f'),
+            'speedAccuracyISC': st.column_config.NumberColumn(format='%.02f'),
+        },
+        hide_index=True)
+
+
 def main():
     if not isStreamlitHostedApp():
         st.set_page_config(layout = 'wide')
@@ -80,6 +94,7 @@ def main():
         if jumpStatus == JumpStatus.OK:
             with col0:
                 displayJumpDataIn(jumpResult.table)
+                _displayAllJumpDataIn(jumpResult.data)
             with col1:
                 plotJumpResult(tag, jumpResult)
                 st.write('Brightest point corresponds to the max speed')

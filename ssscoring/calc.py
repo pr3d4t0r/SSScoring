@@ -17,12 +17,14 @@ from ssscoring.constants import DEG_IN_RADIANS
 from ssscoring.constants import EXIT_SPEED
 from ssscoring.constants import FLYSIGHT_FILE_ENCODING
 from ssscoring.constants import FT_IN_M
+from ssscoring.constants import KMH_AS_MS
 from ssscoring.constants import LAST_TIME_TRANCHE
 from ssscoring.constants import MAX_ALTITUDE_METERS
 from ssscoring.constants import MAX_SPEED_ACCURACY
 from ssscoring.constants import MPS_2_KMH
 from ssscoring.constants import PERFORMANCE_WINDOW_LENGTH
 from ssscoring.constants import SCORING_INTERVAL
+from ssscoring.constants import TABLE_INTERVAL
 from ssscoring.constants import VALIDATION_WINDOW_LENGTH
 from ssscoring.datatypes import JumpResults
 from ssscoring.datatypes import JumpStatus
@@ -280,8 +282,7 @@ def getSpeedSkydiveFrom(data: pd.DataFrame) -> tuple:
         data = data.drop('group', axis = 1).drop('positive', axis = 1)
 
     if len(data) > 0:
-        # Speed ~= 9.81 m/s; subtract 1 second for actual exit.
-        exitTime = data[data.vMetersPerSecond > EXIT_SPEED].head(1).timeUnix.iat[0]-2.0
+        exitTime = data[data.vMetersPerSecond > EXIT_SPEED].head(1).timeUnix.iat[0]
         data = data[data.timeUnix >= exitTime]
         data = data[data.altitudeAGL >= BREAKOFF_ALTITUDE]
 
@@ -296,6 +297,11 @@ def getSpeedSkydiveFrom(data: pd.DataFrame) -> tuple:
         return PerformanceWindow(windowStart, windowEnd, validationWindowStart), data
     else:
         return None, data
+
+
+def _verticalAcceleration(vKMh: pd.Series, time: pd.Series, interval=TABLE_INTERVAL) -> pd.Series:
+    vAcc = ((vKMh/KMH_AS_MS).diff()/time.diff()).fillna(vKMh/KMH_AS_MS/interval)
+    return vAcc
 
 
 def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
@@ -346,13 +352,13 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
                 'time': table.time,
                 'vKMh': table.vKMh,
                 'deltaV': table.vKMh.diff().fillna(table.vKMh),
-                'hKMh': table.hKMh,
+                'vAccel m/s²': _verticalAcceleration(table.vKMh, table.time),
                 'speedAngle': table.speedAngle,
+                'angularVel º/s': (table.speedAngle.diff()/table.time.diff()).fillna(table.speedAngle/TABLE_INTERVAL),
                 'deltaAngle': table.speedAngle.diff().fillna(table.speedAngle),
+                'hKMh': table.hKMh,
                 'distanceFromExit (m)': table.distanceFromExit,
                 'altitude (ft)': table.altitudeAGLFt,
-                # TODO:  Decide if we'll keep this one.  Delete after 20250401 if present.
-                # 'netVectorKMh': (table.vKMh**2+table.hKMh**2)**0.5,
             })
 
     return (data.vKMh.max(), table)
