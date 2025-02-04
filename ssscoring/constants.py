@@ -21,7 +21,7 @@ DEG_IN_RADIANS = math.pi/180.0
 π/180º
 """
 
-EXIT_SPEED = 2*9.81
+EXIT_SPEED = 9.81
 """
 Guesstimate of the exit speed; 2*g
 """
@@ -54,6 +54,12 @@ IGNORE_LIST = [ '.ipynb_checkpoints', ]
 """
 Internal use - list of files to be ignored during bulk file processing in the
 data lake (e.g. `./data`).
+"""
+
+
+KMH_AS_MS = 3.6
+"""
+km/h as m/s
 """
 
 
@@ -123,6 +129,12 @@ value is set by governing bodies like ISC and USPA.
 SKYTRAX_1_HEADER = set([ 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 'hAcc', 'vAcc', 'sAcc', 'heading', 'cAcc', 'gpsFix', 'numSV', ])
 """
 SkyTraX GPS + barometric SMD v1 CSV file headers.
+"""
+
+
+TABLE_INTERVAL = 5.0
+"""
+Speed run table interval.
 """
 
 
