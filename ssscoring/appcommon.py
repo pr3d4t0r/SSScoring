@@ -13,7 +13,6 @@ from ssscoring.calc import isValidMinimumAltitude
 from ssscoring.constants import FLYSIGHT_FILE_ENCODING
 from ssscoring.datatypes import JumpResults
 from ssscoring.datatypes import JumpStatus
-from ssscoring.dzdir import DROP_ZONES_LIST
 from ssscoring.errors import SSScoringError
 from ssscoring.notebook import SPEED_COLORS
 from ssscoring.notebook import graphAltitude
@@ -110,24 +109,6 @@ def initDropZonesFromResource(resourceName: str) -> pd.DataFrame:
         raise SSScoringError('dropZone object is a dataframe but not the drop zones directory')
 
     return dropZones
-
-
-def initDropZonesFromObject() -> pd.DataFrame:
-    """
-    Get the DZs directory from a Python object.  This was implemented as a
-    workaround to a bug (?) on how Streamlit treats resources.
-
-    Returns
-    -------
-    The global drop zones directory as a dataframe.
-
-    See
-    ---
-    `ssscoring.apps.common.initDropZonesFromResource` for alternatives.  The
-    hard-coded object is generated from the `DZ-locations-normalizer.ipynb`
-    notebook.
-    """
-    return pd.DataFrame(DROP_ZONES_LIST)
 
 
 def displayJumpDataIn(resultsTable: pd.DataFrame):

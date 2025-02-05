@@ -4,7 +4,6 @@
 from ssscoring.appcommon import DZ_DIRECTORY
 from ssscoring.appcommon import STREAMLIT_SIG_KEY
 from ssscoring.appcommon import STREAMLIT_SIG_VALUE
-from ssscoring.appcommon import initDropZonesFromObject
 from ssscoring.appcommon import initDropZonesFromResource
 from ssscoring.appcommon import initFileUploaderState
 from ssscoring.appcommon import isStreamlitHostedApp
@@ -38,18 +37,6 @@ def test_initDropZonesFromResource():
     assert 'dropZone' in d.columns
     with pytest.raises(SSScoringError):
         initDropZonesFromResource('bogus.CSV')
-
-
-def test_initDropZonesFromObject():
-    d = initDropZonesFromObject()
-    assert isinstance(d, pd.DataFrame)
-    assert 'dropZone' in d.columns
-
-
-
-# test_initDropZonesFromResource()
-
-# TODO:  Missing unit tests for a bunch of functions here.
 
 
 def test_initFileUploaderState():
