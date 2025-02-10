@@ -67,6 +67,7 @@ libupdate:
 
 
 local:
+	./dzresource
 	pip install -e .
 
 
