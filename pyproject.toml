@@ -1,7 +1,14 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 [build-system]
-requires = [ 'numpy', 'pandas', 'setuptools>=61.0', 'pytest', 'pytest-cov', ]
+requires = [
+    'devpi',
+    'numpy',
+    'pandas',
+    'pytest',
+    'pytest-cov',
+    'setuptools>=61.0',
+]
 build-backend = 'setuptools.build_meta'
 
 
@@ -28,7 +35,7 @@ license = { text = 'BSD-3-Clause' }
 name = 'ssscoring'  # $(PACKAGE) and package.txt
 readme = 'README.md'
 requires-python = '>=3.9.9'
-version = '2.0.26'
+version = '2.0.27'
 
 
 [project.scripts]
@@ -36,9 +43,12 @@ ssscore = 'ssscoring.cli:_ssscoreCommand'
 
 
 [tool.pytest.ini_options]
-addopts = '-sv'
+addopts = '-sv -p no:warnings -rm --cov="ssscoring"'
 testpaths = [
-    'tests'
+    'tests',
+]
+pythonpath = [
+    '.',
 ]
 
 

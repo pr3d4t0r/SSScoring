@@ -7,7 +7,7 @@ import pytest
 
 # +++ tests +++
 
-@pytest.mark.skip('Unable to validate in standalone modules, requires Streamlit')
+@pytest.mark.skip('This test requires an interactive testing framework')
 def test_app():
     pass # bogus
 

@@ -64,11 +64,11 @@
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="c1"># See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">from</span> <span class="nn">geopy</span> <span class="kn">import</span> <span class="n">distance</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">from</span> <span class="nn">ssscoring.datatypes</span> <span class="kn">import</span> <span class="n">JumpResults</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">geopy</span><span class="w"> </span><span class="kn">import</span> <span class="n">distance</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">ssscoring.datatypes</span><span class="w"> </span><span class="kn">import</span> <span class="n">JumpResults</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a>
-</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">import</span> <span class="nn">pydeck</span> <span class="k">as</span> <span class="nn">pdk</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">pydeck</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pdk</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a>
 </span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a>
 </span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="c1"># *** constants ***</span>
@@ -82,7 +82,7 @@
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a>
 </span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="c1"># *** implementation ***</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>
-</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="k">def</span> <span class="nf">viewPointBox</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="k">def</span><span class="w"> </span><span class="nf">viewPointBox</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="sd">    Calculate the NW and SE corners of a &quot;box&quot; delimiting the viewport area</span>
 </span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="sd">    `DISTANCE_FROM_MIDDLE` meters away from the middle of the speed skydive.</span>
@@ -114,13 +114,13 @@
 </span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>    <span class="k">return</span> <span class="n">result</span>
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>
 </span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="k">def</span> <span class="nf">_resolveMaxSpeedTimeFrom</span><span class="p">(</span><span class="n">jumpResult</span><span class="p">:</span> <span class="n">JumpResults</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="k">def</span><span class="w"> </span><span class="nf">_resolveMaxSpeedTimeFrom</span><span class="p">(</span><span class="n">jumpResult</span><span class="p">:</span> <span class="n">JumpResults</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 </span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>    <span class="n">plotTime</span> <span class="o">=</span> <span class="n">jumpResult</span><span class="o">.</span><span class="n">scores</span><span class="p">[</span><span class="n">jumpResult</span><span class="o">.</span><span class="n">score</span><span class="p">]</span>
 </span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>
 </span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>    <span class="k">return</span> <span class="n">plotTime</span>
 </span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>
 </span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="k">def</span> <span class="nf">speedJumpTrajectory</span><span class="p">(</span><span class="n">jumpResult</span><span class="p">:</span> <span class="n">JumpResults</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pdk</span><span class="o">.</span><span class="n">Deck</span><span class="p">:</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="k">def</span><span class="w"> </span><span class="nf">speedJumpTrajectory</span><span class="p">(</span><span class="n">jumpResult</span><span class="p">:</span> <span class="n">JumpResults</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pdk</span><span class="o">.</span><span class="n">Deck</span><span class="p">:</span>
 </span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">    Build the layers for a PyDeck map showing a jumper&#39;s trajectory.</span>
 </span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>
@@ -204,7 +204,7 @@ for the initial view of a new rendered map.</p>
 
     </div>
     <a class="headerlink" href="#viewPointBox"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="viewPointBox-22"><a href="#viewPointBox-22"><span class="linenos">22</span></a><span class="k">def</span> <span class="nf">viewPointBox</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="viewPointBox-22"><a href="#viewPointBox-22"><span class="linenos">22</span></a><span class="k">def</span><span class="w"> </span><span class="nf">viewPointBox</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 </span><span id="viewPointBox-23"><a href="#viewPointBox-23"><span class="linenos">23</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="viewPointBox-24"><a href="#viewPointBox-24"><span class="linenos">24</span></a><span class="sd">    Calculate the NW and SE corners of a &quot;box&quot; delimiting the viewport area</span>
 </span><span id="viewPointBox-25"><a href="#viewPointBox-25"><span class="linenos">25</span></a><span class="sd">    `DISTANCE_FROM_MIDDLE` meters away from the middle of the speed skydive.</span>
@@ -275,7 +275,7 @@ with these columns:</p>
 
     </div>
     <a class="headerlink" href="#speedJumpTrajectory"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="speedJumpTrajectory-60"><a href="#speedJumpTrajectory-60"><span class="linenos"> 60</span></a><span class="k">def</span> <span class="nf">speedJumpTrajectory</span><span class="p">(</span><span class="n">jumpResult</span><span class="p">:</span> <span class="n">JumpResults</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pdk</span><span class="o">.</span><span class="n">Deck</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="speedJumpTrajectory-60"><a href="#speedJumpTrajectory-60"><span class="linenos"> 60</span></a><span class="k">def</span><span class="w"> </span><span class="nf">speedJumpTrajectory</span><span class="p">(</span><span class="n">jumpResult</span><span class="p">:</span> <span class="n">JumpResults</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pdk</span><span class="o">.</span><span class="n">Deck</span><span class="p">:</span>
 </span><span id="speedJumpTrajectory-61"><a href="#speedJumpTrajectory-61"><span class="linenos"> 61</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="speedJumpTrajectory-62"><a href="#speedJumpTrajectory-62"><span class="linenos"> 62</span></a><span class="sd">    Build the layers for a PyDeck map showing a jumper&#39;s trajectory.</span>
 </span><span id="speedJumpTrajectory-63"><a href="#speedJumpTrajectory-63"><span class="linenos"> 63</span></a>
