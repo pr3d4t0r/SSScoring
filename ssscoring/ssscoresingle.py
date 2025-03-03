@@ -97,6 +97,7 @@ def main():
                 displayJumpDataIn(jumpResult.table)
                 _displayAllJumpDataIn(jumpResult.data)
             with col1:
+                st.write('Jump result = %s' % jumpStatus)
                 plotJumpResult(tag, jumpResult)
                 st.write('Brightest point corresponds to the max speed')
                 st.pydeck_chart(speedJumpTrajectory(jumpResult))

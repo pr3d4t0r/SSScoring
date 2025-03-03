@@ -177,9 +177,12 @@ def interpretJumpResult(tag: str,
     maxSpeed = jumpResult.maxSpeed
     window = jumpResult.window
     jumpStatus = jumpResult.status
+    jumpStatusInfo = ''
     if jumpResult.status == JumpStatus.WARM_UP_FILE:
-        jumpStatusInfo = ''
         badJumpLegend = '<span style="color: red">Warm up file - nothing to do<br>'
+        scoringInfo = ''
+    elif jumpResult.status == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT:
+        badJumpLegend = '<span style="color: red">RE-JUMP: speed accuracy exceeds ISC limit<br>'
         scoringInfo = ''
     else:
         scoringInfo = 'Max speed = {0:,.0f}; '.format(maxSpeed)+('exit at %d m (%d ft)<br>End scoring window at %d m (%d ft)<br>'%(window.start, 3.2808*window.start, window.end, 3.2808*window.end))
@@ -194,10 +197,6 @@ def interpretJumpResult(tag: str,
             jumpStatusInfo = '<span style="color: %s">%s jump - %s - %.02f km/h</span><br>' % ('red', tag, 'INVALID', jumpResult.score)
             badJumpLegend = '<span style="color: red"><span style="font-weight: bold">RE-JUMP:</span> exit altitude AGL exceeds the maximum altitude<br>'
             jumpStatus = JumpStatus.ALTITUDE_EXCEEDS_MAXIMUM
-    elif jumpStatus == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT:
-        badJumpLegend = '<span style="color: red"><span style="font-weight: bold">RE-JUMP:</span> exit altitude AGL exceeds the maximum altitude<br>'
-    jumpStatus = JumpStatus.OK if jumpStatus != JumpStatus.OK and processBadJump and jumpStatus != JumpStatus.WARM_UP_FILE else jumpStatus
-
     return jumpStatusInfo, scoringInfo, badJumpLegend, jumpStatus
 
 
