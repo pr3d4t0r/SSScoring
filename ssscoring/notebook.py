@@ -33,7 +33,8 @@ corresponding to each jump in a competition.
 
 # *** global initialization ***
 
-bp.output_notebook(hide_banner = True)
+# bp.output_notebook(hide_banner = True)
+bp.output_file('/dev/null', mode='inline')
 # TODO: make this configurable:
 bi.curdoc().theme = 'dark_minimal'
 
@@ -212,11 +213,13 @@ def graphJumpResult(plot,
     A title for the plot.
 
         showIt: bool
-    A boolean flag for whether the call should render the plot upon the function
-    call.  This flag is used for combining two or more jumps on the same plot.
-    In that case, a call to this function is made with a different `jumpResult`
-    and the `showIt` flag set to `False`.  When the user is ready to view the
-    combined plot, issue a call to `bp.show(plot)`.  Example:
+    A boolean flag for whether the call should rencer the max speed, time,
+    horizontal speed, etc. in the current plot.  This is used for discriminating
+    between single jump plots and plotting only the speed for the aggreagate
+    plot display for a competition or training session.
+
+    To display the actual plot, use `bp.show(plot)` if running from Lucyfer/Jupyter
+    or use `st.bokeh_chart(plot)` if in the Streamlit environment.
 
     ```python
     for result in jumpResults:
@@ -224,7 +227,6 @@ def graphJumpResult(plot,
 
     bp.show(plot)
     ```
-
     Another alternative use is in Streamlit.io applications:
 
     ```python
@@ -248,7 +250,6 @@ def graphJumpResult(plot,
         _graphSegment(plot, scores[score]+1.5, 0.0, scores[score]+1.5, score, 1, 'darkseagreen')
         _graphSegment(plot, scores[score]-1.5, 0.0, scores[score]-1.5, score, 1, 'darkseagreen')
         plot.scatter(x = [ scores[score], ], y = [ score, ], marker = 'square_cross', size = [ 20, ], line_color = 'lightblue', fill_color = None, line_width = 3)
-        bp.show(plot)
 
 
 def graphAltitude(plot,
