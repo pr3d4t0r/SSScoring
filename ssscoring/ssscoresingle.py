@@ -76,6 +76,13 @@ def _displayAllJumpDataIn(data: pd.DataFrame):
         hide_index=True)
 
 
+def _displayScoresIn(rawData: dict):
+    st.html('<h3>Scores</h3>')
+    data = pd.DataFrame.from_dict({ 'time': rawData.values(), 'score': rawData.keys(), })
+    data.time = data.time.apply(lambda x: '%.2f' % x)
+    st.dataframe(data, hide_index=True)
+
+
 def main():
     if not isStreamlitHostedApp():
         st.set_page_config(layout = 'wide')
@@ -96,7 +103,9 @@ def main():
             with col0:
                 displayJumpDataIn(jumpResult.table)
                 _displayAllJumpDataIn(jumpResult.data)
+                _displayScoresIn(jumpResult.scores)
             with col1:
+                st.write('Jump result = %s' % jumpStatus)
                 plotJumpResult(tag, jumpResult)
                 st.write('Brightest point corresponds to the max speed')
                 st.pydeck_chart(speedJumpTrajectory(jumpResult))
@@ -104,3 +113,4 @@ def main():
 
 if '__main__' == __name__:
     main()
+
