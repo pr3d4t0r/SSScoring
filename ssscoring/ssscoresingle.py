@@ -17,8 +17,10 @@ from ssscoring.appcommon import interpretJumpResult
 from ssscoring.appcommon import isStreamlitHostedApp
 from ssscoring.appcommon import plotJumpResult
 from ssscoring.calc import convertFlySight2SSScoring
+from ssscoring.calc import dropNonSkydiveDataFrom
 from ssscoring.calc import getFlySightDataFromCSVBuffer
 from ssscoring.calc import processJump
+from ssscoring.constants import MAX_SPEED_ACCURACY
 from ssscoring.datatypes import JumpStatus
 from ssscoring.mapview import speedJumpTrajectory
 
@@ -84,6 +86,34 @@ def _displayScoresIn(rawData: dict):
     st.dataframe(data, hide_index=True)
 
 
+def _displayBadRowsISCAccuracyExceeded(data: pd.DataFrame):
+    badRows = data[data.speedAccuracyISC >= MAX_SPEED_ACCURACY]
+    badRows = dropNonSkydiveDataFrom(badRows)
+    times = pd.to_datetime(badRows.timeUnix, unit='s').dt.strftime('%Y-%m-%d %H:%M:%S.%f').str[:-4]
+    badRows.insert(0, 'time', times)
+    badRows.drop(columns = [
+        'timeUnix',
+        'altitudeMSL',
+        'altitudeMSLFt',
+        'speedAccuracy',
+        'hMetersPerSecond',
+        'hKMh',
+        'speedAngle',
+        'latitude',
+        'longitude',
+        'verticalAccuracy', ], inplace=True)
+    st.html('<h3>%d track rows where the ISC speed accuracy threshold was exceeded during the speed run:</h3>' % len(badRows))
+    st.dataframe(badRows, hide_index=True)
+
+
+    workData = data.copy()
+    workData = dropNonSkydiveDataFrom(workData)
+    times = pd.to_datetime(workData.timeUnix, unit='s').dt.strftime('%Y-%m-%d %H:%M:%S.%f').str[:-4]
+    workData.insert(0, 'time', times)
+    st.html('<h3>Full speed run data (%d rows)</h3>' % len(workData))
+    st.dataframe(workData, hide_index=True)
+
+
 def main():
     if not isStreamlitHostedApp():
         st.set_page_config(layout = 'wide')
@@ -108,6 +138,9 @@ def main():
             with col1:
                 plotJumpResult(tag, jumpResult)
                 displayTrackOnMap(speedJumpTrajectory(jumpResult))
+        elif jumpStatus == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT:
+            with col0:
+                _displayBadRowsISCAccuracyExceeded(data)
 
 
 if '__main__' == __name__:

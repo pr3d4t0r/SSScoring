@@ -183,7 +183,7 @@ def interpretJumpResult(tag: str,
         badJumpLegend = '<span style="color: red">Warm up file - nothing to do<br>'
         scoringInfo = ''
     elif jumpResult.status == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT:
-        badJumpLegend = '<span style="color: red">RE-JUMP: speed accuracy exceeds ISC limit<br>'
+        badJumpLegend = '<span style="color: red">%s - RE-JUMP: speed accuracy exceeds ISC limit<br>' % tag
         scoringInfo = ''
     else:
         scoringInfo = 'Max speed = {0:,.0f}; '.format(maxSpeed)+('exit at %d m (%d ft)<br>End scoring window at %d m (%d ft)<br>'%(window.start, 3.2808*window.start, window.end, 3.2808*window.end))
