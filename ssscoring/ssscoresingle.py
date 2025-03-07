@@ -10,6 +10,7 @@ https://discuss.streamlit.io/t/pythonpath-issue-modulenotfounderror-in-same-pack
 from ssscoring import __VERSION__
 from ssscoring.appcommon import DZ_DIRECTORY
 from ssscoring.appcommon import displayJumpDataIn
+from ssscoring.appcommon import displayTrackOnMap
 from ssscoring.appcommon import initDropZonesFromResource
 from ssscoring.appcommon import initFileUploaderState
 from ssscoring.appcommon import interpretJumpResult
@@ -105,10 +106,8 @@ def main():
                 _displayAllJumpDataIn(jumpResult.data)
                 _displayScoresIn(jumpResult.scores)
             with col1:
-                st.write('Jump result = %s' % jumpStatus)
                 plotJumpResult(tag, jumpResult)
-                st.write('Brightest point corresponds to the max speed')
-                st.pydeck_chart(speedJumpTrajectory(jumpResult))
+                displayTrackOnMap(speedJumpTrajectory(jumpResult))
 
 
 if '__main__' == __name__:

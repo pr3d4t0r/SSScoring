@@ -25,6 +25,7 @@ import os
 
 import bokeh.models as bm
 import pandas as pd
+import pydeck as pdk
 import streamlit as st
 
 
@@ -252,4 +253,9 @@ def initFileUploaderState(filesObject:str, uploaderKey:str ='uploaderKey'):
         st.session_state[filesObject] = None
     if uploaderKey not in st.session_state:
         st.session_state[uploaderKey] = 0
+
+
+def displayTrackOnMap(deck: pdk.Deck):
+    st.write('Brightest point corresponds to the max speed score')
+    st.pydeck_chart(deck)
 

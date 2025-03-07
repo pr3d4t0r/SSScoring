@@ -110,9 +110,6 @@ def isValidJumpISC(data: pd.DataFrame,
     -------
     `True` if the jump is valid according to ISC/FAI/USPA rules.
     """
-    # TODO:  Remove these if present after 20250101:
-    # accuracy = data[data.altitudeAGL < window.validationStart].verticalAccuracy.max()
-    # return accuracy < MAX_SPEED_ACCURACY
     if len(data) > 0:
         accuracy = data[data.altitudeAGL < window.validationStart].speedAccuracyISC.max()
         return accuracy < MAX_SPEED_ACCURACY
