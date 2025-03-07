@@ -38,7 +38,9 @@ def _selectDZState(*args, **kwargs):
 
 def _setSideBarAndMain():
     dropZones = initDropZonesFromResource(DZ_DIRECTORY)
-    st.sidebar.title('1️⃣  SSScore %s β' % __VERSION__)
+    # TODO: Clear this for the main version!
+    # st.sidebar.title('1️⃣  SSScore %s β' % __VERSION__)
+    st.sidebar.title('1️⃣  SSScore BERT')
     st.session_state.processBadJump = st.sidebar.checkbox('Process bad jump', value=True, help='Display results from invalid jumps')
     dropZone = st.sidebar.selectbox('Select drop zone:', dropZones.dropZone, index=None, on_change=_selectDZState)
     if dropZone:

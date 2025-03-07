@@ -21,9 +21,9 @@ DEG_IN_RADIANS = math.pi/180.0
 π/180º
 """
 
-EXIT_SPEED = 9.81
+EXIT_SPEED = 10.0
 """
-Guesstimate of the exit speed; 2*g
+Guesstimate of the exit speed; ~g
 """
 
 FLYSIGHT_1_HEADER = set([ 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 'hAcc', 'vAcc', 'sAcc', 'heading', 'cAcc', 'gpsFix', 'numSV', ])
