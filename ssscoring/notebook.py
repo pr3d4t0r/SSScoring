@@ -5,6 +5,8 @@
 """
 
 
+from bokeh.models import ColumnDataSource
+from bokeh.models import HoverTool
 from bokeh.models import LinearAxis
 from bokeh.models import Range1d
 
@@ -181,9 +183,11 @@ def initializeExtraYRanges(plot,
     plot.extra_y_ranges = {
         'altitudeFt': Range1d(start = startY, end = endY),
         'angle': Range1d(start = 0.0, end = 90.0),
+        'speedAccuracy': Range1d(start = 0.0, end = 20.0),
     }
     plot.add_layout(_initLinearAxis('Alt (ft)', 'altitudeFt', colorName=DEFAULT_AXIS_COLOR_BOKEH), 'left')
     plot.add_layout(_initLinearAxis('angle', 'angle', colorName=DEFAULT_AXIS_COLOR_BOKEH), 'left')
+    plot.add_layout(_initLinearAxis('Speed Accuracy (m/s)', 'speedAccuracy', colorName=DEFAULT_AXIS_COLOR_BOKEH), 'left')
 
     return plot
 
@@ -192,7 +196,8 @@ def graphJumpResult(plot,
                     jumpResult,
                     lineColor = 'green',
                     legend = 'speed',
-                    showIt = True):
+                    showIt = True,
+                    showAccuracy = True):
     """
     Graph the jump results using the initialized plot.
 
@@ -209,29 +214,37 @@ def graphJumpResult(plot,
     This module defines 8 colors for rendering a competition's results.  See:
     `ssscoring.notebook.SPEED_COLORS` for the list.
 
-        leged: str
+        legend: str
     A title for the plot.
 
         showIt: bool
-    A boolean flag for whether the call should rencer the max speed, time,
+    A boolean flag for whether the call should render the max speed, time,
     horizontal speed, etc. in the current plot.  This is used for discriminating
-    between single jump plots and plotting only the speed for the aggreagate
+    between single jump plots and plotting only the speed for the aggregate
     plot display for a competition or training session.
+
+        showAccuracy: bool
+    When True, displays the speed accuracy ISC values on a separate y-axis with
+    hover tooltips showing exact values. Defaults to True.
 
     To display the actual plot, use `bp.show(plot)` if running from Lucyfer/Jupyter
     or use `st.bokeh_chart(plot)` if in the Streamlit environment.
 
     ```python
-    for result in jumpResults:
-        graphJumpResult(plot, result, showIt = False)
+    # Basic usage showing speed accuracy overlay
+    graphJumpResult(plot, result)
+    bp.show(plot)
 
+    # Multiple jumps without speed accuracy overlay
+    for result in jumpResults:
+        graphJumpResult(plot, result, showIt=False, showAccuracy=False)
     bp.show(plot)
     ```
     Another alternative use is in Streamlit.io applications:
 
     ```python
-    graphJumpResult(plot, result, showIt = False)
-
+    # Streamlit app with speed accuracy overlay
+    graphJumpResult(plot, result, showIt=False)
     st.bokeh_chart(plot, use_container_width=True)
     ```
 
@@ -242,7 +255,26 @@ def graphJumpResult(plot,
     data = jumpResult.data
     scores = jumpResult.scores
     score = jumpResult.score
+    # Main speed line
     plot.line(data.plotTime, data.vKMh, legend_label = legend, line_width = 2, line_color = lineColor)
+    
+    # Speed accuracy line with hover tool
+    if showAccuracy:
+        hover = bm.HoverTool(
+            tooltips=[('Time', '@x{0.0}s'), ('Accuracy', '@y{0.00} m/s')],
+            mode='vline'
+        )
+        plot.add_tools(hover)
+        accuracy_source = bm.ColumnDataSource({
+            'x': data.plotTime,
+            'y': data.speedAccuracyISC
+        })
+        plot.line('x', 'y', 
+                 y_range_name='speedAccuracy',
+                 legend_label='Speed Accuracy',
+                 line_width=1.5,
+                 line_color='yellow',
+                 source=accuracy_source)
 
     if showIt:
         plot.line(data.plotTime, data.hKMh, legend_label = 'H-speed', line_width = 2, line_color = 'red')
