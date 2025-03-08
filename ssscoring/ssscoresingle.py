@@ -23,6 +23,9 @@ from ssscoring.calc import processJump
 from ssscoring.constants import MAX_SPEED_ACCURACY
 from ssscoring.datatypes import JumpStatus
 from ssscoring.mapview import speedJumpTrajectory
+from ssscoring.notebook import graphJumpResult
+from ssscoring.notebook import initializeExtraYRanges
+from ssscoring.notebook import initializePlot
 
 import pandas as pd
 import streamlit as st
@@ -88,7 +91,7 @@ def _displayScoresIn(rawData: dict):
     st.dataframe(data, hide_index=True)
 
 
-def _displayBadRowsISCAccuracyExceeded(data: pd.DataFrame):
+def _displayBadRowsISCAccuracyExceeded(data: pd.DataFrame, jumpResult):
     badRows = data[data.speedAccuracyISC >= MAX_SPEED_ACCURACY]
     badRows = dropNonSkydiveDataFrom(badRows)
     times = pd.to_datetime(badRows.timeUnix, unit='s').dt.strftime('%Y-%m-%d %H:%M:%S.%f').str[:-4]
@@ -114,6 +117,13 @@ def _displayBadRowsISCAccuracyExceeded(data: pd.DataFrame):
     workData.insert(0, 'time', times)
     st.html('<h3>Full speed run data (%d rows)</h3>' % len(workData))
     st.dataframe(workData, hide_index=True)
+
+    # Initialize and display plot with dynamic speed accuracy range
+    maxSpeedAccuracy = data.speedAccuracyISC.max()
+    plot = initializePlot('Jump Result with Speed Accuracy Violations')
+    plot = initializeExtraYRanges(plot, maxSpeedAccuracy=maxSpeedAccuracy)
+    graphJumpResult(plot, jumpResult)
+    st.bokeh_chart(plot, use_container_width=True)
 
 
 def main():
@@ -142,7 +152,7 @@ def main():
                 displayTrackOnMap(speedJumpTrajectory(jumpResult))
         elif jumpStatus == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT:
             with col0:
-                _displayBadRowsISCAccuracyExceeded(data)
+                _displayBadRowsISCAccuracyExceeded(data, jumpResult)
 
 
 if '__main__' == __name__:

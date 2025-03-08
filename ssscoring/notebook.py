@@ -5,15 +5,15 @@
 """
 
 
-# from bokeh.models import ColumnDataSource
-# from bokeh.models import HoverTool
-# from bokeh.models import LinearAxis
-# from bokeh.models import Range1d
+from bokeh.models import ColumnDataSource
+from bokeh.models import HoverTool
+from bokeh.models import LinearAxis
+from bokeh.models import Range1d
 
 from ssscoring.constants import MAX_ALTITUDE_FT
+from ssscoring.constants import MAX_SPEED_ACCURACY
 
 import bokeh.io as bi
-import bokeh.models as bm
 import bokeh.plotting as bp
 
 
@@ -127,7 +127,7 @@ def _graphSegment(plot,
 
 def _initLinearAxis(label: str,
                     rangeName: str,
-                    colorName: str=DEFAULT_AXIS_COLOR_BOKEH) -> bm.LinearAxis:
+                    colorName: str=DEFAULT_AXIS_COLOR_BOKEH) -> LinearAxis:
     """
     Make a linear initialized to use standard colors with Bokeh plots.
 
@@ -147,7 +147,7 @@ def _initLinearAxis(label: str,
     ------
     An instance of `bokeh.models.LinearAxis`.
     """
-    linearAxis = bm.LinearAxis(
+    linearAxis = LinearAxis(
             axis_label = label,
             axis_label_text_color = colorName,
             axis_line_color = colorName,
@@ -161,7 +161,8 @@ def _initLinearAxis(label: str,
 
 def initializeExtraYRanges(plot,
                            startY: float = 0.0,
-                           endY: float = MAX_ALTITUDE_FT):
+                           endY: float = MAX_ALTITUDE_FT,
+                           maxSpeedAccuracy: float | None = None):
     """
     Initialize an extra Y range for reporting other data trend (e.g. altitude)
     in the plot.
@@ -177,18 +178,26 @@ def initializeExtraYRanges(plot,
         endY: float
     The Y range ending value
 
+        maxSpeedAccuracy: float
+    Maximum speed accuracy value to determine the range of the speed accuracy axis.
+    If None or < MAX_SPEED_ACCURACY, range is 0-10. Otherwise, range is 0-maxSpeedAccuracy*1.1
+
     Returns
     -------
     An instance of `bp.figure` updated to report an additional Y axis.
     """
+    speedAccuracyEnd = 10.0
+    if maxSpeedAccuracy is not None and maxSpeedAccuracy >= MAX_SPEED_ACCURACY:
+        speedAccuracyEnd = maxSpeedAccuracy * 1.1
+
     plot.extra_y_ranges = {
-        'altitudeFt': bm.Range1d(start = startY, end = endY),
-        'angle': bm.Range1d(start = 0.0, end = 90.0),
-        'speedAccuracy': bm.Range1d(start = 0.0, end = 20.0),
+        'altitudeFt': Range1d(start = startY, end = endY),
+        'angle': Range1d(start = 0.0, end = 90.0),
+        'speedAccuracy': Range1d(start = 0.0, end = speedAccuracyEnd),
     }
     plot.add_layout(_initLinearAxis('Alt (ft)', 'altitudeFt', colorName=DEFAULT_AXIS_COLOR_BOKEH), 'left')
     plot.add_layout(_initLinearAxis('angle', 'angle', colorName=DEFAULT_AXIS_COLOR_BOKEH), 'left')
-    plot.add_layout(_initLinearAxis('Speed accuracy ISC', 'speedAccuracy', colorName=DEFAULT_AXIS_COLOR_BOKEH), 'left')
+    plot.add_layout(_initLinearAxis('Speed Accuracy (m/s)', 'speedAccuracy', colorName=DEFAULT_AXIS_COLOR_BOKEH), 'left')
 
     return plot
 
@@ -224,6 +233,10 @@ def graphJumpResult(plot,
     between single jump plots and plotting only the speed for the aggregate
     plot display for a competition or training session.
 
+        showAccuracy: bool
+    When True, displays the speed accuracy ISC values on a separate y-axis with
+    hover tooltips showing exact values. Defaults to True.
+
     To display the actual plot, use `bp.show(plot)` if running from Lucyfer/Jupyter
     or use `st.bokeh_chart(plot)` if in the Streamlit environment.
 
@@ -254,11 +267,37 @@ def graphJumpResult(plot,
     score = jumpResult.score
     # Main speed line
     plot.line(data.plotTime, data.vKMh, legend_label = legend, line_width = 2, line_color = lineColor)
+    
+    # Speed accuracy line with hover tool and bad points marked in red
+    if showAccuracy:
+        hover = bm.HoverTool(
+            tooltips=[('Time', '@x{0.0}s'), ('Accuracy', '@y{0.00} m/s')],
+            mode='vline'
+        )
+        plot.add_tools(hover)
+        accuracy_source = bm.ColumnDataSource({
+            'x': data.plotTime,
+            'y': data.speedAccuracyISC
+        })
+        plot.line('x', 'y', 
+                 y_range_name='speedAccuracy',
+                 legend_label='Speed Accuracy',
+                 line_width=1.5,
+                 line_color='yellow',
+                 source=accuracy_source)
+        
+        # Mark points exceeding MAX_SPEED_ACCURACY in red
+        badPoints = data[data.speedAccuracyISC >= MAX_SPEED_ACCURACY]
+        if len(badPoints) > 0:
+            plot.scatter(x=badPoints.plotTime,
+                        y=badPoints.speedAccuracyISC,
+                        y_range_name='speedAccuracy',
+                        color='red',
+                        size=8,
+                        legend_label='Speed Accuracy Exceeded')
 
     if showIt:
-        accuracyDataSource = bm.ColumnDataSource({ 'x': data.plotTime, 'y': data.speedAccuracyISC, })
         plot.line(data.plotTime, data.hKMh, legend_label = 'H-speed', line_width = 2, line_color = 'red')
-        plot.line('x', 'y', y_range_name='speedAccuracy', legend_label='Speed accuracy ISC', line_width=1.5, line_color='green', source=accuracyDataSource)
         _graphSegment(plot, scores[score], 0.0, scores[score], score, 3, 'lightblue')
         _graphSegment(plot, scores[score]+1.5, 0.0, scores[score]+1.5, score, 1, 'darkseagreen')
         _graphSegment(plot, scores[score]-1.5, 0.0, scores[score]-1.5, score, 1, 'darkseagreen')
