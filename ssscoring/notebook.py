@@ -224,10 +224,6 @@ def graphJumpResult(plot,
     between single jump plots and plotting only the speed for the aggregate
     plot display for a competition or training session.
 
-        showAccuracy: bool
-    When True, displays the speed accuracy ISC values on a separate y-axis with
-    hover tooltips showing exact values. Defaults to True.
-
     To display the actual plot, use `bp.show(plot)` if running from Lucyfer/Jupyter
     or use `st.bokeh_chart(plot)` if in the Streamlit environment.
 
