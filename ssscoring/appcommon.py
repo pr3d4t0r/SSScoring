@@ -221,7 +221,7 @@ def plotJumpResult(tag: str,
     plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
     graphAltitude(plot, jumpResult)
     graphAngle(plot, jumpResult)
-    hoverValue = bm.HoverTool(tooltips=[('Y-val', '@y{0.00}',),])
+    hoverValue = bm.HoverTool(tooltips=[('time', '@x{0.0}s'), ('y-val', '@y{0.00}')])
     plot.add_tools(hoverValue)
     graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
     st.bokeh_chart(plot, use_container_width=True)
