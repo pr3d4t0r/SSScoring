@@ -14,6 +14,7 @@ from ssscoring.constants import MAX_ALTITUDE_FT
 from ssscoring.constants import MAX_SPEED_ACCURACY
 
 import bokeh.io as bi
+import bokeh.models as bm
 import bokeh.plotting as bp
 
 
@@ -267,7 +268,7 @@ def graphJumpResult(plot,
     score = jumpResult.score
     # Main speed line
     plot.line(data.plotTime, data.vKMh, legend_label = legend, line_width = 2, line_color = lineColor)
-    
+
     # Speed accuracy line with hover tool and bad points marked in red
     if showAccuracy:
         hover = bm.HoverTool(
@@ -279,13 +280,13 @@ def graphJumpResult(plot,
             'x': data.plotTime,
             'y': data.speedAccuracyISC
         })
-        plot.line('x', 'y', 
+        plot.line('x', 'y',
                  y_range_name='speedAccuracy',
                  legend_label='Speed Accuracy',
                  line_width=1.5,
                  line_color='yellow',
                  source=accuracy_source)
-        
+
         # Mark points exceeding MAX_SPEED_ACCURACY in red
         badPoints = data[data.speedAccuracyISC >= MAX_SPEED_ACCURACY]
         if len(badPoints) > 0:
