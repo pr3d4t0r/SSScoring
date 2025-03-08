@@ -13,6 +13,7 @@ from bokeh.models import Range1d
 from ssscoring.constants import MAX_ALTITUDE_FT
 
 import bokeh.io as bi
+import bokeh.models as bm
 import bokeh.plotting as bp
 
 
@@ -261,7 +262,7 @@ def graphJumpResult(plot,
     # Speed accuracy line with hover tool
     if showAccuracy:
         hover = bm.HoverTool(
-            tooltips=[('Time', '@x{0.0}s'), ('Accuracy', '@y{0.00} m/s')],
+            tooltips=[('Time', '@x{0.0}s'), ('y-val', '@y{0.00} m/s')],
             mode='vline'
         )
         plot.add_tools(hover)
