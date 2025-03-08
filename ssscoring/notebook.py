@@ -258,7 +258,7 @@ def graphJumpResult(plot,
     score = jumpResult.score
     # Main speed line
     plot.line(data.plotTime, data.vKMh, legend_label = legend, line_width = 2, line_color = lineColor)
-    
+
     # Speed accuracy line with hover tool
     if showAccuracy:
         hover = bm.HoverTool(
@@ -270,7 +270,7 @@ def graphJumpResult(plot,
             'x': data.plotTime,
             'y': data.speedAccuracyISC
         })
-        plot.line('x', 'y', 
+        plot.line('x', 'y',
                  y_range_name='speedAccuracy',
                  legend_label='Speed Accuracy',
                  line_width=1.5,
