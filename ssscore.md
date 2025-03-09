@@ -1,4 +1,4 @@
-% ssscore(1) Version 2.0.28 | Speed Skydiving Scoring command line tool
+% ssscore(1) Version 2.0.31 | Speed Skydiving Scoring command line tool
 
 Name
 ====

@@ -16,14 +16,26 @@ BREAKOFF_ALTITUDE = 1707.0
 Breakoff altitude or hard deck.
 """
 
+DEFAULT_SPEED_ACCURACY_SCALE = 5.0
+"""
+Default speed accuracy scale set to 5, to make it visible in plots.  This value
+was chosen because the valid threshold is accuracy < 3.0, and this makes most
+values visible without intefering with other curves in the same plot.
+
+See
+===
+    ssscoring.notebook
+    ssscoring.appcommon
+"""
+
 DEG_IN_RADIANS = math.pi/180.0
 """
 π/180º
 """
 
-EXIT_SPEED = 9.81
+EXIT_SPEED = 10.0
 """
-Guesstimate of the exit speed; 2*g
+Guesstimate of the exit speed; ~g
 """
 
 FLYSIGHT_1_HEADER = set([ 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 'hAcc', 'vAcc', 'sAcc', 'heading', 'cAcc', 'gpsFix', 'numSV', ])
@@ -85,7 +97,13 @@ section 5.3.
 """
 
 
-MAX_SPEED_ACCURACY = 3.0
+M_2_FT = 3.28084
+"""
+Meters to feet conversion factor.
+"""
+
+
+SPEED_ACCURACY_THRESHOLD = 3.0
 """
 Speed accuracy for the FlySight device.
 """
@@ -142,3 +160,4 @@ VALIDATION_WINDOW_LENGTH = 1006.0
 """
 The validation window length as defined in the competition rules.
 """
+

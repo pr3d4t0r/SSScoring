@@ -9,6 +9,7 @@ Process a group of jumps uploaded from a file uploader.
 from ssscoring import __VERSION__
 from ssscoring.appcommon import DZ_DIRECTORY
 from ssscoring.appcommon import displayJumpDataIn
+from ssscoring.appcommon import displayTrackOnMap
 from ssscoring.appcommon import initDropZonesFromResource
 from ssscoring.appcommon import initFileUploaderState
 from ssscoring.appcommon import interpretJumpResult
@@ -37,7 +38,7 @@ def _selectDZState(*args, **kwargs):
 
 def _setSideBarAndMain():
     dropZones = initDropZonesFromResource(DZ_DIRECTORY)
-    st.sidebar.title('🔢 SSScore %s β' % __VERSION__)
+    st.sidebar.title('🔢 SSScore %s' % __VERSION__)
     st.session_state.processBadJump = st.sidebar.checkbox('Process bad jumps', value=True, help='Display results from invalid jumps')
     dropZone = st.sidebar.selectbox('Select drop zone:', dropZones.dropZone, index=None, on_change=_selectDZState)
     if dropZone:
@@ -106,8 +107,7 @@ def main():
                         legend='%s = %.2f' % (tag, jumpResult.score),
                         showIt=False
                     )
-                    st.write('Brightest point corresponds to the max speed')
-                    st.pydeck_chart(speedJumpTrajectory(jumpResult))
+                    displayTrackOnMap(speedJumpTrajectory(jumpResult))
         with col0:
             st.html('<h2>Jumps in this set</h2>')
             if jumpStatus == JumpStatus.OK:

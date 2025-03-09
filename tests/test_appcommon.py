@@ -1,15 +1,14 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 
+# from ssscoring.appcommon import initFileUploaderState
 from ssscoring.appcommon import DZ_DIRECTORY
 from ssscoring.appcommon import STREAMLIT_SIG_KEY
 from ssscoring.appcommon import STREAMLIT_SIG_VALUE
 from ssscoring.appcommon import initDropZonesFromResource
-from ssscoring.appcommon import initFileUploaderState
 from ssscoring.appcommon import isStreamlitHostedApp
 from ssscoring.errors import SSScoringError
 
-import logging
 import warnings
 import os
 
@@ -41,3 +40,5 @@ def test_initDropZonesFromResource():
 
 def test_initFileUploaderState():
     pass
+
+

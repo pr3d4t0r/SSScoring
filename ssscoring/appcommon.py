@@ -11,6 +11,7 @@ from io import StringIO
 from ssscoring.calc import isValidMaximumAltitude
 from ssscoring.calc import isValidMinimumAltitude
 from ssscoring.constants import FLYSIGHT_FILE_ENCODING
+from ssscoring.constants import M_2_FT
 from ssscoring.datatypes import JumpResults
 from ssscoring.datatypes import JumpStatus
 from ssscoring.errors import SSScoringError
@@ -25,6 +26,7 @@ import os
 
 import bokeh.models as bm
 import pandas as pd
+import pydeck as pdk
 import streamlit as st
 
 
@@ -182,10 +184,11 @@ def interpretJumpResult(tag: str,
         badJumpLegend = '<span style="color: red">Warm up file - nothing to do<br>'
         scoringInfo = ''
     elif jumpResult.status == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT:
-        badJumpLegend = '<span style="color: red">RE-JUMP: speed accuracy exceeds ISC limit<br>'
+        badJumpLegend = '<span style="color: red">%s - RE-JUMP: speed accuracy exceeds ISC threshold<br>' % tag
         scoringInfo = ''
     else:
-        scoringInfo = 'Max speed = {0:,.0f}; '.format(maxSpeed)+('exit at %d m (%d ft)<br>End scoring window at %d m (%d ft)<br>'%(window.start, 3.2808*window.start, window.end, 3.2808*window.end))
+        scoringInfo = 'Max speed = {0:,.0f}; '.format(maxSpeed)+('exit at %d m (%d ft)<br>Validation window starts at %d m (%d ft)<br>End scoring window at %d m (%d ft)<br>' % \
+                        (window.start, M_2_FT*window.start, window.validationStart, M_2_FT*window.validationStart, window.end, M_2_FT*window.end))
     if jumpStatus == JumpStatus.OK:
         jumpStatusInfo = '<span style="color: %s">%s jump - %s - %.02f km/h</span><br>' % ('green', tag, 'VALID', jumpResult.score)
         belowMaxAltitude = isValidMaximumAltitude(jumpResult.data.altitudeAGL.max())
@@ -220,7 +223,7 @@ def plotJumpResult(tag: str,
     plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
     graphAltitude(plot, jumpResult)
     graphAngle(plot, jumpResult)
-    hoverValue = bm.HoverTool(tooltips=[('Y-val', '@y{0.00}',),])
+    hoverValue = bm.HoverTool(tooltips=[('time', '@x{0.0}s'), ('y-val', '@y{0.00}')])
     plot.add_tools(hoverValue)
     graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
     st.bokeh_chart(plot, use_container_width=True)
@@ -252,4 +255,9 @@ def initFileUploaderState(filesObject:str, uploaderKey:str ='uploaderKey'):
         st.session_state[filesObject] = None
     if uploaderKey not in st.session_state:
         st.session_state[uploaderKey] = 0
+
+
+def displayTrackOnMap(deck: pdk.Deck):
+    st.write('Brightest point corresponds to the max speed score')
+    st.pydeck_chart(deck)
 

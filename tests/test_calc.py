@@ -42,6 +42,7 @@ TEST_FLYSIGHT_DATA_V1 = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-da
 TEST_FLYSIGHT_DATA_BAD_HEADERS = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-03.csv'
 TEST_FLYSIGHT_DATA_V1_WARM_UP = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-05-warm-up.csv'
 TEST_FLYSIGHT_DATA_V1_EXCEEDS_MAX_ALT = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-06-exceeds-max-alt.CSV'
+TEST_FLYSIGHT_DATA_V1_EXCEEDS_ISC_THRESHOLD = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-07-BAD-ISC.CSV'
 
 
 # +++ globals +++
@@ -130,6 +131,11 @@ def test_isValidJumpISC():
     bogus = pd.DataFrame( { 'altitudeAGL': (2800, ), 'speedAccuracyISC': (3.1, ), } )
     assert isValidJumpISC(_data, _window)
     assert not isValidJumpISC(bogus, _window)
+    rawData = pd.read_csv(TEST_FLYSIGHT_DATA_V1_EXCEEDS_ISC_THRESHOLD, skiprows = (1,1))
+    data = convertFlySight2SSScoring(rawData, altitudeDZMeters = 3.0)
+    data = dropNonSkydiveDataFrom(data)
+    window, data = getSpeedSkydiveFrom(data)
+    assert not isValidJumpISC(data, window)
 
 
 def test_calculateDistance():
@@ -288,9 +294,10 @@ def test_totalResultsFrom():
 
 # For symbolic debugger:
 
-test_convertFlySight2SSScoring()
-test_dropNonSkydiveDataFrom()
-test_getSpeedSkydiveFrom()
+# test_convertFlySight2SSScoring()
+# test_dropNonSkydiveDataFrom()
+# test_getSpeedSkydiveFrom()
+# test_isValidJumpISC()
 # test_jumpAnalysisTable()
 # test__verticalAcceleration()
 # test_isValidMinimumAltitude(_invalidAltFileName)
