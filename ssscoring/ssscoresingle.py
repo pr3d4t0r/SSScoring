@@ -20,8 +20,10 @@ from ssscoring.calc import convertFlySight2SSScoring
 from ssscoring.calc import dropNonSkydiveDataFrom
 from ssscoring.calc import getFlySightDataFromCSVBuffer
 from ssscoring.calc import processJump
-from ssscoring.constants import MAX_SPEED_ACCURACY
+from ssscoring.constants import M_2_FT
+from ssscoring.constants import SPEED_ACCURACY_THRESHOLD
 from ssscoring.datatypes import JumpStatus
+from ssscoring.datatypes import PerformanceWindow
 from ssscoring.mapview import speedJumpTrajectory
 
 import pandas as pd
@@ -38,9 +40,7 @@ def _selectDZState(*args, **kwargs):
 
 def _setSideBarAndMain():
     dropZones = initDropZonesFromResource(DZ_DIRECTORY)
-    # TODO: Clear this for the main version!
-    # st.sidebar.title('1️⃣  SSScore %s β' % __VERSION__)
-    st.sidebar.title('1️⃣  SSScore BERT')
+    st.sidebar.title('1️⃣  SSScore %s' % __VERSION__)
     st.session_state.processBadJump = st.sidebar.checkbox('Process bad jump', value=True, help='Display results from invalid jumps')
     dropZone = st.sidebar.selectbox('Select drop zone:', dropZones.dropZone, index=None, on_change=_selectDZState)
     if dropZone:
@@ -88,8 +88,8 @@ def _displayScoresIn(rawData: dict):
     st.dataframe(data, hide_index=True)
 
 
-def _displayBadRowsISCAccuracyExceeded(data: pd.DataFrame):
-    badRows = data[data.speedAccuracyISC >= MAX_SPEED_ACCURACY]
+def _displayBadRowsISCAccuracyExceeded(data: pd.DataFrame, window: PerformanceWindow):
+    badRows = data[data.speedAccuracyISC >= SPEED_ACCURACY_THRESHOLD]
     badRows = dropNonSkydiveDataFrom(badRows)
     times = pd.to_datetime(badRows.timeUnix, unit='s').dt.strftime('%Y-%m-%d %H:%M:%S.%f').str[:-4]
     badRows.insert(0, 'time', times)
@@ -104,6 +104,8 @@ def _displayBadRowsISCAccuracyExceeded(data: pd.DataFrame):
         'latitude',
         'longitude',
         'verticalAccuracy', ], inplace=True)
+    st.html('<h3>Performance window:<br>start = %.2f m (%.2f ft)<br>end = %.2f m (%.2f ft)<br>validation start = %.2f m (%.2f ft)</h3>' % \
+                    (window.start, M_2_FT*window.start, window.end, M_2_FT*window.end, window.validationStart, M_2_FT*window.validationStart))
     st.html('<h3>%d track rows where the ISC speed accuracy threshold was exceeded during the speed run:</h3>' % len(badRows))
     st.dataframe(badRows, hide_index=True)
 
@@ -142,7 +144,7 @@ def main():
                 displayTrackOnMap(speedJumpTrajectory(jumpResult))
         elif jumpStatus == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT:
             with col0:
-                _displayBadRowsISCAccuracyExceeded(data)
+                _displayBadRowsISCAccuracyExceeded(data, jumpResult.window)
 
 
 if '__main__' == __name__:
