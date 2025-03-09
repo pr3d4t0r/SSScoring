@@ -114,7 +114,6 @@ MIN_JUMP_FILE_SIZE = 1024*64
 """
 FlySight v1 files smaller than `MIN_JUMP_FILE_SIZE` are ignored because they
 lack the minimum number of data points to contain a valid speed skydive.
-**TODO:** Revise for FlySight v2.
 """
 
 
