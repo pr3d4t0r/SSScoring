@@ -20,7 +20,7 @@ from ssscoring.constants import FT_IN_M
 from ssscoring.constants import KMH_AS_MS
 from ssscoring.constants import LAST_TIME_TRANCHE
 from ssscoring.constants import MAX_ALTITUDE_METERS
-from ssscoring.constants import MAX_SPEED_ACCURACY
+from ssscoring.constants import SPEED_ACCURACY_THRESHOLD
 from ssscoring.constants import MPS_2_KMH
 from ssscoring.constants import PERFORMANCE_WINDOW_LENGTH
 from ssscoring.constants import SCORING_INTERVAL
@@ -111,8 +111,8 @@ def isValidJumpISC(data: pd.DataFrame,
     `True` if the jump is valid according to ISC/FAI/USPA rules.
     """
     if len(data) > 0:
-        accuracy = data[data.altitudeAGL < window.validationStart].speedAccuracyISC.max()
-        return accuracy < MAX_SPEED_ACCURACY
+        accuracy = data[data.altitudeAGL <= window.validationStart].speedAccuracyISC.max()
+        return accuracy < SPEED_ACCURACY_THRESHOLD
     else:
         return False
 
@@ -319,7 +319,6 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
     - a floating point number
     """
     table = None
-
     distanceStart = (data.iloc[0].latitude, data.iloc[0].longitude)
     for column in pd.Series([ 5.0, 10.0, 15.0, 20.0, 25.0, ]):
         for interval in range(int(column)*10, 10*(int(column)+1)):
@@ -344,7 +343,6 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
             table = pd.concat([ table, tranche, ])
         else:
             table = tranche
-
     table = pd.DataFrame({
                 'time': table.time,
                 'vKMh': table.vKMh,
@@ -357,7 +355,6 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
                 'distanceFromExit (m)': table.distanceFromExit,
                 'altitude (ft)': table.altitudeAGLFt,
             })
-
     return (data.vKMh.max(), table)
 
 
