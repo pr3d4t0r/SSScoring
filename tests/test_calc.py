@@ -148,9 +148,8 @@ def test_calculateDistance():
 
 
 def test_jumpAnalysisTable():
-    maxSpeed, table = jumpAnalysisTable(_data)
+    table = jumpAnalysisTable(_data)
 
-    assert maxSpeed > 400.0
     assert 'time' in table.columns
     assert 'vKMh' in table.columns
     assert 'deltaV' in table.columns
@@ -162,7 +161,7 @@ def test_jumpAnalysisTable():
 
 
 def test__verticalAcceleration():
-    _, table = jumpAnalysisTable(_data)
+    table = jumpAnalysisTable(_data)
     vAcc = _verticalAcceleration(table.vKMh, table.time)
     assert isinstance(vAcc, pd.Series)
     pd.testing.assert_series_equal(vAcc, vAcc.astype(float))
@@ -300,7 +299,7 @@ def test_totalResultsFrom():
 # test_isValidJumpISC()
 # test_jumpAnalysisTable()
 # test__verticalAcceleration()
-# test_isValidMinimumAltitude(_invalidAltFileName)
+# # test_isValidMinimumAltitude(_invalidAltFileName)
 # test_isValidMaximumAltitude()
 # test_calcScoreMeanVelocity()
 # test_calcScoreISC()
