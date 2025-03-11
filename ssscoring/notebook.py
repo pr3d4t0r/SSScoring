@@ -228,7 +228,7 @@ def _plotSpeedAccuracy(plot, data, window):
     plot.line('x', 'y', y_range_name='speedAccuracy', legend_label='Speed accuracy ISC', line_width=5.0, line_color='lime', source=accuracyDataSource)
 
     validationData = data[data.altitudeAGL <= window.validationStart]
-    plot.line(x = validationData.plotTime, y = SPEED_ACCURACY_THRESHOLD, y_range_name='speedAccuracy', line_dash='dashed', line_color='seagreen', line_width=1.0)
+    plot.line(x = validationData.plotTime, y = pd.Series([ SPEED_ACCURACY_THRESHOLD, ]*len(validationData)), y_range_name='speedAccuracy', line_dash='dashed', line_color='lime', line_width=1.0)
 
 
 def graphJumpResult(plot,

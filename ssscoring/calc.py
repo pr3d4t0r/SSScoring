@@ -355,7 +355,7 @@ def jumpAnalysisTable(data: pd.DataFrame) -> pd.DataFrame:
                 'distanceFromExit (m)': table.distanceFromExit,
                 'altitude (ft)': table.altitudeAGLFt,
             })
-    return (data.vKMh.max(), table)
+    return table
 
 
 def dropNonSkydiveDataFrom(data: pd.DataFrame) -> pd.DataFrame:
@@ -475,11 +475,11 @@ def processJump(data: pd.DataFrame) -> JumpResults:
       values are _green_ for valid jump, _red_ for invalid jump, per ISC rules
     - `result` a string with the legend of _valid_ or _invalid_ jump
     """
-    data = data.copy()
-    data = dropNonSkydiveDataFrom(data)
-    window, data = getSpeedSkydiveFrom(data)
-    if data.empty and not window:
-        data = None
+    workData = data.copy()
+    workData = dropNonSkydiveDataFrom(workData)
+    window, workData = getSpeedSkydiveFrom(workData)
+    if workData.empty and not window:
+        workData = None
         maxSpeed = -1.0
         score = -1.0
         scores = None
@@ -487,24 +487,25 @@ def processJump(data: pd.DataFrame) -> JumpResults:
         window = None
         jumpStatus = JumpStatus.WARM_UP_FILE
     else:
-        validJump = isValidJumpISC(data, window)
+        validJump = isValidJumpISC(workData, window)
         jumpStatus = JumpStatus.OK
         score = None
         scores = None
         table = None
         if validJump:
             table = None
-            maxSpeed, table = jumpAnalysisTable(data)
-            baseTime = data.iloc[0].timeUnix
-            data['plotTime'] = round(data.timeUnix-baseTime, 2)
-            score, scores = calcScoreISC(data)
+            table = jumpAnalysisTable(workData)
+            maxSpeed = data.vKMh.max()
+            baseTime = workData.iloc[0].timeUnix
+            workData['plotTime'] = round(workData.timeUnix-baseTime, 2)
+            score, scores = calcScoreISC(workData)
         else:
             maxSpeed = -1
-            if len(data):
+            if len(workData):
                 jumpStatus = JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT
             else:
                 jumpStatus = JumpStatus.INVALID_SPEED_FILE
-    return JumpResults(data, maxSpeed, score, scores, table, window, jumpStatus)
+    return JumpResults(workData, maxSpeed, score, scores, table, window, jumpStatus)
 
 
 def _readVersion1CSV(fileThing: str) -> pd.DataFrame:
