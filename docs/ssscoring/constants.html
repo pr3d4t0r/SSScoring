@@ -239,52 +239,51 @@
 </span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="sd">FlySight v1 files smaller than `MIN_JUMP_FILE_SIZE` are ignored because they</span>
 </span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="sd">lack the minimum number of data points to contain a valid speed skydive.</span>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="sd">**TODO:** Revise for FlySight v2.</span>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>
 </span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>
-</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="n">MPS_2_KMH</span> <span class="o">=</span> <span class="mf">3.6</span>
-</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="sd">m/s to km/h conversion factor:</span>
-</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>
-</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="sd">```python</span>
-</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="sd">s = mps * 60 * 60 / 1000</span>
-</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a><span class="sd">  = mps * 3600 / 1000</span>
-</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="sd">  = mps * 3.6</span>
-</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a><span class="sd">```</span>
-</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="n">MPS_2_KMH</span> <span class="o">=</span> <span class="mf">3.6</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="sd">m/s to km/h conversion factor:</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="sd">```python</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="sd">s = mps * 60 * 60 / 1000</span>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="sd">  = mps * 3600 / 1000</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a><span class="sd">  = mps * 3.6</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="sd">```</span>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>
 </span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>
-</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>
-</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a><span class="n">PERFORMANCE_WINDOW_LENGTH</span> <span class="o">=</span> <span class="mf">2256.0</span>
-</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a><span class="sd">Performance window length as defined by ISSA/IPC/USPA.</span>
-</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a><span class="n">PERFORMANCE_WINDOW_LENGTH</span> <span class="o">=</span> <span class="mf">2256.0</span>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a><span class="sd">Performance window length as defined by ISSA/IPC/USPA.</span>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>
 </span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>
-</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>
-</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a><span class="n">SCORING_INTERVAL</span> <span class="o">=</span> <span class="mf">3.0</span>
-</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a><span class="sd">Scoring is based on the maximum speed the jumper attained within the `VALIDATION_WINDOW_LENGTH`</span>
-</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a><span class="sd">as the average speed during a sliding window of SCORING_INTERVAL seconds.  The</span>
-</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a><span class="sd">value is set by governing bodies like ISC and USPA.</span>
-</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a><span class="n">SCORING_INTERVAL</span> <span class="o">=</span> <span class="mf">3.0</span>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a><span class="sd">Scoring is based on the maximum speed the jumper attained within the `VALIDATION_WINDOW_LENGTH`</span>
+</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a><span class="sd">as the average speed during a sliding window of SCORING_INTERVAL seconds.  The</span>
+</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a><span class="sd">value is set by governing bodies like ISC and USPA.</span>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>
 </span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>
-</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>
-</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a><span class="n">SKYTRAX_1_HEADER</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span> <span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="s1">&#39;hMSL&#39;</span><span class="p">,</span> <span class="s1">&#39;velN&#39;</span><span class="p">,</span> <span class="s1">&#39;velE&#39;</span><span class="p">,</span> <span class="s1">&#39;velD&#39;</span><span class="p">,</span> <span class="s1">&#39;hAcc&#39;</span><span class="p">,</span> <span class="s1">&#39;vAcc&#39;</span><span class="p">,</span> <span class="s1">&#39;sAcc&#39;</span><span class="p">,</span> <span class="s1">&#39;heading&#39;</span><span class="p">,</span> <span class="s1">&#39;cAcc&#39;</span><span class="p">,</span> <span class="s1">&#39;gpsFix&#39;</span><span class="p">,</span> <span class="s1">&#39;numSV&#39;</span><span class="p">,</span> <span class="p">])</span>
-</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a><span class="sd">SkyTraX GPS + barometric SMD v1 CSV file headers.</span>
-</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a><span class="n">SKYTRAX_1_HEADER</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span> <span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="s1">&#39;hMSL&#39;</span><span class="p">,</span> <span class="s1">&#39;velN&#39;</span><span class="p">,</span> <span class="s1">&#39;velE&#39;</span><span class="p">,</span> <span class="s1">&#39;velD&#39;</span><span class="p">,</span> <span class="s1">&#39;hAcc&#39;</span><span class="p">,</span> <span class="s1">&#39;vAcc&#39;</span><span class="p">,</span> <span class="s1">&#39;sAcc&#39;</span><span class="p">,</span> <span class="s1">&#39;heading&#39;</span><span class="p">,</span> <span class="s1">&#39;cAcc&#39;</span><span class="p">,</span> <span class="s1">&#39;gpsFix&#39;</span><span class="p">,</span> <span class="s1">&#39;numSV&#39;</span><span class="p">,</span> <span class="p">])</span>
+</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a><span class="sd">SkyTraX GPS + barometric SMD v1 CSV file headers.</span>
+</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>
 </span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>
-</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>
-</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a><span class="n">TABLE_INTERVAL</span> <span class="o">=</span> <span class="mf">5.0</span>
-</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a><span class="sd">Speed run table interval.</span>
-</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a><span class="n">TABLE_INTERVAL</span> <span class="o">=</span> <span class="mf">5.0</span>
+</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a><span class="sd">Speed run table interval.</span>
+</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>
 </span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>
-</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a>
-</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a><span class="n">VALIDATION_WINDOW_LENGTH</span> <span class="o">=</span> <span class="mf">1006.0</span>
-</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a><span class="sd">The validation window length as defined in the competition rules.</span>
-</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a><span class="n">VALIDATION_WINDOW_LENGTH</span> <span class="o">=</span> <span class="mf">1006.0</span>
+</span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a><span class="sd">The validation window length as defined in the competition rules.</span>
+</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span></pre></div>
 
 
@@ -357,7 +356,7 @@ values visible without intefering with other curves in the same plot.</p>
                     <div class="attr variable">
             <span class="name">FLYSIGHT_1_HEADER</span>        =
 <input id="FLYSIGHT_1_HEADER-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-            <label class="view-value-button pdoc-button" for="FLYSIGHT_1_HEADER-view-value"></label><span class="default_value">{&#39;velD&#39;, &#39;lat&#39;, &#39;heading&#39;, &#39;cAcc&#39;, &#39;sAcc&#39;, &#39;hAcc&#39;, &#39;velN&#39;, &#39;velE&#39;, &#39;hMSL&#39;, &#39;gpsFix&#39;, &#39;vAcc&#39;, &#39;numSV&#39;, &#39;lon&#39;, &#39;time&#39;}</span>
+            <label class="view-value-button pdoc-button" for="FLYSIGHT_1_HEADER-view-value"></label><span class="default_value">{&#39;time&#39;, &#39;vAcc&#39;, &#39;sAcc&#39;, &#39;velN&#39;, &#39;numSV&#39;, &#39;heading&#39;, &#39;gpsFix&#39;, &#39;velE&#39;, &#39;hMSL&#39;, &#39;hAcc&#39;, &#39;cAcc&#39;, &#39;lon&#39;, &#39;velD&#39;, &#39;lat&#39;}</span>
 
         
     </div>
@@ -525,8 +524,7 @@ section 5.3.</p>
     <a class="headerlink" href="#MIN_JUMP_FILE_SIZE"></a>
     
             <div class="docstring"><p>FlySight v1 files smaller than <code><a href="#MIN_JUMP_FILE_SIZE">MIN_JUMP_FILE_SIZE</a></code> are ignored because they
-lack the minimum number of data points to contain a valid speed skydive.
-<strong>TODO:</strong> Revise for FlySight v2.</p>
+lack the minimum number of data points to contain a valid speed skydive.</p>
 </div>
 
 
@@ -586,7 +584,7 @@ value is set by governing bodies like ISC and USPA.</p>
                     <div class="attr variable">
             <span class="name">SKYTRAX_1_HEADER</span>        =
 <input id="SKYTRAX_1_HEADER-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-            <label class="view-value-button pdoc-button" for="SKYTRAX_1_HEADER-view-value"></label><span class="default_value">{&#39;velD&#39;, &#39;lat&#39;, &#39;heading&#39;, &#39;cAcc&#39;, &#39;sAcc&#39;, &#39;hAcc&#39;, &#39;velN&#39;, &#39;velE&#39;, &#39;hMSL&#39;, &#39;gpsFix&#39;, &#39;vAcc&#39;, &#39;numSV&#39;, &#39;lon&#39;, &#39;time&#39;}</span>
+            <label class="view-value-button pdoc-button" for="SKYTRAX_1_HEADER-view-value"></label><span class="default_value">{&#39;time&#39;, &#39;vAcc&#39;, &#39;sAcc&#39;, &#39;velN&#39;, &#39;numSV&#39;, &#39;heading&#39;, &#39;gpsFix&#39;, &#39;velE&#39;, &#39;hMSL&#39;, &#39;hAcc&#39;, &#39;cAcc&#39;, &#39;lon&#39;, &#39;velD&#39;, &#39;lat&#39;}</span>
 
         
     </div>
