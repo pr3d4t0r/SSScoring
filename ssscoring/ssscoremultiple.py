@@ -94,10 +94,10 @@ def main():
                 scoringInfo,\
                 badJumpLegend,\
                 jumpStatus = interpretJumpResult(tag, jumpResult, st.session_state.processBadJump)
-                if jumpStatus == JumpStatus.OK:
+                if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                     jumpResultsSubset[tag] = jumpResult
                 st.html('<hr><h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend if badJumpLegend else '')+'</h3>')
-                if jumpStatus == JumpStatus.OK:
+                if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                     displayJumpDataIn(jumpResult.table)
                     plotJumpResult(tag, jumpResult)
                     graphJumpResult(
