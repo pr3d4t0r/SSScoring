@@ -189,7 +189,7 @@ def interpretJumpResult(tag: str,
     else:
         scoringInfo = 'Max speed = {0:,.0f}; '.format(maxSpeed)+('exit at %d m (%d ft)<br>Validation window starts at %d m (%d ft)<br>End scoring window at %d m (%d ft)<br>' % \
                         (window.start, M_2_FT*window.start, window.validationStart, M_2_FT*window.validationStart, window.end, M_2_FT*window.end))
-    if jumpStatus == JumpStatus.OK:
+    if (processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
         jumpStatusInfo = '<span style="color: %s">%s jump - %s - %.02f km/h</span><br>' % ('green', tag, 'VALID', jumpResult.score)
         belowMaxAltitude = isValidMaximumAltitude(jumpResult.data.altitudeAGL.max())
         badJumpLegend = None

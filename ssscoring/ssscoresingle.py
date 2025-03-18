@@ -134,7 +134,7 @@ def main():
         jumpStatus = interpretJumpResult(tag, jumpResult, st.session_state.processBadJump)
         with col0:
             st.html('<h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend if badJumpLegend else '')+'</h3>')
-        if jumpStatus == JumpStatus.OK:
+        if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
             with col0:
                 displayJumpDataIn(jumpResult.table)
                 _displayAllJumpDataIn(jumpResult.data)
