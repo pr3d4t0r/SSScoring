@@ -15,6 +15,7 @@ from ssscoring.appcommon import initFileUploaderState
 from ssscoring.appcommon import interpretJumpResult
 from ssscoring.appcommon import isStreamlitHostedApp
 from ssscoring.appcommon import plotJumpResult
+from ssscoring.appcommon import setSideBarAndMain
 from ssscoring.calc import aggregateResults
 from ssscoring.calc import processAllJumpFiles
 from ssscoring.calc import totalResultsFrom
@@ -36,31 +37,6 @@ def _selectDZState(*args, **kwargs):
         st.session_state.trackFiles = None
 
 
-def _setSideBarAndMain():
-    dropZones = initDropZonesFromResource(DZ_DIRECTORY)
-    st.sidebar.title('🔢 SSScore %s' % __VERSION__)
-    st.session_state.processBadJump = st.sidebar.checkbox('Process bad jumps', value=True, help='Display results from invalid jumps')
-    dropZone = st.sidebar.selectbox('Select drop zone:', dropZones.dropZone, index=None, on_change=_selectDZState)
-    if dropZone:
-        st.session_state.elevation = dropZones[dropZones.dropZone == dropZone ].iloc[0].elevation
-    else:
-        st.session_state.elevation = None
-        st.session_state.trackFiles = None
-    st.sidebar.metric('Elevation', value='%.1f m' % (0.0 if st.session_state.elevation == None else st.session_state.elevation))
-    trackFiles = st.sidebar.file_uploader(
-        'Track files',
-        [ 'CSV' ],
-        disabled=st.session_state.elevation == None,
-        accept_multiple_files=True,
-        key = st.session_state.uploaderKey
-    )
-    if trackFiles:
-        st.session_state.trackFiles = trackFiles
-    st.sidebar.button('Clear', on_click=_selectDZState)
-    st.sidebar.link_button('Report missing DZ', 'https://github.com/pr3d4t0r/SSScoring/issues/new?template=report-missing-dz.md', icon=':material/breaking_news_alt_1:')
-    st.sidebar.link_button('Feature request or bug report', 'https://github.com/pr3d4t0r/SSScoring/issues/new?template=Blank+issue', icon=':material/breaking_news_alt_1:')
-
-
 def _styleShowMaxIn(scores: pd.Series) -> pd.DataFrame:
     return [
         'background-color: mediumseagreen' if v == scores.max() else \
@@ -78,7 +54,7 @@ def main():
     if not isStreamlitHostedApp():
         st.set_page_config(layout = 'wide')
     initFileUploaderState('trackFiles')
-    _setSideBarAndMain()
+    setSideBarAndMain('🔢', False, _selectDZState)
 
     col0, col1 = st.columns([0.5, 0.5, ])
     if st.session_state.trackFiles:
