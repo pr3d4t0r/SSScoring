@@ -8,6 +8,7 @@ package.
 from importlib_resources import files
 from io import StringIO
 
+from ssscoring import __VERSION__
 from ssscoring.calc import isValidMaximumAltitude
 from ssscoring.calc import isValidMinimumAltitude
 from ssscoring.constants import FLYSIGHT_FILE_ENCODING
@@ -258,6 +259,76 @@ def initFileUploaderState(filesObject:str, uploaderKey:str ='uploaderKey'):
 
 
 def displayTrackOnMap(deck: pdk.Deck):
+    """
+    Displays a track map drawn using PyDeck.
+
+    Arguments
+    ---------
+        deck
+    A PyDeck initialized with map layers.
+    """
     st.write('Brightest point corresponds to the max speed score')
     st.pydeck_chart(deck)
+
+
+def setSideBarAndMain(icon: str, singleTrack: bool, selectDZState):
+    """
+    Set all the interactive and navigational components for the app's side bar.
+
+    Arguments
+    ---------
+        icon
+    A meaningful Emoji associated with the the side bar's title.
+
+        singleTrack
+    A flag for allowing selection of a single or multiple track files in the
+    corresponding selector component.  Determines whether the side bar is used
+    for the single- or multiple selection application.
+
+        selectDZState
+    A callback for the drop zone selector selection box, affected by events in
+    the main application.
+
+    Notes
+    -----
+    All the aplication level values associated with the components and
+    selections from the side bar are stored in `st.session_state` and visible
+    across the whole application.
+
+    **Do not** cache calls to `ssscoring.appcommon.setSideBarAndMain()` because
+    this can result in unpredictable behavior since the cache may never be
+    cleared until application reload.
+    """
+    dropZones = initDropZonesFromResource(DZ_DIRECTORY)
+    dropZone = None
+    elevation = None
+    st.sidebar.title('%s SSScore %s' % (icon, __VERSION__))
+    st.session_state.processBadJump = st.sidebar.checkbox('Process bad jumps', value=True, help='Display results from invalid jumps')
+    dropZone = st.sidebar.selectbox('Select the drop zone:', dropZones.dropZone, index=None, on_change=selectDZState, disabled=(elevation != None and elevation != 0.0))
+    elevation = st.sidebar.number_input('Or enter the DZ elevation in meters', min_value=0.0, max_value=4000.0, value='min', format='%.2f', disabled=(dropZone != None), on_change=selectDZState)
+    if dropZone:
+        st.session_state.elevation = dropZones[dropZones.dropZone == dropZone ].iloc[0].elevation
+    elif elevation != None and elevation != 0.0:
+        st.session_state.elevation= elevation
+    else:
+        st.session_state.elevation = None
+        st.session_state.trackFiles = None
+    st.sidebar.metric('Elevation', value='%.1f m' % (0.0 if st.session_state.elevation == None else st.session_state.elevation))
+    if singleTrack:
+        trackFile = st.sidebar.file_uploader('Track file', [ 'CSV' ], disabled=st.session_state.elevation == None, key = st.session_state.uploaderKey)
+        if trackFile:
+            st.session_state.trackFile = trackFile
+    else:
+        trackFiles = st.sidebar.file_uploader(
+            'Track files',
+            [ 'CSV' ],
+            disabled=st.session_state.elevation == None,
+            accept_multiple_files=True,
+            key = st.session_state.uploaderKey
+        )
+        if trackFiles:
+            st.session_state.trackFiles = trackFiles
+    st.sidebar.button('Clear', on_click=selectDZState)
+    st.sidebar.link_button('Report missing DZ', 'https://github.com/pr3d4t0r/SSScoring/issues/new?template=report-missing-dz.md', icon=':material/breaking_news_alt_1:')
+    st.sidebar.link_button('Feature request or bug report', 'https://github.com/pr3d4t0r/SSScoring/issues/new?template=Blank+issue', icon=':material/breaking_news_alt_1:')
 
