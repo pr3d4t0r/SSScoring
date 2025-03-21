@@ -111,6 +111,8 @@ def main():
         scoringInfo, \
         badJumpLegend, \
         jumpStatus = interpretJumpResult(tag, jumpResult, st.session_state.processBadJump)
+        if jumpStatus != JumpStatus.OK:
+            st.toast('#### %s - %s' % (tag, str(jumpStatus)), icon='⚠️')
         with col0:
             st.html('<h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend if badJumpLegend else '')+'</h3>')
         if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
