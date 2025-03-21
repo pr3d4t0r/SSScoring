@@ -90,6 +90,10 @@ package:
 	python -m build --wheel
 
 
+prune:
+	for f in $$(git branch | awk '!/master/ && !/main/ && !/^\*/ && !/local-work/ { print; }'); do git branch -d "$$f"; done
+
+
 # The publish: target is for PyPI, not for the devpi server.
 # https://www.python.org/dev/peps/pep-0541/#how-to-request-a-name-transfer
 #
