@@ -6,11 +6,8 @@
 Process a group of jumps uploaded from a file uploader.
 """
 
-from ssscoring import __VERSION__
-from ssscoring.appcommon import DZ_DIRECTORY
 from ssscoring.appcommon import displayJumpDataIn
 from ssscoring.appcommon import displayTrackOnMap
-from ssscoring.appcommon import initDropZonesFromResource
 from ssscoring.appcommon import initFileUploaderState
 from ssscoring.appcommon import interpretJumpResult
 from ssscoring.appcommon import isStreamlitHostedApp
@@ -70,6 +67,8 @@ def main():
                 scoringInfo,\
                 badJumpLegend,\
                 jumpStatus = interpretJumpResult(tag, jumpResult, st.session_state.processBadJump)
+                if jumpStatus != JumpStatus.OK:
+                    st.toast('#### %s - %s' % (tag, str(jumpStatus)), icon='⚠️')
                 if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                     jumpResultsSubset[tag] = jumpResult
                 st.html('<hr><h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend if badJumpLegend else '')+'</h3>')

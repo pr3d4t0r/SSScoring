@@ -305,7 +305,7 @@ def setSideBarAndMain(icon: str, singleTrack: bool, selectDZState):
     st.sidebar.title('%s SSScore %s' % (icon, __VERSION__))
     st.session_state.processBadJump = st.sidebar.checkbox('Process bad jumps', value=True, help='Display results from invalid jumps')
     dropZone = st.sidebar.selectbox('Select the drop zone:', dropZones.dropZone, index=None, on_change=selectDZState, disabled=(elevation != None and elevation != 0.0))
-    elevation = st.sidebar.number_input('Or enter the DZ elevation in meters', min_value=0.0, max_value=4000.0, value='min', format='%.2f', disabled=(dropZone != None), on_change=selectDZState)
+    elevation = st.sidebar.number_input('...or enter the DZ elevation in meters:', min_value=0.0, max_value=4000.0, value='min', format='%.2f', disabled=(dropZone != None), on_change=selectDZState)
     if dropZone:
         st.session_state.elevation = dropZones[dropZones.dropZone == dropZone ].iloc[0].elevation
     elif elevation != None and elevation != 0.0:
