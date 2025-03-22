@@ -85,7 +85,7 @@ def main():
                     displayTrackOnMap(speedJumpTrajectory(jumpResult))
         with col0:
             st.html('<h2>Jumps in this set</h2>')
-            if jumpStatus == JumpStatus.OK:
+            if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                 aggregate = aggregateResults(jumpResultsSubset)
                 displayAggregate = aggregate.style.apply(_styleShowMinMaxIn, subset=[ 'score', ]).apply(_styleShowMaxIn, subset=[ 'maxSpeed', ]).format(precision=2)
                 st.dataframe(displayAggregate)
