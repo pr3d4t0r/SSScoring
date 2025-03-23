@@ -182,7 +182,7 @@ def interpretJumpResult(tag: str,
     jumpStatus = jumpResult.status
     jumpStatusInfo = ''
     if jumpResult.status == JumpStatus.WARM_UP_FILE:
-        badJumpLegend = '<span style="color: red">Warm up file - nothing to do<br>'
+        badJumpLegend = '<span style="color: red">Warm up file or SMD ran out of battery - nothing to do<br>'
         scoringInfo = ''
     elif jumpResult.status == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT:
         badJumpLegend = '<span style="color: red">%s - RE-JUMP: speed accuracy exceeds ISC threshold<br>' % tag
@@ -190,7 +190,7 @@ def interpretJumpResult(tag: str,
     else:
         scoringInfo = 'Max speed = {0:,.0f}; '.format(maxSpeed)+('exit at %d m (%d ft)<br>Validation window starts at %d m (%d ft)<br>End scoring window at %d m (%d ft)<br>' % \
                         (window.start, M_2_FT*window.start, window.validationStart, M_2_FT*window.validationStart, window.end, M_2_FT*window.end))
-    if (processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
+    if (processBadJump and jumpStatus != JumpStatus.OK and jumpStatus != JumpStatus.WARM_UP_FILE) or jumpStatus == JumpStatus.OK:
         jumpStatusInfo = '<span style="color: %s">%s jump - %s - %.02f km/h</span><br>' % ('green', tag, 'VALID', jumpResult.score)
         belowMaxAltitude = isValidMaximumAltitude(jumpResult.data.altitudeAGL.max())
         badJumpLegend = None

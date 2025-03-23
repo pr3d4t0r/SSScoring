@@ -115,7 +115,7 @@ def main():
             st.toast('#### %s - %s' % (tag, str(jumpStatus)), icon='⚠️')
         with col0:
             st.html('<h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend if badJumpLegend else '')+'</h3>')
-        if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
+        if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK and jumpStatus != JumpStatus.WARM_UP_FILE) or jumpStatus == JumpStatus.OK:
             with col0:
                 displayJumpDataIn(jumpResult.table)
                 _displayAllJumpDataIn(jumpResult.data)
