@@ -72,7 +72,14 @@ Quickstart
   interactive quickstart, can be used for scoring speed skydives from the
   command line with minimum installation
 - Read the <a href='https://pr3d4t0r.github.io/SSScoring/ssscoring.html' target='_blank'>SSScoring API documentation</a>
-- SSScoring browser tools - EXPERIMENTAL
+
+
+### SSScore web tool
+
+Analyze single tracks or a group of tracks using the SSScoring API in a
+full-featured web application.  Requires Internet connectivity.
+
+URL:  <a href='https://ssscore.streamlit.app/' target='_blank'>SSScore 2</a>
 
 
 ### ssscore command line tool
