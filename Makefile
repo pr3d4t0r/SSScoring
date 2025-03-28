@@ -91,7 +91,7 @@ package:
 
 
 prune:
-	for f in $$(git branch | awk '!/master/ && !/main/ && !/^\*/ && !/local-work/ { print; }'); do git branch -d "$$f"; done
+	for f in $$(git branch | awk '!/master/ && !/main/ && !/^\*/ && !/local-work/ { print; }'); do git branch -D "$$f"; done
 
 
 # The publish: target is for PyPI, not for the devpi server.
