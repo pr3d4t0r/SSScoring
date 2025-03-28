@@ -51,7 +51,6 @@ def _displayAllJumpDataIn(data: pd.DataFrame):
     st.html('<h3>All rows of jump data</h3>')
     st.dataframe(data,
         column_order=columns,
-        # TODO:  Decide if we apply the same format to all columns
         column_config={
             'plotTime': st.column_config.NumberColumn(format='%.02f'),
             'speedAngle': st.column_config.NumberColumn(format='%.02f'),
