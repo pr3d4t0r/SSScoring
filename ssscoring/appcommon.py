@@ -133,8 +133,6 @@ def displayJumpDataIn(resultsTable: pd.DataFrame):
     table.deltaV = table.deltaV.apply(lambda x: round(x, 2))
     table.deltaAngle = table.deltaAngle.apply(lambda x: round(x, 2))
     table['altitude (ft)'] = table['altitude (ft)'].apply(lambda x: round(x, 1))
-    # TODO:  Decide if we'll keep this one.  Delete after 20250401 if present.
-    # table.netVectorKMh = table.netVectorKMh.apply(round)
     table.index = ['']*len(table)
     st.dataframe(table, hide_index=True)
 
