@@ -279,22 +279,25 @@ def getSpeedSkydiveFrom(data: pd.DataFrame) -> tuple:
         data = data[data.group == freeFallGroup]
         data = data.drop('group', axis = 1).drop('positive', axis = 1)
 
-    # TODO: WTF?
-    # data = data[data.altitudeAGL <= MAX_VALID_ELEVATION]
+    data = data[data.altitudeAGL <= MAX_VALID_ELEVATION]
     if len(data) > 0:
         exitTime = data[data.vMetersPerSecond > EXIT_SPEED].head(1).timeUnix.iat[0]
         data = data[data.timeUnix >= exitTime]
         data = data[data.altitudeAGL >= BREAKOFF_ALTITUDE]
 
-        windowStart = data.iloc[0].altitudeAGL
-        windowEnd = windowStart-PERFORMANCE_WINDOW_LENGTH
-        if windowEnd < BREAKOFF_ALTITUDE:
-            windowEnd = BREAKOFF_ALTITUDE
+        if len(data):
+            windowStart = data.iloc[0].altitudeAGL
+            windowEnd = windowStart-PERFORMANCE_WINDOW_LENGTH
+            if windowEnd < BREAKOFF_ALTITUDE:
+                windowEnd = BREAKOFF_ALTITUDE
 
-        validationWindowStart = windowEnd+VALIDATION_WINDOW_LENGTH
-        data = data[data.altitudeAGL >= windowEnd]
+            validationWindowStart = windowEnd+VALIDATION_WINDOW_LENGTH
+            data = data[data.altitudeAGL >= windowEnd]
+            performanceWindow = PerformanceWindow(windowStart, windowEnd, validationWindowStart)
+        else:
+            performanceWindow = None
 
-        return PerformanceWindow(windowStart, windowEnd, validationWindowStart), data
+        return performanceWindow, data
     else:
         return None, data
 
@@ -723,6 +726,7 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
                 speeds = d.copy()
             else:
                 speeds = pd.concat([ speeds, d, ])
+    speeds = speeds.replace(np.nan, 0.0)
     return speeds.sort_index()
 
 
