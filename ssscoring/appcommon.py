@@ -22,6 +22,7 @@ from ssscoring.notebook import graphAngle
 from ssscoring.notebook import graphJumpResult
 from ssscoring.notebook import initializeExtraYRanges
 from ssscoring.notebook import initializePlot
+from streamlit_bokeh import streamlit_bokeh
 
 import os
 
@@ -220,12 +221,14 @@ def plotJumpResult(tag: str,
     """
     plot = initializePlot(tag)
     plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
-    graphAltitude(plot, jumpResult)
-    graphAngle(plot, jumpResult)
-    hoverValue = bm.HoverTool(tooltips=[('time', '@x{0.0}s'), ('y-val', '@y{0.00}')])
-    plot.add_tools(hoverValue)
+#     graphAltitude(plot, jumpResult)
+#     graphAngle(plot, jumpResult)
+#     hoverValue = bm.HoverTool(tooltips=[('time', '@x{0.0}s'), ('y-val', '@y{0.00}')])
+#     plot.add_tools(hoverValue)
     graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
-    st.bokeh_chart(plot, use_container_width=True)
+    # st.bokeh_chart(plot, use_container_width=True)
+    streamlit_bokeh(plot, use_container_width=True, theme='dark_medium')
+
 
 
 def initFileUploaderState(filesObject:str, uploaderKey:str ='uploaderKey'):
