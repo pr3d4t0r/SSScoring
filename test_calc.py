@@ -19,6 +19,7 @@ from ssscoring.calc import processJump
 from ssscoring.calc import roundedAggregateResults
 from ssscoring.calc import totalResultsFrom
 from ssscoring.constants import BREAKOFF_ALTITUDE
+from ssscoring.constants import FLYSIGHT_2_HEADER
 from ssscoring.constants import FT_IN_M
 from ssscoring.datatypes import JumpStatus
 from ssscoring.errors import SSScoringError
@@ -43,6 +44,7 @@ TEST_FLYSIGHT_DATA_BAD_HEADERS = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' /
 TEST_FLYSIGHT_DATA_V1_WARM_UP = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-05-warm-up.csv'
 TEST_FLYSIGHT_DATA_V1_EXCEEDS_MAX_ALT = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-06-exceeds-max-alt.CSV'
 TEST_FLYSIGHT_DATA_V1_EXCEEDS_ISC_THRESHOLD = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-07-BAD-ISC.CSV'
+TEST_FLYSIGHT_DATA_V2_DISCARD_STRATOSPHERE = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS2' / 'test-data-08-stratosphere.CSV'
 
 
 # +++ globals +++
@@ -125,6 +127,11 @@ def test_getSpeedSkydiveFrom():
     assert '{0:,.2f}'.format(_window.end) == '1,886.01'
     assert '{0:,.2f}'.format(_window.validationStart) == '2,892.01'
     assert _data.iloc[-1].altitudeAGL >= _window.end
+
+#     rawData = pd.read_csv(TEST_FLYSIGHT_DATA_V2_DISCARD_STRATOSPHERE, names = FLYSIGHT_2_HEADER, skiprows = 8, index_col = False)
+#     workData = convertFlySight2SSScoring(rawData, 241.0)
+#     _, testData = getSpeedSkydiveFrom(workData)
+#     assert len(testData) == 125
 
 
 def test_isValidJumpISC():
@@ -293,10 +300,10 @@ def test_totalResultsFrom():
 
 # For symbolic debugger:
 
-test_convertFlySight2SSScoring()
-test_dropNonSkydiveDataFrom()
-test_getSpeedSkydiveFrom()
-test_isValidJumpISC()
+# test_convertFlySight2SSScoring()
+# test_dropNonSkydiveDataFrom()
+# test_getSpeedSkydiveFrom()
+# test_isValidJumpISC()
 # test_jumpAnalysisTable()
 # test__verticalAcceleration()
 # # test_isValidMinimumAltitude(_invalidAltFileName)
