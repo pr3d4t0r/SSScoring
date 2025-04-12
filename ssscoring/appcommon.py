@@ -265,7 +265,7 @@ def displayTrackOnMap(deck: pdk.Deck):
         deck
     A PyDeck initialized with map layers.
     """
-    st.write('Brightest point shows the max speed point.  Each track dot is 4 m in diameter.')
+    st.write('Brightest green point shows the max speed point.  Exit at orange point.  Each track dot is 4 m in diameter.')
     st.pydeck_chart(deck)
 
 
