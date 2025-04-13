@@ -88,7 +88,7 @@ def speedJumpTrajectory(jumpResult: JumpResults) -> pdk.Deck:
         pdk.Layer(
             'ScatterplotLayer',
             data=workData.head(1),
-            get_color=[ 0, 128, 0, 120 ],
+            get_color=[ 255, 126, 0, 255 ],
             get_position=[ 'longitude', 'latitude', ],
             get_radius=8),
         pdk.Layer(

@@ -82,6 +82,24 @@ vSpeed < 400 km/h.
 """
 
 
+MAX_VALID_ELEVATION = 4602.0
+"""
+Max valid elevation allowed in the FlySight or FlySsight 2 time series.  Speed
+skydivers are known to jump from as high as `MAX_VALID_ELEVATION` without O2.
+The SSScoring algorithms eliminate all data entries where elevation AGL > `MAX_VALID_ELEVATION`
+before processing the jump for scoring.  That's because occasional FlySight
+errors caused by intermittent GPS signal loss and invalid GPS readings when the
+skydiver sits under an airplane's wing during the climb to altitude and other
+factors.
+"""
+
+
+MAX_VALID_ELEVATION_FT = MAX_VALID_ELEVATION*3.28
+"""
+Same as `MAX_VALID_ELEVATION`, in ft.
+"""
+
+
 MAX_ALTITUDE_FT = 14000.0
 """
 Maximum exit altitude AGL according to FAI Competition Rules Speed Skydiving

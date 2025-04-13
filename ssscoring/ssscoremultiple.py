@@ -59,7 +59,10 @@ def main():
         allJumpsPlot = initializePlot('All jumps', backgroundColorName='#2c2c2c')
         mixColor = 0
         jumpResultsSubset = dict()
-        for tag in sorted(list(jumpResults.keys())):
+        with col1:
+            st.write('**Jump results detail and charts are displayed most recent first unless _Reverse_ order is selected**')
+            st.session_state.reverseDisplay = st.checkbox('Reverse', value=False, help='Display jump results in ascending order by track file tag name.')
+        for tag in sorted(list(jumpResults.keys()), reverse=(not st.session_state.reverseDisplay)):
             jumpResult = jumpResults[tag]
             mixColor = (mixColor+1)%len(SPEED_COLORS)
             with col1:
