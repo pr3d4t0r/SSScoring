@@ -53,22 +53,24 @@ def main():
     initFileUploaderState('trackFiles')
     setSideBarAndMain('🔢', False, _selectDZState)
 
-    col0, col1 = st.columns([0.5, 0.5, ])
+    # col0, col1 = st.columns([0.5, 0.5, ])
     if st.session_state.trackFiles:
         jumpResults = processAllJumpFiles(st.session_state.trackFiles, altitudeDZMeters=st.session_state.elevation)
         allJumpsPlot = initializePlot('All jumps', backgroundColorName='#2c2c2c')
         mixColor = 0
         jumpResultsSubset = dict()
-        with col1:
-            st.write('**Jump results detail and charts are displayed most recent first unless _Reverse_ order is selected**')
-            st.session_state.reverseDisplay = st.checkbox('Reverse', value=False, help='Display jump results in ascending order by track file tag name.')
-        resultTags = sorted(list(jumpResults.keys()), reverse=(not st.session_state.reverseDisplay))
-        tabs = st.tabs(resultTags)
-        index = len(resultTags)-1
+#         with col1:
+#             st.write('**Jump results detail and charts are displayed most recent first unless _Reverse_ order is selected**')
+#             st.session_state.reverseDisplay = st.checkbox('Reverse', value=False, help='Display jump results in ascending order by track file tag name.')
+#         resultTags = sorted(list(jumpResults.keys()), reverse=(not st.session_state.reverseDisplay))
+        resultTags = sorted(list(jumpResults.keys()), reverse=True)
+        tabs = st.tabs(['Totals']+resultTags)
+        index = 1
         for tag in resultTags:
             jumpResult = jumpResults[tag]
             mixColor = (mixColor+1)%len(SPEED_COLORS)
-            with col1:
+            # with col1:
+            with tabs[index]:
                 jumpStatusInfo,\
                 scoringInfo,\
                 badJumpLegend,\
@@ -77,7 +79,8 @@ def main():
                     st.toast('#### %s - %s' % (tag, str(jumpStatus)), icon='⚠️')
                 if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                     jumpResultsSubset[tag] = jumpResult
-                st.html('<hr><h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend if badJumpLegend else '')+'</h3>')
+                # st.html('<hr><h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend if badJumpLegend else '')+'</h3>')
+                st.html('<h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend if badJumpLegend else '')+'</h3>')
                 if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                     displayJumpDataIn(jumpResult.table)
                     plotJumpResult(tag, jumpResult)
@@ -89,8 +92,9 @@ def main():
                         showIt=False
                     )
                     displayTrackOnMap(speedJumpTrajectory(jumpResult))
-            index -= 1
-        with col0:
+            index += 1
+        # with col0:
+        with tabs[0]:
             st.html('<h2>Jumps in this set</h2>')
             if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                 aggregate = aggregateResults(jumpResultsSubset)
