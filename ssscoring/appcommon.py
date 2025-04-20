@@ -272,6 +272,26 @@ def displayTrackOnMap(deck: pdk.Deck):
     st.pydeck_chart(deck)
 
 
+@st.dialog('DZ Coordinates')
+def displayDZCoordinates():
+    """
+    Display the DZ coordinates in a dialog if one is selected in the drop zones
+    selection box.  The selection is stored in the  `st.session_state.currentDropZone`
+    variable.  If a valid name is available, the latitude and longitude are
+    displayed.  If `None` or invalid, a notification dialog is displayed.
+
+    The corresponding UI button is only enabled if the user selected a valid DZ,
+    otherwise the button is disabled.
+    """
+    dropZones = initDropZonesFromResource(DZ_DIRECTORY)
+    lat = float(dropZones[dropZones.dropZone == st.session_state.currentDropZone ].iloc[0].lat)
+    lon = float(dropZones[dropZones.dropZone == st.session_state.currentDropZone ].iloc[0].lon)
+    st.write(st.session_state.currentDropZone)
+    st.write('lat, lon: %.4f, %.4f' % (lat, lon))
+    if st.button('OK'):
+        st.rerun()
+
+
 def setSideBarAndMain(icon: str, singleTrack: bool, selectDZState):
     """
     Set all the interactive and navigational components for the app's side bar.
@@ -301,14 +321,14 @@ def setSideBarAndMain(icon: str, singleTrack: bool, selectDZState):
     cleared until application reload.
     """
     dropZones = initDropZonesFromResource(DZ_DIRECTORY)
-    dropZone = None
+    st.session_state.currentDropZone = None
     elevation = None
     st.sidebar.title('%s SSScore %s' % (icon, __VERSION__))
     st.session_state.processBadJump = st.sidebar.checkbox('Process bad jumps', value=True, help='Display results from invalid jumps')
-    dropZone = st.sidebar.selectbox('Select the drop zone:', dropZones.dropZone, index=None, on_change=selectDZState, disabled=(elevation != None and elevation != 0.0))
-    elevation = st.sidebar.number_input('...or enter the DZ elevation in meters:', min_value=0.0, max_value=4000.0, value='min', format='%.2f', disabled=(dropZone != None), on_change=selectDZState)
-    if dropZone:
-        st.session_state.elevation = dropZones[dropZones.dropZone == dropZone ].iloc[0].elevation
+    st.session_state.currentDropZone = st.sidebar.selectbox('Select the drop zone:', dropZones.dropZone, index=None, on_change=selectDZState, disabled=(elevation != None and elevation != 0.0))
+    elevation = st.sidebar.number_input('...or enter the DZ elevation in meters:', min_value=0.0, max_value=4000.0, value='min', format='%.2f', disabled=(st.session_state.currentDropZone != None), on_change=selectDZState)
+    if st.session_state.currentDropZone:
+        st.session_state.elevation = dropZones[dropZones.dropZone == st.session_state.currentDropZone ].iloc[0].elevation
     elif elevation != None and elevation != 0.0:
         st.session_state.elevation= elevation
     else:
@@ -330,6 +350,7 @@ def setSideBarAndMain(icon: str, singleTrack: bool, selectDZState):
         if trackFiles:
             st.session_state.trackFiles = trackFiles
     st.sidebar.button('Clear', on_click=selectDZState)
+    st.sidebar.button('Display DZ coordinates', on_click=displayDZCoordinates, disabled=(st.session_state.currentDropZone == None))
     st.sidebar.link_button('Report missing DZ', 'https://github.com/pr3d4t0r/SSScoring/issues/new?template=report-missing-dz.md', icon=':material/breaking_news_alt_1:')
     st.sidebar.link_button('Feature request or bug report', 'https://github.com/pr3d4t0r/SSScoring/issues/new?template=Blank+issue', icon=':material/breaking_news_alt_1:')
 
