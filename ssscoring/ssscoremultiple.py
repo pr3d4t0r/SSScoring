@@ -17,6 +17,7 @@ from ssscoring.calc import aggregateResults
 from ssscoring.calc import processAllJumpFiles
 from ssscoring.calc import totalResultsFrom
 from ssscoring.datatypes import JumpStatus
+# from ssscoring.mapview import multipleSpeedJumpsTrajectories
 from ssscoring.mapview import speedJumpTrajectory
 from ssscoring.notebook import SPEED_COLORS
 from ssscoring.notebook import graphJumpResult
@@ -103,6 +104,7 @@ def main():
                 st.html('<h2>Summary</h2>')
                 st.dataframe(totalResultsFrom(aggregate), hide_index = True)
                 st.bokeh_chart(allJumpsPlot, use_container_width=True)
+                # displayTrackOnMap(multipleSpeedJumpsTrajectories(jumpResults))
 
 
 if '__main__' == __name__:
