@@ -22,6 +22,10 @@ from ssscoring.mapview import speedJumpTrajectory
 from ssscoring.notebook import SPEED_COLORS
 from ssscoring.notebook import graphJumpResult
 from ssscoring.notebook import initializePlot
+from ssscoring.constants import M_2_FT
+from ssscoring.calc import dropNonSkydiveDataFrom
+from ssscoring.datatypes import PerformanceWindow
+from ssscoring.constants import SPEED_ACCURACY_THRESHOLD
 
 import pandas as pd
 import streamlit as st
@@ -39,6 +43,56 @@ def _styleShowMaxIn(scores: pd.Series) -> pd.DataFrame:
     return [
         'background-color: mediumseagreen' if v == scores.max() else \
         '' for v in scores ]
+
+
+def _displayAllJumpDataIn(data: pd.DataFrame):
+    columns = [ 'plotTime' ] + [ column for column in data.columns if column != 'plotTime' and column != 'timeUnix' ]
+    st.html('<h3>All jump data from exit</h3>')
+    st.dataframe(data,
+        column_order=columns,
+        column_config={
+            'plotTime': st.column_config.NumberColumn(format='%.02f'),
+            'speedAngle': st.column_config.NumberColumn(format='%.02f'),
+            'speedAccuracyISC': st.column_config.NumberColumn(format='%.02f'),
+        },
+        hide_index=True)
+
+
+def _displayScoresIn(rawData: dict):
+    st.html('<h3>All 3-sec sliding window scores</h3>')
+    data = pd.DataFrame.from_dict({ 'time': rawData.values(), 'score': rawData.keys(), })
+    data.time = data.time.apply(lambda x: '%.2f' % x)
+    st.dataframe(data, hide_index=True)
+
+
+def _displayBadRowsISCAccuracyExceeded(data: pd.DataFrame, window: PerformanceWindow):
+    badRows = data[data.speedAccuracyISC >= SPEED_ACCURACY_THRESHOLD]
+    badRows = dropNonSkydiveDataFrom(badRows)
+    times = pd.to_datetime(badRows.timeUnix, unit='s').dt.strftime('%Y-%m-%d %H:%M:%S.%f').str[:-4]
+    badRows.insert(0, 'time', times)
+    badRows.drop(columns = [
+        'timeUnix',
+        'altitudeMSL',
+        'altitudeMSLFt',
+        'speedAccuracy',
+        'hMetersPerSecond',
+        'hKMh',
+        'speedAngle',
+        'latitude',
+        'longitude',
+        'verticalAccuracy', ], inplace=True)
+    st.html('<h3>Performance window:<br>start = %.2f m (%.2f ft)<br>end = %.2f m (%.2f ft)<br>validation start = %.2f m (%.2f ft)</h3>' % \
+                    (window.start, M_2_FT*window.start, window.end, M_2_FT*window.end, window.validationStart, M_2_FT*window.validationStart))
+    st.html('<h3>%d track rows where the ISC speed accuracy threshold was exceeded during the speed run:</h3>' % len(badRows))
+    st.dataframe(badRows, hide_index=True)
+
+
+    workData = data.copy()
+    workData = dropNonSkydiveDataFrom(workData)
+    times = pd.to_datetime(workData.timeUnix, unit='s').dt.strftime('%Y-%m-%d %H:%M:%S.%f').str[:-4]
+    workData.insert(0, 'time', times)
+    st.html('<h3>Full speed run data (%d rows)</h3>' % len(workData))
+    st.dataframe(workData, hide_index=True)
 
 
 def _styleShowMinMaxIn(scores: pd.Series) -> pd.DataFrame:
@@ -93,6 +147,10 @@ def main():
                         showIt=False
                     )
                     displayTrackOnMap(speedJumpTrajectory(jumpResult))
+                    _displayAllJumpDataIn(jumpResult.data)
+                    _displayScoresIn(jumpResult.scores)
+                elif jumpStatus == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT:
+                    _displayBadRowsISCAccuracyExceeded(jumpResult.data, jumpResult.window)
             index += 1
         # with col0:
         with tabs[0]:
