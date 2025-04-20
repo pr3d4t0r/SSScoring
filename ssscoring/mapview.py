@@ -57,6 +57,7 @@ def _resolveMaxSpeedTimeFrom(jumpResult: JumpResults) -> float:
 
 
 def speedJumpTrajectory(jumpResult: JumpResults) -> pdk.Deck:
+    # TODO:  https://en.wikipedia.org/wiki/X11_color_names
     """
     Build the layers for a PyDeck map showing a jumper's trajectory.
 
@@ -80,13 +81,6 @@ def speedJumpTrajectory(jumpResult: JumpResults) -> pdk.Deck:
     layers = [
         pdk.Layer(
             'ScatterplotLayer',
-            data=workData,
-            # get_color=[ 0, 160, 0, 128 ],
-            get_color=[ 0, 192, 0, 255 ],
-            get_position=[ 'longitude', 'latitude', ],
-            t_radius=4),
-        pdk.Layer(
-            'ScatterplotLayer',
             data=workData.head(1),
             get_color=[ 255, 126, 0, 255 ],
             get_position=[ 'longitude', 'latitude', ],
@@ -103,12 +97,71 @@ def speedJumpTrajectory(jumpResult: JumpResults) -> pdk.Deck:
             get_color=[ 0, 255, 0, ],
             get_position=[ 'longitude', 'latitude', ],
             get_radius=12),
+        pdk.Layer(
+            'ScatterplotLayer',
+            data=workData,
+            # get_color=[ 0, 192, 0, 255 ],
+            get_color=[ 0x64, 0x95, 0xed, 255 ],
+            get_position=[ 'longitude', 'latitude', ],
+            get_radius=2),
+        pdk.Layer(
+            'ScatterplotLayer',
+            data=workData[workData.plotTime == maxSpeedTime],
+            get_color=[ 0, 128, 0, ],
+            get_position=[ 'longitude', 'latitude', ],
+            get_radius=4),
     ]
     viewBox = viewPointBox(workData)
     deck = pdk.Deck(
         map_style = None,
         initial_view_state=pdk.data_utils.compute_view(viewBox[['longitude', 'latitude',]]),
         layers=layers
+    )
+    return deck
+
+
+def multipleSpeedJumpsTrajectories(jumpResults):
+    """
+    **EXPERIMENTAL**
+    """
+    mapLayers = list()
+    for result in jumpResults.values():
+        workData = result.data.copy()
+        maxSpeedTime = _resolveMaxSpeedTimeFrom(result)
+        layers = [
+            pdk.Layer(
+                'ScatterplotLayer',
+                data=workData,
+                # get_color=[ 0, 160, 0, 128 ],
+                get_color=[ 0, 192, 0, 255 ],
+                get_position=[ 'longitude', 'latitude', ],
+                t_radius=4),
+            pdk.Layer(
+                'ScatterplotLayer',
+                data=workData.head(1),
+                get_color=[ 255, 126, 0, 255 ],
+                get_position=[ 'longitude', 'latitude', ],
+                get_radius=8),
+            pdk.Layer(
+                'ScatterplotLayer',
+                data=workData.tail(1),
+                get_color=[ 0, 192, 0, 160 ],
+                get_position=[ 'longitude', 'latitude', ],
+                get_radius=8),
+            pdk.Layer(
+                'ScatterplotLayer',
+                data=workData[workData.plotTime == maxSpeedTime],
+                get_color=[ 0, 255, 0, ],
+                get_position=[ 'longitude', 'latitude', ],
+                get_radius=12),
+        ]
+        mapLayers += layers
+
+    viewBox = viewPointBox(workData)
+    deck = pdk.Deck(
+        map_style = None,
+        initial_view_state=pdk.data_utils.compute_view(viewBox[['longitude', 'latitude',]]),
+        layers=mapLayers
     )
     return deck
 
