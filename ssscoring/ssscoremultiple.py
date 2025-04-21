@@ -121,15 +121,19 @@ def main():
         resultTags = sorted(list(jumpResults.keys()), reverse=True)
         tabs = st.tabs(['Totals']+resultTags)
         index = 1
+        jumpStatus = JumpStatus.OK
         for tag in resultTags:
+            st.write(tabs)
             jumpResult = jumpResults[tag]
             mixColor = (mixColor+1)%len(SPEED_COLORS)
             # with col1:
+            st.write('tag = %s' % tag)
             with tabs[index]:
                 jumpStatusInfo,\
                 scoringInfo,\
                 badJumpLegend,\
                 jumpStatus = interpretJumpResult(tag, jumpResult, st.session_state.processBadJump)
+                st.write('jumpStatus = %s' % jumpStatus)
                 if jumpStatus != JumpStatus.OK:
                     st.toast('#### %s - %s' % (tag, str(jumpStatus)), icon='⚠️')
                 if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
@@ -155,14 +159,17 @@ def main():
         # with col0:
         with tabs[0]:
             st.html('<h2>Jumps in this set</h2>')
-            if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
-                aggregate = aggregateResults(jumpResultsSubset)
-                displayAggregate = aggregate.style.apply(_styleShowMinMaxIn, subset=[ 'score', ]).apply(_styleShowMaxIn, subset=[ 'maxSpeed', ]).format(precision=2)
-                st.dataframe(displayAggregate)
-                st.html('<h2>Summary</h2>')
-                st.dataframe(totalResultsFrom(aggregate), hide_index = True)
-                st.bokeh_chart(allJumpsPlot, use_container_width=True)
-                # displayTrackOnMap(multipleSpeedJumpsTrajectories(jumpResults))
+            st.write('resultTags = %s' % resultTags)
+            st.write(st.session_state.trackFiles)
+            if len(resultTags):
+                if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
+                    aggregate = aggregateResults(jumpResultsSubset)
+                    displayAggregate = aggregate.style.apply(_styleShowMinMaxIn, subset=[ 'score', ]).apply(_styleShowMaxIn, subset=[ 'maxSpeed', ]).format(precision=2)
+                    st.dataframe(displayAggregate)
+                    st.html('<h2>Summary</h2>')
+                    st.dataframe(totalResultsFrom(aggregate), hide_index = True)
+                    st.bokeh_chart(allJumpsPlot, use_container_width=True)
+                    # displayTrackOnMap(multipleSpeedJumpsTrajectories(jumpResults))
 
 
 if '__main__' == __name__:
