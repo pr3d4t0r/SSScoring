@@ -678,8 +678,10 @@ def processAllJumpFiles(jumpFiles: list, altitudeDZMeters = 0.0) -> dict:
         else:
             rawData, tag = getFlySightDataFromCSVFileName(jumpFile)
         jumpResult = processJump(convertFlySight2SSScoring(rawData, altitudeDZMeters = altitudeDZMeters))
-        if JumpStatus.OK == jumpResult.status:
-            jumpResults[tag] = jumpResult
+# TODO:  00183-deprecate-single-view
+#         if JumpStatus.OK == jumpResult.status:
+#             jumpResults[tag] = jumpResult
+        jumpResults[tag] = jumpResult
     return jumpResults
 
 
