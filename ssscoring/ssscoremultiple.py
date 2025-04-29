@@ -1,4 +1,4 @@
-# See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
+# See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txtl
 
 """
 ## Experimental
@@ -46,23 +46,25 @@ def _styleShowMaxIn(scores: pd.Series) -> pd.DataFrame:
 
 
 def _displayAllJumpDataIn(data: pd.DataFrame):
-    columns = [ 'plotTime' ] + [ column for column in data.columns if column != 'plotTime' and column != 'timeUnix' ]
-    st.html('<h3>All jump data from exit</h3>')
-    st.dataframe(data,
-        column_order=columns,
-        column_config={
-            'plotTime': st.column_config.NumberColumn(format='%.02f'),
-            'speedAngle': st.column_config.NumberColumn(format='%.02f'),
-            'speedAccuracyISC': st.column_config.NumberColumn(format='%.02f'),
-        },
-        hide_index=True)
+    if data is not None:
+        columns = [ 'plotTime' ] + [ column for column in data.columns if column != 'plotTime' and column != 'timeUnix' ]
+        st.html('<h3>All jump data from exit</h3>')
+        st.dataframe(data,
+            column_order=columns,
+            column_config={
+                'plotTime': st.column_config.NumberColumn(format='%.02f'),
+                'speedAngle': st.column_config.NumberColumn(format='%.02f'),
+                'speedAccuracyISC': st.column_config.NumberColumn(format='%.02f'),
+            },
+            hide_index=True)
 
 
 def _displayScoresIn(rawData: dict):
-    st.html('<h3>All 3-sec sliding window scores</h3>')
-    data = pd.DataFrame.from_dict({ 'time': rawData.values(), 'score': rawData.keys(), })
-    data.time = data.time.apply(lambda x: '%.2f' % x)
-    st.dataframe(data, hide_index=True)
+    if rawData is not None:
+        st.html('<h3>All 3-sec sliding window scores</h3>')
+        data = pd.DataFrame.from_dict({ 'time': rawData.values(), 'score': rawData.keys(), })
+        data.time = data.time.apply(lambda x: '%.2f' % x)
+        st.dataframe(data, hide_index=True)
 
 
 def _displayBadRowsISCAccuracyExceeded(data: pd.DataFrame, window: PerformanceWindow):
@@ -123,17 +125,14 @@ def main():
         index = 1
         jumpStatus = JumpStatus.OK
         for tag in resultTags:
-            st.write(tabs)
             jumpResult = jumpResults[tag]
             mixColor = (mixColor+1)%len(SPEED_COLORS)
             # with col1:
-            st.write('tag = %s' % tag)
             with tabs[index]:
                 jumpStatusInfo,\
                 scoringInfo,\
                 badJumpLegend,\
                 jumpStatus = interpretJumpResult(tag, jumpResult, st.session_state.processBadJump)
-                st.write('jumpStatus = %s' % jumpStatus)
                 if jumpStatus != JumpStatus.OK:
                     st.toast('#### %s - %s' % (tag, str(jumpStatus)), icon='⚠️')
                 if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
@@ -159,17 +158,16 @@ def main():
         # with col0:
         with tabs[0]:
             st.html('<h2>Jumps in this set</h2>')
-            st.write('resultTags = %s' % resultTags)
-            st.write(st.session_state.trackFiles)
             if len(resultTags):
                 if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                     aggregate = aggregateResults(jumpResultsSubset)
-                    displayAggregate = aggregate.style.apply(_styleShowMinMaxIn, subset=[ 'score', ]).apply(_styleShowMaxIn, subset=[ 'maxSpeed', ]).format(precision=2)
-                    st.dataframe(displayAggregate)
-                    st.html('<h2>Summary</h2>')
-                    st.dataframe(totalResultsFrom(aggregate), hide_index = True)
-                    st.bokeh_chart(allJumpsPlot, use_container_width=True)
-                    # displayTrackOnMap(multipleSpeedJumpsTrajectories(jumpResults))
+                    if len(aggregate) > 0:
+                        displayAggregate = aggregate.style.apply(_styleShowMinMaxIn, subset=[ 'score', ]).apply(_styleShowMaxIn, subset=[ 'maxSpeed', ]).format(precision=2)
+                        st.dataframe(displayAggregate)
+                        st.html('<h2>Summary</h2>')
+                        st.dataframe(totalResultsFrom(aggregate), hide_index = True)
+                        st.bokeh_chart(allJumpsPlot, use_container_width=True)
+                        # displayTrackOnMap(multipleSpeedJumpsTrajectories(jumpResults))
 
 
 if '__main__' == __name__:
