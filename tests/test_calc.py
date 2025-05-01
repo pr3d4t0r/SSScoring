@@ -135,6 +135,8 @@ def test_getSpeedSkydiveFrom():
 
 
 def test_isValidJumpISC():
+    # warnings.warn('This function is DEPRECATED as of version 2.4.0', UserWarning)
+    warnings.warn('This function is DEPRECATED as of version 2.4.0')
     bogus = pd.DataFrame( { 'altitudeAGL': (2800, ), 'speedAccuracyISC': (3.1, ), } )
     assert isValidJumpISC(_data, _window)
     assert not isValidJumpISC(bogus, _window)
@@ -143,6 +145,19 @@ def test_isValidJumpISC():
     data = dropNonSkydiveDataFrom(data)
     window, data = getSpeedSkydiveFrom(data)
     assert not isValidJumpISC(data, window)
+
+
+
+def test_validateJumpISC():
+#     bogus = pd.DataFrame( { 'altitudeAGL': (2800, ), 'speedAccuracyISC': (3.1, ), } )
+#     assert isValidJumpISC(_data, _window)
+#     assert not isValidJumpISC(bogus, _window)
+#     rawData = pd.read_csv(TEST_FLYSIGHT_DATA_V1_EXCEEDS_ISC_THRESHOLD, skiprows = (1,1))
+#     data = convertFlySight2SSScoring(rawData, altitudeDZMeters = 3.0)
+#     data = dropNonSkydiveDataFrom(data)
+#     window, data = getSpeedSkydiveFrom(data)
+#     assert not isValidJumpISC(data, window)
+    pass
 
 
 def test_calculateDistance():
