@@ -100,7 +100,7 @@ def main():
     if not isStreamlitHostedApp():
         st.set_page_config(layout = 'wide')
     initFileUploaderState('trackFile')
-    setSideBarAndMain('1️⃣ ', True, _selectDZState)
+    setSideBarAndMain('❌', True, _selectDZState)
 
     col0, col1 = st.columns([ 0.4, 0.6, ])
     if st.session_state.trackFile:
