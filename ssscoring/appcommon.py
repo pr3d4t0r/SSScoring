@@ -127,14 +127,15 @@ def displayJumpDataIn(resultsTable: pd.DataFrame):
     ---
     `ssscoring.datatypes.JumpResults`
     """
-    table = resultsTable.copy()
-    table.vKMh = table.vKMh.apply(lambda x: round(x, 2))
-    table.hKMh = table.hKMh.apply(lambda x: round(x, 2))
-    table.deltaV = table.deltaV.apply(lambda x: round(x, 2))
-    table.deltaAngle = table.deltaAngle.apply(lambda x: round(x, 2))
-    table['altitude (ft)'] = table['altitude (ft)'].apply(lambda x: round(x, 1))
-    table.index = ['']*len(table)
-    st.dataframe(table, hide_index=True)
+    if resultsTable is not None:
+        table = resultsTable.copy()
+        table.vKMh = table.vKMh.apply(lambda x: round(x, 2))
+        table.hKMh = table.hKMh.apply(lambda x: round(x, 2))
+        table.deltaV = table.deltaV.apply(lambda x: round(x, 2))
+        table.deltaAngle = table.deltaAngle.apply(lambda x: round(x, 2))
+        table['altitude (ft)'] = table['altitude (ft)'].apply(lambda x: round(x, 1))
+        table.index = ['']*len(table)
+        st.dataframe(table, hide_index=True)
 
 
 def interpretJumpResult(tag: str,
@@ -218,14 +219,15 @@ def plotJumpResult(tag: str,
         jumpResult
     An instance of `ssscoring.datatypes.JumpResults` with jump data.
     """
-    plot = initializePlot(tag)
-    plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
-    graphAltitude(plot, jumpResult)
-    graphAngle(plot, jumpResult)
-    hoverValue = bm.HoverTool(tooltips=[('time', '@x{0.0}s'), ('y-val', '@y{0.00}')])
-    plot.add_tools(hoverValue)
-    graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
-    st.bokeh_chart(plot, use_container_width=True)
+    if jumpResult.data is not None:
+        plot = initializePlot(tag)
+        plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
+        graphAltitude(plot, jumpResult)
+        graphAngle(plot, jumpResult)
+        hoverValue = bm.HoverTool(tooltips=[('time', '@x{0.0}s'), ('y-val', '@y{0.00}')])
+        plot.add_tools(hoverValue)
+        graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
+        st.bokeh_chart(plot, use_container_width=True)
 
 
 def initFileUploaderState(filesObject:str, uploaderKey:str ='uploaderKey'):
@@ -265,8 +267,9 @@ def displayTrackOnMap(deck: pdk.Deck):
         deck
     A PyDeck initialized with map layers.
     """
-    st.write('Brightest green point shows the max speed point.  Exit at orange point.  Each track dot is 4 m in diameter.')
-    st.pydeck_chart(deck)
+    if deck is not None:
+        st.write('Brightest green point shows the max speed point.  Exit at orange point.  Each track dot is 4 m in diameter.')
+        st.pydeck_chart(deck)
 
 
 @st.dialog('DZ Coordinates')
@@ -333,13 +336,13 @@ def setSideBarAndMain(icon: str, singleTrack: bool, selectDZState):
         st.session_state.trackFiles = None
     st.sidebar.metric('Elevation', value='%.1f m' % (0.0 if st.session_state.elevation == None else st.session_state.elevation))
     if singleTrack:
-        trackFile = st.sidebar.file_uploader('Track file', [ 'CSV' ], disabled=st.session_state.elevation == None, key = st.session_state.uploaderKey)
+        trackFile = st.sidebar.file_uploader('Track file', [ 'CSV', 'csv', ], disabled=st.session_state.elevation == None, key = st.session_state.uploaderKey)
         if trackFile:
             st.session_state.trackFile = trackFile
     else:
         trackFiles = st.sidebar.file_uploader(
             'Track files',
-            [ 'CSV' ],
+            [ 'CSV', 'csv', ],
             disabled=st.session_state.elevation == None,
             accept_multiple_files=True,
             key = st.session_state.uploaderKey

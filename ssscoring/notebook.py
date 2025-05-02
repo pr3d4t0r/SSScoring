@@ -287,19 +287,20 @@ def graphJumpResult(plot,
     -------
     `None`.
     """
-    data = jumpResult.data
-    scores = jumpResult.scores
-    score = jumpResult.score
-    # Main speed line
-    plot.line(data.plotTime, data.vKMh, legend_label = legend, line_width = 2, line_color = lineColor)
+    if jumpResult.data is not None:
+        data = jumpResult.data
+        scores = jumpResult.scores
+        score = jumpResult.score
+        # Main speed line
+        plot.line(data.plotTime, data.vKMh, legend_label = legend, line_width = 2, line_color = lineColor)
 
-    if showIt:
-        plot.line(data.plotTime, data.hKMh, legend_label = 'H-speed', line_width = 2, line_color = 'red')
-        _plotSpeedAccuracy(plot, data, jumpResult.window)
-        _graphSegment(plot, scores[score], 0.0, scores[score], score, 3, 'lightblue')
-        _graphSegment(plot, scores[score]+1.5, 0.0, scores[score]+1.5, score, 1, 'darkseagreen')
-        _graphSegment(plot, scores[score]-1.5, 0.0, scores[score]-1.5, score, 1, 'darkseagreen')
-        plot.scatter(x = [ scores[score], ], y = [ score, ], marker = 'square_cross', size = [ 20, ], line_color = 'lightblue', fill_color = None, line_width = 3)
+        if showIt:
+            plot.line(data.plotTime, data.hKMh, legend_label = 'H-speed', line_width = 2, line_color = 'red')
+            _plotSpeedAccuracy(plot, data, jumpResult.window)
+            _graphSegment(plot, scores[score], 0.0, scores[score], score, 3, 'lightblue')
+            _graphSegment(plot, scores[score]+1.5, 0.0, scores[score]+1.5, score, 1, 'darkseagreen')
+            _graphSegment(plot, scores[score]-1.5, 0.0, scores[score]-1.5, score, 1, 'darkseagreen')
+            plot.scatter(x = [ scores[score], ], y = [ score, ], marker = 'square_cross', size = [ 20, ], line_color = 'lightblue', fill_color = None, line_width = 3)
 
 
 def graphAltitude(plot,

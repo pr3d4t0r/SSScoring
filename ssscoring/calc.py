@@ -35,6 +35,7 @@ from ssscoring.flysight import FlySightVersion
 from ssscoring.flysight import detectFlySightFileVersionOf
 
 import math
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -96,7 +97,7 @@ def isValidMaximumAltitude(altitude: float) -> bool:
 def isValidJumpISC(data: pd.DataFrame,
                 window: PerformanceWindow) -> bool:
     """
-    Validates the jump according to ISC/FAI/USPA competition rules.  A jump is
+    **DEPRECATED** - Validates the jump according to ISC/FAI/USPA competition rules.  A jump is
     valid when the speed accuracy parameter is less than 3 m/s for the whole
     validation window duration.
 
@@ -111,11 +112,44 @@ def isValidJumpISC(data: pd.DataFrame,
     -------
     `True` if the jump is valid according to ISC/FAI/USPA rules.
     """
+    warnings.warn('This function is DEPRECATED as of version 2.4.0', UserWarning)
     if len(data) > 0:
         accuracy = data[data.altitudeAGL <= window.validationStart].speedAccuracyISC.max()
         return accuracy < SPEED_ACCURACY_THRESHOLD
     else:
         return False
+
+
+def validateJumpISC(data: pd.DataFrame,
+                window: PerformanceWindow) -> JumpStatus:
+    """
+    Validates the jump according to ISC/FAI/USPA competition rules.  A jump is
+    valid when the speed accuracy parameter is less than 3 m/s for the whole
+    validation window duration.
+
+    Arguments
+    ---------
+        data : pd.DataFramce
+    Jumnp data in SSScoring format
+        window : ssscoring.PerformanceWindow
+    Performance window start, end values in named tuple format
+
+    Returns
+    -------
+    - `JumpStatus.OK` if `data` reflects a valid jump according to ISC rules,
+    where all speed accuracy values < 'SPEED_ACCURACY_THRESHOLD'.
+    - `JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT' if `data` has one or more values
+    within the validation window with a value >= 'SPEED_ACCURACY_THRESHOLD'.
+
+    Raises
+    ------
+    `SSScoringError' if `data` has a length of zero or it's not initialized.
+    """
+    if len(data) > 0:
+        accuracy = data[data.altitudeAGL <= window.validationStart].speedAccuracyISC.max()
+        return JumpStatus.OK if accuracy < SPEED_ACCURACY_THRESHOLD else JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT
+    else:
+        raise SSScoringError('data length of zero or invalid')
 
 
 def calculateDistance(start: tuple, end: tuple) -> float:
@@ -493,12 +527,11 @@ def processJump(data: pd.DataFrame) -> JumpResults:
         window = None
         jumpStatus = JumpStatus.WARM_UP_FILE
     else:
-        validJump = isValidJumpISC(workData, window)
-        jumpStatus = JumpStatus.OK
+        jumpStatus = validateJumpISC(workData, window)
         score = None
         scores = None
         table = None
-        if validJump:
+        if jumpStatus == JumpStatus.OK:
             table = None
             table = jumpAnalysisTable(workData)
             maxSpeed = data.vKMh.max()
@@ -507,9 +540,7 @@ def processJump(data: pd.DataFrame) -> JumpResults:
             score, scores = calcScoreISC(workData)
         else:
             maxSpeed = -1
-            if len(workData):
-                jumpStatus = JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT
-            else:
+            if not len(workData):
                 jumpStatus = JumpStatus.INVALID_SPEED_FILE
     return JumpResults(workData, maxSpeed, score, scores, table, window, jumpStatus)
 
@@ -678,8 +709,10 @@ def processAllJumpFiles(jumpFiles: list, altitudeDZMeters = 0.0) -> dict:
         else:
             rawData, tag = getFlySightDataFromCSVFileName(jumpFile)
         jumpResult = processJump(convertFlySight2SSScoring(rawData, altitudeDZMeters = altitudeDZMeters))
-        if JumpStatus.OK == jumpResult.status:
-            jumpResults[tag] = jumpResult
+# TODO:  00183-deprecate-single-view
+#         if JumpStatus.OK == jumpResult.status:
+#             jumpResults[tag] = jumpResult
+        jumpResults[tag] = jumpResult
     return jumpResults
 
 
