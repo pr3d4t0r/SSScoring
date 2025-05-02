@@ -1,4 +1,4 @@
-# See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
+# See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txtl
 
 """
 ## Experimental
@@ -22,6 +22,10 @@ from ssscoring.mapview import speedJumpTrajectory
 from ssscoring.notebook import SPEED_COLORS
 from ssscoring.notebook import graphJumpResult
 from ssscoring.notebook import initializePlot
+from ssscoring.constants import M_2_FT
+from ssscoring.calc import dropNonSkydiveDataFrom
+from ssscoring.datatypes import PerformanceWindow
+from ssscoring.constants import SPEED_ACCURACY_THRESHOLD
 
 import pandas as pd
 import streamlit as st
@@ -41,6 +45,58 @@ def _styleShowMaxIn(scores: pd.Series) -> pd.DataFrame:
         '' for v in scores ]
 
 
+def _displayAllJumpDataIn(data: pd.DataFrame):
+    if data is not None:
+        columns = [ 'plotTime' ] + [ column for column in data.columns if column != 'plotTime' and column != 'timeUnix' ]
+        st.html('<h3>All jump data from exit</h3>')
+        st.dataframe(data,
+            column_order=columns,
+            column_config={
+                'plotTime': st.column_config.NumberColumn(format='%.02f'),
+                'speedAngle': st.column_config.NumberColumn(format='%.02f'),
+                'speedAccuracyISC': st.column_config.NumberColumn(format='%.02f'),
+            },
+            hide_index=True)
+
+
+def _displayScoresIn(rawData: dict):
+    if rawData is not None:
+        st.html('<h3>All 3-sec sliding window scores</h3>')
+        data = pd.DataFrame.from_dict({ 'time': rawData.values(), 'score': rawData.keys(), })
+        data.time = data.time.apply(lambda x: '%.2f' % x)
+        st.dataframe(data, hide_index=True)
+
+
+def _displayBadRowsISCAccuracyExceeded(data: pd.DataFrame, window: PerformanceWindow):
+    badRows = data[data.speedAccuracyISC >= SPEED_ACCURACY_THRESHOLD]
+    badRows = dropNonSkydiveDataFrom(badRows)
+    times = pd.to_datetime(badRows.timeUnix, unit='s').dt.strftime('%Y-%m-%d %H:%M:%S.%f').str[:-4]
+    badRows.insert(0, 'time', times)
+    badRows.drop(columns = [
+        'timeUnix',
+        'altitudeMSL',
+        'altitudeMSLFt',
+        'speedAccuracy',
+        'hMetersPerSecond',
+        'hKMh',
+        'speedAngle',
+        'latitude',
+        'longitude',
+        'verticalAccuracy', ], inplace=True)
+    st.html('<h3>Performance window:<br>start = %.2f m (%.2f ft)<br>end = %.2f m (%.2f ft)<br>validation start = %.2f m (%.2f ft)</h3>' % \
+                    (window.start, M_2_FT*window.start, window.end, M_2_FT*window.end, window.validationStart, M_2_FT*window.validationStart))
+    st.html('<h3>%d track rows where the ISC speed accuracy threshold was exceeded during the speed run:</h3>' % len(badRows))
+    st.dataframe(badRows, hide_index=True)
+
+
+    workData = data.copy()
+    workData = dropNonSkydiveDataFrom(workData)
+    times = pd.to_datetime(workData.timeUnix, unit='s').dt.strftime('%Y-%m-%d %H:%M:%S.%f').str[:-4]
+    workData.insert(0, 'time', times)
+    st.html('<h3>Full speed run data (%d rows)</h3>' % len(workData))
+    st.dataframe(workData, hide_index=True)
+
+
 def _styleShowMinMaxIn(scores: pd.Series) -> pd.DataFrame:
     return [
         'background-color: green' if v == scores.max() else \
@@ -54,23 +110,18 @@ def main():
     initFileUploaderState('trackFiles')
     setSideBarAndMain('🔢', False, _selectDZState)
 
-    # col0, col1 = st.columns([0.5, 0.5, ])
     if st.session_state.trackFiles:
         jumpResults = processAllJumpFiles(st.session_state.trackFiles, altitudeDZMeters=st.session_state.elevation)
         allJumpsPlot = initializePlot('All jumps', backgroundColorName='#2c2c2c')
         mixColor = 0
         jumpResultsSubset = dict()
-#         with col1:
-#             st.write('**Jump results detail and charts are displayed most recent first unless _Reverse_ order is selected**')
-#             st.session_state.reverseDisplay = st.checkbox('Reverse', value=False, help='Display jump results in ascending order by track file tag name.')
-#         resultTags = sorted(list(jumpResults.keys()), reverse=(not st.session_state.reverseDisplay))
         resultTags = sorted(list(jumpResults.keys()), reverse=True)
         tabs = st.tabs(['Totals']+resultTags)
         index = 1
+        jumpStatus = JumpStatus.OK
         for tag in resultTags:
             jumpResult = jumpResults[tag]
             mixColor = (mixColor+1)%len(SPEED_COLORS)
-            # with col1:
             with tabs[index]:
                 jumpStatusInfo,\
                 scoringInfo,\
@@ -80,8 +131,7 @@ def main():
                     st.toast('#### %s - %s' % (tag, str(jumpStatus)), icon='⚠️')
                 if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                     jumpResultsSubset[tag] = jumpResult
-                # st.html('<hr><h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend if badJumpLegend else '')+'</h3>')
-                st.html('<h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend if badJumpLegend else '')+'</h3>')
+                st.html('<h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend+"<br>If this was NOT a warm-up file, it's probably an ISC altitude violation; please report to Eugene/pr3d4t0r and attach the TRACK.CSV file" if badJumpLegend else '')+'</h3>')
                 if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                     displayJumpDataIn(jumpResult.table)
                     plotJumpResult(tag, jumpResult)
@@ -93,18 +143,23 @@ def main():
                         showIt=False
                     )
                     displayTrackOnMap(speedJumpTrajectory(jumpResult))
+                    _displayAllJumpDataIn(jumpResult.data)
+                    _displayScoresIn(jumpResult.scores)
+                elif jumpStatus == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT:
+                    _displayBadRowsISCAccuracyExceeded(jumpResult.data, jumpResult.window)
             index += 1
-        # with col0:
         with tabs[0]:
             st.html('<h2>Jumps in this set</h2>')
-            if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
-                aggregate = aggregateResults(jumpResultsSubset)
-                displayAggregate = aggregate.style.apply(_styleShowMinMaxIn, subset=[ 'score', ]).apply(_styleShowMaxIn, subset=[ 'maxSpeed', ]).format(precision=2)
-                st.dataframe(displayAggregate)
-                st.html('<h2>Summary</h2>')
-                st.dataframe(totalResultsFrom(aggregate), hide_index = True)
-                st.bokeh_chart(allJumpsPlot, use_container_width=True)
-                # displayTrackOnMap(multipleSpeedJumpsTrajectories(jumpResults))
+            if len(resultTags):
+                if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
+                    aggregate = aggregateResults(jumpResultsSubset)
+                    if len(aggregate) > 0:
+                        displayAggregate = aggregate.style.apply(_styleShowMinMaxIn, subset=[ 'score', ]).apply(_styleShowMaxIn, subset=[ 'maxSpeed', ]).format(precision=2)
+                        st.dataframe(displayAggregate)
+                        st.html('<h2>Summary</h2>')
+                        st.dataframe(totalResultsFrom(aggregate), hide_index = True)
+                        st.bokeh_chart(allJumpsPlot, use_container_width=True)
+                        # displayTrackOnMap(multipleSpeedJumpsTrajectories(jumpResults))
 
 
 if '__main__' == __name__:

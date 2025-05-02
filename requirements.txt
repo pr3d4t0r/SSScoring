@@ -1,11 +1,10 @@
-bokeh
+bokeh==2.4.3
 click
 geopy
 haversine
 importlib-resources
-jupyter_bokeh
+jupyter_bokeh==3.0.4
 numpy<1.26.4
 psutil
 pydeck
-streamlit
-streamlit-bokeh
+streamlit==1.44.1
