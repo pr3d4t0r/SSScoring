@@ -35,6 +35,7 @@ from ssscoring.flysight import FlySightVersion
 from ssscoring.flysight import detectFlySightFileVersionOf
 
 import math
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -111,6 +112,7 @@ def isValidJumpISC(data: pd.DataFrame,
     -------
     `True` if the jump is valid according to ISC/FAI/USPA rules.
     """
+    warnings.warn('This function is DEPRECATED as of version 2.4.0', UserWarning)
     if len(data) > 0:
         accuracy = data[data.altitudeAGL <= window.validationStart].speedAccuracyISC.max()
         return accuracy < SPEED_ACCURACY_THRESHOLD
@@ -525,12 +527,11 @@ def processJump(data: pd.DataFrame) -> JumpResults:
         window = None
         jumpStatus = JumpStatus.WARM_UP_FILE
     else:
-        validJump = isValidJumpISC(workData, window)
-        jumpStatus = JumpStatus.OK
+        jumpStatus = validateJumpISC(workData, window)
         score = None
         scores = None
         table = None
-        if validJump:
+        if jumpStatus == JumpStatus.OK:
             table = None
             table = jumpAnalysisTable(workData)
             maxSpeed = data.vKMh.max()
@@ -539,9 +540,7 @@ def processJump(data: pd.DataFrame) -> JumpResults:
             score, scores = calcScoreISC(workData)
         else:
             maxSpeed = -1
-            if len(workData):
-                jumpStatus = JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT
-            else:
+            if not len(workData):
                 jumpStatus = JumpStatus.INVALID_SPEED_FILE
     return JumpResults(workData, maxSpeed, score, scores, table, window, jumpStatus)
 

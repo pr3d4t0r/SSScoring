@@ -110,16 +110,11 @@ def main():
     initFileUploaderState('trackFiles')
     setSideBarAndMain('🔢', False, _selectDZState)
 
-    # col0, col1 = st.columns([0.5, 0.5, ])
     if st.session_state.trackFiles:
         jumpResults = processAllJumpFiles(st.session_state.trackFiles, altitudeDZMeters=st.session_state.elevation)
         allJumpsPlot = initializePlot('All jumps', backgroundColorName='#2c2c2c')
         mixColor = 0
         jumpResultsSubset = dict()
-#         with col1:
-#             st.write('**Jump results detail and charts are displayed most recent first unless _Reverse_ order is selected**')
-#             st.session_state.reverseDisplay = st.checkbox('Reverse', value=False, help='Display jump results in ascending order by track file tag name.')
-#         resultTags = sorted(list(jumpResults.keys()), reverse=(not st.session_state.reverseDisplay))
         resultTags = sorted(list(jumpResults.keys()), reverse=True)
         tabs = st.tabs(['Totals']+resultTags)
         index = 1
@@ -127,7 +122,6 @@ def main():
         for tag in resultTags:
             jumpResult = jumpResults[tag]
             mixColor = (mixColor+1)%len(SPEED_COLORS)
-            # with col1:
             with tabs[index]:
                 jumpStatusInfo,\
                 scoringInfo,\
@@ -137,8 +131,7 @@ def main():
                     st.toast('#### %s - %s' % (tag, str(jumpStatus)), icon='⚠️')
                 if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                     jumpResultsSubset[tag] = jumpResult
-                # st.html('<hr><h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend if badJumpLegend else '')+'</h3>')
-                st.html('<h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend if badJumpLegend else '')+'</h3>')
+                st.html('<h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend+"<br>If this was NOT a warm-up file, it's probably an ISC altitude violation; please report to Eugene/pr3d4t0r and attach the TRACK.CSV file" if badJumpLegend else '')+'</h3>')
                 if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                     displayJumpDataIn(jumpResult.table)
                     plotJumpResult(tag, jumpResult)
@@ -155,7 +148,6 @@ def main():
                 elif jumpStatus == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT:
                     _displayBadRowsISCAccuracyExceeded(jumpResult.data, jumpResult.window)
             index += 1
-        # with col0:
         with tabs[0]:
             st.html('<h2>Jumps in this set</h2>')
             if len(resultTags):

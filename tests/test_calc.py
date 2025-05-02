@@ -18,8 +18,8 @@ from ssscoring.calc import processAllJumpFiles
 from ssscoring.calc import processJump
 from ssscoring.calc import roundedAggregateResults
 from ssscoring.calc import totalResultsFrom
+from ssscoring.calc import validateJumpISC
 from ssscoring.constants import BREAKOFF_ALTITUDE
-from ssscoring.constants import FLYSIGHT_2_HEADER
 from ssscoring.constants import FT_IN_M
 from ssscoring.datatypes import JumpStatus
 from ssscoring.errors import SSScoringError
@@ -135,8 +135,8 @@ def test_getSpeedSkydiveFrom():
 
 
 def test_isValidJumpISC():
-    # warnings.warn('This function is DEPRECATED as of version 2.4.0', UserWarning)
-    warnings.warn('This function is DEPRECATED as of version 2.4.0')
+    # TODO:  00183-deprecate-single-view
+    warnings.warn('This function is DEPRECATED as of version 2.4.0', UserWarning)
     bogus = pd.DataFrame( { 'altitudeAGL': (2800, ), 'speedAccuracyISC': (3.1, ), } )
     assert isValidJumpISC(_data, _window)
     assert not isValidJumpISC(bogus, _window)
@@ -149,15 +149,17 @@ def test_isValidJumpISC():
 
 
 def test_validateJumpISC():
-#     bogus = pd.DataFrame( { 'altitudeAGL': (2800, ), 'speedAccuracyISC': (3.1, ), } )
-#     assert isValidJumpISC(_data, _window)
-#     assert not isValidJumpISC(bogus, _window)
-#     rawData = pd.read_csv(TEST_FLYSIGHT_DATA_V1_EXCEEDS_ISC_THRESHOLD, skiprows = (1,1))
-#     data = convertFlySight2SSScoring(rawData, altitudeDZMeters = 3.0)
-#     data = dropNonSkydiveDataFrom(data)
-#     window, data = getSpeedSkydiveFrom(data)
-#     assert not isValidJumpISC(data, window)
-    pass
+    bogus = pd.DataFrame( { 'altitudeAGL': (2800, ), 'speedAccuracyISC': (3.1, ), } )
+    result = validateJumpISC(_data, _window)
+    assert result == JumpStatus.OK
+    result = validateJumpISC(bogus, _window)
+    assert result == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT
+    rawData = pd.read_csv(TEST_FLYSIGHT_DATA_V1_EXCEEDS_ISC_THRESHOLD, skiprows = (1,1))
+    data = convertFlySight2SSScoring(rawData, altitudeDZMeters = 3.0)
+    data = dropNonSkydiveDataFrom(data)
+    window, data = getSpeedSkydiveFrom(data)
+    with pytest.raises(SSScoringError):
+        result = validateJumpISC(data, window)
 
 
 def test_calculateDistance():
@@ -318,7 +320,7 @@ def test_totalResultsFrom():
 # test_convertFlySight2SSScoring()
 # test_dropNonSkydiveDataFrom()
 # test_getSpeedSkydiveFrom()
-# test_isValidJumpISC()
+# test_validateJumpISC()
 # test_jumpAnalysisTable()
 # test__verticalAcceleration()
 # # test_isValidMinimumAltitude(_invalidAltFileName)

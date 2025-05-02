@@ -336,13 +336,13 @@ def setSideBarAndMain(icon: str, singleTrack: bool, selectDZState):
         st.session_state.trackFiles = None
     st.sidebar.metric('Elevation', value='%.1f m' % (0.0 if st.session_state.elevation == None else st.session_state.elevation))
     if singleTrack:
-        trackFile = st.sidebar.file_uploader('Track file', [ 'CSV' ], disabled=st.session_state.elevation == None, key = st.session_state.uploaderKey)
+        trackFile = st.sidebar.file_uploader('Track file', [ 'CSV', 'csv', ], disabled=st.session_state.elevation == None, key = st.session_state.uploaderKey)
         if trackFile:
             st.session_state.trackFile = trackFile
     else:
         trackFiles = st.sidebar.file_uploader(
             'Track files',
-            [ 'CSV' ],
+            [ 'CSV', 'csv', ],
             disabled=st.session_state.elevation == None,
             accept_multiple_files=True,
             key = st.session_state.uploaderKey
