@@ -737,20 +737,23 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
     - Max speed
 
     The dataframe rows are identified by the human readable jump file name.
+
+    Raises
+    ------
+    `SSSCoringError` if the `jumpResults` object is empty.
     """
+    if not len(jumpResults):
+        raise SSScoringError('jumpResults is empty - impossible to collate angles')
     speeds = pd.DataFrame()
     for jumpResultIndex in sorted(list(jumpResults.keys())):
         jumpResult = jumpResults[jumpResultIndex]
-        # TODO: if jumpResult.score > 0.0:
         if jumpResult.status == JumpStatus.OK:
             t = jumpResult.table
             finalTime = t.iloc[-1].time
             t.iloc[-1].time = LAST_TIME_TRANCHE
             t = pd.pivot_table(t, columns = t.time)
-            t.drop(['altitude (ft)'], inplace = True)
             d = pd.DataFrame([ jumpResult.score, ], index = [ jumpResultIndex, ], columns = [ 'score', ], dtype = object)
             for column in t.columns:
-                # d[column] = t[column].iloc[2]
                 d[column] = t[column].vKMh
             d['finalTime'] = [ finalTime, ]
             d['maxSpeed'] = jumpResult.maxSpeed
@@ -789,11 +792,65 @@ def roundedAggregateResults(aggregate: pd.DataFrame) -> pd.DataFrame:
     This is a less precise version of the `ssscoring.aggregateResults`
     dataframe, useful during training to keep rounded results available for
     review.
+
+    Raises
+    ------
+    `SSSCoringError` if the `jumpResults` object is empty.
     """
     for column in [col for col in aggregate.columns if 'Time' not in str(col)]:
         aggregate[column] = aggregate[column].apply(round)
 
     return aggregate
+
+
+def collateAnglesByTimeFromExit(jumpResults: dict) -> pd.DataFrame:
+    """
+    Collate all the angles by time from the `jumpResults` into a dataframe that
+    features the jump tag as index, the time tranches and the angles at each
+    time tranche.
+
+    Arguments
+    ---------
+        jumpResults: dict
+    A dictionary of jump results, in which each result corresponds to a FlySight
+    file name.  See `ssscoring.processAllJumpFiles` for details.
+
+    Returns
+    -------
+    A dataframe featuring these columns:
+
+    - Score
+    - Angles at 5, 10, 15, 20, and 25 second tranches
+    - Final time contemplated in the analysis
+
+    Raises
+    ------
+    `SSSCoringError` if the `jumpResults` object is empty.
+    """
+    if not len(jumpResults):
+        raise SSScoringError('jumpResults is empty - impossible to collate angles')
+    angles = pd.DataFrame()
+    for jumpResultIndex in sorted(list(jumpResults.keys())):
+        jumpResult = jumpResults[jumpResultIndex]
+        if jumpResult.status == JumpStatus.OK:
+            t = jumpResult.table
+            finalTime = t.iloc[-1].time
+            t.iloc[-1].time = LAST_TIME_TRANCHE
+            t = pd.pivot_table(t, columns = t.time)
+            d = pd.DataFrame([ jumpResult.score, ], index = [ jumpResultIndex, ], columns = [ 'score', ], dtype = object)
+            for column in t.columns:
+                d[column] = t[column].speedAngle
+            d['finalTime'] = [ finalTime, ]
+
+            if angles.empty:
+                angles = d.copy()
+            else:
+                angles = pd.concat([ angles, d, ])
+    cols = sorted([ column for column in angles.columns if isinstance(column, float) ])
+    cols = [ 'score', ]+cols+[ 'finalTime', ]
+    angles = angles[cols]
+    angles = angles.replace(np.nan, 0.0)
+    return angles.sort_index()
 
 
 def totalResultsFrom(aggregate: pd.DataFrame) -> pd.DataFrame:

@@ -6,6 +6,7 @@
 Process a group of jumps uploaded from a file uploader.
 """
 
+# from ssscoring.mapview import multipleSpeedJumpsTrajectories
 from ssscoring.appcommon import displayJumpDataIn
 from ssscoring.appcommon import displayTrackOnMap
 from ssscoring.appcommon import initFileUploaderState
@@ -14,19 +15,20 @@ from ssscoring.appcommon import isStreamlitHostedApp
 from ssscoring.appcommon import plotJumpResult
 from ssscoring.appcommon import setSideBarAndMain
 from ssscoring.calc import aggregateResults
+from ssscoring.calc import collateAnglesByTimeFromExit
+from ssscoring.calc import dropNonSkydiveDataFrom
 from ssscoring.calc import processAllJumpFiles
 from ssscoring.calc import totalResultsFrom
+from ssscoring.constants import M_2_FT
+from ssscoring.constants import SPEED_ACCURACY_THRESHOLD
 from ssscoring.datatypes import JumpStatus
-# from ssscoring.mapview import multipleSpeedJumpsTrajectories
+from ssscoring.datatypes import PerformanceWindow
 from ssscoring.mapview import speedJumpTrajectory
 from ssscoring.notebook import SPEED_COLORS
 from ssscoring.notebook import graphJumpResult
 from ssscoring.notebook import initializePlot
-from ssscoring.constants import M_2_FT
-from ssscoring.calc import dropNonSkydiveDataFrom
-from ssscoring.datatypes import PerformanceWindow
-from ssscoring.constants import SPEED_ACCURACY_THRESHOLD
 
+import bokeh.plotting as bp
 import pandas as pd
 import streamlit as st
 
@@ -104,6 +106,25 @@ def _styleShowMinMaxIn(scores: pd.Series) -> pd.DataFrame:
         '' for v in scores ]
 
 
+def _displayJumpsInSet(aggregate: pd.DataFrame):
+    with st.expander('**Jumps in this set**', expanded=True, icon=':material/dataset:'):
+        displayAggregate = aggregate.style.apply(_styleShowMinMaxIn, subset=[ 'score', ]).apply(_styleShowMaxIn, subset=[ 'maxSpeed', ]).format(precision=2)
+        st.dataframe(displayAggregate)
+
+
+def _displaySpeedSummary(aggregate: pd.DataFrame,
+                         allJumpsPlot: bp.Figure):
+    st.html('<h2>Speed summary</h2>')
+    st.dataframe(totalResultsFrom(aggregate), hide_index = True)
+    st.bokeh_chart(allJumpsPlot, use_container_width=True)
+
+
+def _displaySpeedAngles(jumpResults: dict):
+    with st.expander('**Speed angles**', icon=':material/arrow_back_ios_new:'):
+        angles = collateAnglesByTimeFromExit(jumpResults).style.format(precision=1)
+        st.dataframe(angles)
+
+
 def main():
     if not isStreamlitHostedApp():
         st.set_page_config(layout = 'wide')
@@ -149,16 +170,14 @@ def main():
                     _displayBadRowsISCAccuracyExceeded(jumpResult.data, jumpResult.window)
             index += 1
         with tabs[0]:
-            st.html('<h2>Jumps in this set</h2>')
+            # st.html('<h2>Jumps in this set</h2>')
             if len(resultTags):
                 if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                     aggregate = aggregateResults(jumpResultsSubset)
                     if len(aggregate) > 0:
-                        displayAggregate = aggregate.style.apply(_styleShowMinMaxIn, subset=[ 'score', ]).apply(_styleShowMaxIn, subset=[ 'maxSpeed', ]).format(precision=2)
-                        st.dataframe(displayAggregate)
-                        st.html('<h2>Summary</h2>')
-                        st.dataframe(totalResultsFrom(aggregate), hide_index = True)
-                        st.bokeh_chart(allJumpsPlot, use_container_width=True)
+                        _displayJumpsInSet(aggregate)
+                        _displaySpeedAngles(jumpResults)
+                        _displaySpeedSummary(aggregate, allJumpsPlot)
                         # displayTrackOnMap(multipleSpeedJumpsTrajectories(jumpResults))
 
 
