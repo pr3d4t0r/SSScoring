@@ -5,6 +5,7 @@ from ssscoring.calc import aggregateResults
 from ssscoring.calc import calcScoreISC
 from ssscoring.calc import calcScoreMeanVelocity
 from ssscoring.calc import calculateDistance
+from ssscoring.calc import collateAnglesByTimeFromExit
 from ssscoring.calc import convertFlySight2SSScoring
 from ssscoring.calc import dropNonSkydiveDataFrom
 from ssscoring.calc import getFlySightDataFromCSVBuffer
@@ -283,8 +284,18 @@ def test_aggregateResults():
     assert _speeds.iloc[0].score
     assert 'maxSpeed' in _speeds.columns
 
-    speeds = aggregateResults(dict())
-    assert not len(speeds)
+    with pytest.raises(SSScoringError):
+        speeds = aggregateResults(dict())
+
+
+def test_collateAnglesByTimeFromExit():
+    angles = collateAnglesByTimeFromExit(_jumpResults)
+    assert len(angles)
+    assert angles.iloc[0].score
+    assert 'finalTime' in angles.columns
+
+    with pytest.raises(SSScoringError):
+        angles = collateAnglesByTimeFromExit(dict())
 
 
 def test_roundedAggregateResults():
@@ -332,6 +343,7 @@ def test_totalResultsFrom():
 # test_processJump()
 # test_processAllJumpFiles()
 # test_aggregateResults()
+# test_collateAnglesByTimeFromExit()
 # test_roundedAggregateResults()
 # test_totalResultsFrom()
 
