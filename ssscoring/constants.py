@@ -33,6 +33,13 @@ DEG_IN_RADIANS = math.pi/180.0
 π/180º
 """
 
+
+DZ_DIRECTORY = 'drop-zones-loc-elev.csv'
+"""
+The CSV file database dump of the drop zones directory.
+"""
+
+
 EXIT_SPEED = 10.0
 """
 Guesstimate of the exit speed; ~g
@@ -121,12 +128,6 @@ Meters to feet conversion factor.
 """
 
 
-SPEED_ACCURACY_THRESHOLD = 3.0
-"""
-Speed accuracy for the FlySight device.
-"""
-
-
 MIN_JUMP_FILE_SIZE = 1024*512
 MIN_JUMP_FILE_SIZE = 1024*64
 """
@@ -153,6 +154,12 @@ Performance window length as defined by ISSA/IPC/USPA.
 """
 
 
+RESOURCES = 'ssscoring.resources'
+"""
+The package resources in the manifest or package wheel resources.
+"""
+
+
 SCORING_INTERVAL = 3.0
 """
 Scoring is based on the maximum speed the jumper attained within the `VALIDATION_WINDOW_LENGTH`
@@ -164,6 +171,18 @@ value is set by governing bodies like ISC and USPA.
 SKYTRAX_1_HEADER = set([ 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 'hAcc', 'vAcc', 'sAcc', 'heading', 'cAcc', 'gpsFix', 'numSV', ])
 """
 SkyTraX GPS + barometric SMD v1 CSV file headers.
+"""
+
+
+SSSCORE_INSTRUCTIONS_MD = 'instructions.md'
+"""
+Markdown representation of the end-user instructions on how to use SSScore.
+"""
+
+
+SPEED_ACCURACY_THRESHOLD = 3.0
+"""
+Speed accuracy for the FlySight device.
 """
 
 

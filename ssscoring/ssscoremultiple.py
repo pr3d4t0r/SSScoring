@@ -9,6 +9,7 @@ Process a group of jumps uploaded from a file uploader.
 # from ssscoring.mapview import multipleSpeedJumpsTrajectories
 from ssscoring.appcommon import displayJumpDataIn
 from ssscoring.appcommon import displayTrackOnMap
+from ssscoring.appcommon import fetchResource
 from ssscoring.appcommon import initFileUploaderState
 from ssscoring.appcommon import interpretJumpResult
 from ssscoring.appcommon import isStreamlitHostedApp
@@ -20,6 +21,7 @@ from ssscoring.calc import dropNonSkydiveDataFrom
 from ssscoring.calc import processAllJumpFiles
 from ssscoring.calc import totalResultsFrom
 from ssscoring.constants import M_2_FT
+from ssscoring.constants import SSSCORE_INSTRUCTIONS_MD
 from ssscoring.constants import SPEED_ACCURACY_THRESHOLD
 from ssscoring.datatypes import JumpStatus
 from ssscoring.datatypes import PerformanceWindow
@@ -170,7 +172,6 @@ def main():
                     _displayBadRowsISCAccuracyExceeded(jumpResult.data, jumpResult.window)
             index += 1
         with tabs[0]:
-            # st.html('<h2>Jumps in this set</h2>')
             if len(resultTags):
                 if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                     aggregate = aggregateResults(jumpResultsSubset)
@@ -179,6 +180,8 @@ def main():
                         _displaySpeedAngles(jumpResults)
                         _displaySpeedSummary(aggregate, allJumpsPlot)
                         # displayTrackOnMap(multipleSpeedJumpsTrajectories(jumpResults))
+    else:
+        st.write(fetchResource(SSSCORE_INSTRUCTIONS_MD).read())
 
 
 if '__main__' == __name__:

@@ -11,8 +11,10 @@ from io import StringIO
 from ssscoring import __VERSION__
 from ssscoring.calc import isValidMaximumAltitude
 from ssscoring.calc import isValidMinimumAltitude
+from ssscoring.constants import DZ_DIRECTORY
 from ssscoring.constants import FLYSIGHT_FILE_ENCODING
 from ssscoring.constants import M_2_FT
+from ssscoring.constants import RESOURCES
 from ssscoring.datatypes import JumpResults
 from ssscoring.datatypes import JumpStatus
 from ssscoring.errors import SSScoringError
@@ -36,16 +38,6 @@ import streamlit as st
 DEFAULT_DATA_LAKE = './data'
 """
 Default data lake directory when reading files from the local file system.
-"""
-
-DZ_DIRECTORY = 'drop-zones-loc-elev.csv'
-"""
-The CSV file database dump of the drop zones directory.
-"""
-
-RESOURCES = 'ssscoring.resources'
-"""
-The package resources in the manifest or package wheel resources.
 """
 
 STREAMLIT_SIG_KEY = 'HOSTNAME'
@@ -82,16 +74,38 @@ def isStreamlitHostedApp() -> bool:
 
 
 @st.cache_data
-def initDropZonesFromResource(resourceName: str) -> pd.DataFrame:
+def fetchResource(resourceName: str) -> StringIO:
     """
-    Get the DZs directory from a CSV enclosed in the distribution package as a
-    resource.  The resources package is fixed to `ssscoring.resources`, the
-    default resource file is defined by `DZ_DIRECTORY` but can be anything.
+    Fetch a file-like resource from the `PYTHONPATH` and `resources` module
+    included in the SSScore package.  Common resources include the drop zones
+    list CSV and in-line documentation Markdown text.
 
     Arguments
     ---------
         resourceName
     A string representing the resource file name, usually a CSV file.
+
+    Returns
+    -------
+    An instance of `StringIO` ready to be process as a text stream by the
+    caller.
+
+    Raises
+    ------
+    `SSScoringError` if the resource dataframe isn't the global drop zones
+    directory or the file is invalid in any way.
+    """
+    try:
+        return StringIO(files(RESOURCES).joinpath(resourceName).read_bytes().decode(FLYSIGHT_FILE_ENCODING))
+    except Exception as e:
+        raise SSScoringError('Invalid resource - %s' % str(e))
+
+
+def initDropZonesFromResource() -> pd.DataFrame:
+    """
+    Get the DZs directory from a CSV enclosed in the distribution package as a
+    resource.  The resources package is fixed to `ssscoring.resources`, the
+    default resource file is defined by `DZ_DIRECTORY` but can be anything.
 
     Returns
     -------
@@ -103,7 +117,7 @@ def initDropZonesFromResource(resourceName: str) -> pd.DataFrame:
     directory or the file is invalid in any way.
     """
     try:
-        buffer = StringIO(files(RESOURCES).joinpath(resourceName).read_bytes().decode(FLYSIGHT_FILE_ENCODING))
+        buffer = fetchResource(DZ_DIRECTORY)
         dropZones = pd.read_csv(buffer, sep=',')
     except Exception as e:
         raise SSScoringError('Invalid resource - %s' % str(e))
@@ -283,7 +297,7 @@ def displayDZCoordinates():
     The corresponding UI button is only enabled if the user selected a valid DZ,
     otherwise the button is disabled.
     """
-    dropZones = initDropZonesFromResource(DZ_DIRECTORY)
+    dropZones = initDropZonesFromResource()
     lat = float(dropZones[dropZones.dropZone == st.session_state.currentDropZone ].iloc[0].lat)
     lon = float(dropZones[dropZones.dropZone == st.session_state.currentDropZone ].iloc[0].lon)
     st.write(st.session_state.currentDropZone)
@@ -320,7 +334,7 @@ def setSideBarAndMain(icon: str, singleTrack: bool, selectDZState):
     this can result in unpredictable behavior since the cache may never be
     cleared until application reload.
     """
-    dropZones = initDropZonesFromResource(DZ_DIRECTORY)
+    dropZones = initDropZonesFromResource()
     st.session_state.currentDropZone = None
     elevation = None
     st.sidebar.title('%s SSScore %s' % (icon, __VERSION__))
