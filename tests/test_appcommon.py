@@ -2,14 +2,15 @@
 
 
 # from ssscoring.appcommon import initFileUploaderState
-from ssscoring.appcommon import DZ_DIRECTORY
 from ssscoring.appcommon import STREAMLIT_SIG_KEY
 from ssscoring.appcommon import STREAMLIT_SIG_VALUE
+from ssscoring.appcommon import fetchResource
 from ssscoring.appcommon import initDropZonesFromResource
 from ssscoring.appcommon import interpretJumpResult
 from ssscoring.appcommon import isStreamlitHostedApp
 from ssscoring.calc import convertFlySight2SSScoring
 from ssscoring.calc import processJump
+from ssscoring.constants import DZ_DIRECTORY
 from ssscoring.datatypes import JumpStatus
 from ssscoring.errors import SSScoringError
 
@@ -27,6 +28,7 @@ TEST_FLYSIGHT_DATA_LAKE = './resources/test-tracks'
 TEST_FLYSIGHT_DATA = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-00.csv'
 TEST_FLYSIGHT_DATA_V1_EXCEEDS_ISC_THRESHOLD = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-07-BAD-ISC.CSV'
 TEST_FLYSIGHT_DATA_V1_WARM_UP = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-05-warm-up.csv'
+TEST_RESOURCE = DZ_DIRECTORY
 
 
 # *** tests ***
@@ -44,11 +46,9 @@ def test_isStreamlitHostedApp():
 
 
 def test_initDropZonesFromResource():
-    d = initDropZonesFromResource(DZ_DIRECTORY)
+    d = initDropZonesFromResource()
     assert isinstance(d, pd.DataFrame)
     assert 'dropZone' in d.columns
-    with pytest.raises(SSScoringError):
-        initDropZonesFromResource('bogus.CSV')
 
 
 def test_initFileUploaderState():
@@ -88,5 +88,15 @@ def test_interpretJumpResult():
 #     assert jumpResult.status == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT
 
 
+def test_fetchResource():
+    buffer = fetchResource(TEST_RESOURCE)
+    line = buffer.readline()
+    assert line
+
+    with pytest.raises(SSScoringError):
+        buffer = fetchResource('bogus.dat')
+
+
 # test_interpretJumpResult()
+# test_fetchResource()
 
