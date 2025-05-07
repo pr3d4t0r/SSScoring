@@ -8,6 +8,8 @@ package.
 from importlib_resources import files
 from io import StringIO
 
+from streamlit_bokeh import streamlit_bokeh
+
 from ssscoring import __VERSION__
 from ssscoring.calc import isValidMaximumAltitude
 from ssscoring.calc import isValidMinimumAltitude
@@ -218,7 +220,8 @@ def interpretJumpResult(tag: str,
 
 
 def plotJumpResult(tag: str,
-                   jumpResult: JumpResults):
+                   jumpResult: JumpResults,
+                   key: str = None):
     """
     Plot the jump results including altitude, horizontal speed, time, etc. for
     evaluation and interpretation.
@@ -232,16 +235,22 @@ def plotJumpResult(tag: str,
 
         jumpResult
     An instance of `ssscoring.datatypes.JumpResults` with jump data.
+
+        key
+    A unique key used by the Streamlit Bokeh component to identify the current
+    plot in the context of the application.
     """
     if jumpResult.data is not None:
-        plot = initializePlot(tag)
+        plot = initializePlot(tag,backgroundColorName='#2c2c2c')
         plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
         graphAltitude(plot, jumpResult)
         graphAngle(plot, jumpResult)
         hoverValue = bm.HoverTool(tooltips=[('time', '@x{0.0}s'), ('y-val', '@y{0.00}')])
         plot.add_tools(hoverValue)
         graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
-        st.bokeh_chart(plot, use_container_width=True)
+        # TODO:  00151
+        # st.bokeh_chart(plot, use_container_width=True)
+        streamlit_bokeh(plot, use_container_width=True, key=key)
 
 
 def initFileUploaderState(filesObject:str, uploaderKey:str ='uploaderKey'):

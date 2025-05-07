@@ -46,7 +46,7 @@ corresponding to each jump in a competition.
 
 def initializePlot(jumpTitle: str,
                    height=500,
-                   width=900,
+                   width=1500,
                    xLabel='seconds from exit',
                    yLabel='km/h',
                    xMax=35.0,
@@ -86,28 +86,30 @@ def initializePlot(jumpTitle: str,
         colorName
     A valid CSS color string.
     """
-    # bi.curdoc().theme = 'dark_minimal'
+    bi.curdoc().theme = 'dark_minimal'
     plot = bp.figure(title=jumpTitle,
                      height=height,
-                     width=width,
+#                      width=width,
+                     sizing_mode='stretch_width', # https://docs.bokeh.org/en/latest/docs/first_steps/first_steps_4.html
                      x_axis_label=xLabel,
                      y_axis_label=yLabel,
                      x_range=(0.0, xMax),
                      y_range=(0.0, yMax),
-#                      background_fill_color=backgroundColorName,
-#                      border_fill_color=backgroundColorName
-                     )
-#     plot.xaxis.axis_label_text_color=colorName
-#     plot.xaxis.major_label_text_color=colorName
-#     plot.xaxis.axis_line_color=colorName
-#     plot.xaxis.major_tick_line_color=colorName
-#     plot.xaxis.minor_tick_line_color=colorName
-#     plot.yaxis.axis_label_text_color=colorName
-#     plot.yaxis.major_label_text_color=colorName
-#     plot.yaxis.axis_line_color=colorName
-#     plot.yaxis.major_tick_line_color=colorName
-#     plot.yaxis.minor_tick_line_color=colorName
-#     plot.title.text_color = colorName
+                     background_fill_color=backgroundColorName,
+                     border_fill_color=backgroundColorName,
+                   )
+    plot.xaxis.axis_label_text_color=colorName
+    plot.xaxis.major_label_text_color=colorName
+    # plot.xaxis.axis_line_color=colorName
+    plot.xaxis.axis_line_color='red'
+    plot.xaxis.major_tick_line_color=colorName
+    plot.xaxis.minor_tick_line_color=colorName
+    plot.yaxis.axis_label_text_color=colorName
+    plot.yaxis.major_label_text_color=colorName
+    plot.yaxis.axis_line_color=colorName
+    plot.yaxis.major_tick_line_color=colorName
+    plot.yaxis.minor_tick_line_color=colorName
+    plot.title.text_color = colorName
     return plot
 
 

@@ -7,6 +7,8 @@ Process a group of jumps uploaded from a file uploader.
 """
 
 # from ssscoring.mapview import multipleSpeedJumpsTrajectories
+from streamlit_bokeh import streamlit_bokeh
+
 from ssscoring.appcommon import displayJumpDataIn
 from ssscoring.appcommon import displayTrackOnMap
 from ssscoring.appcommon import fetchResource
@@ -115,10 +117,13 @@ def _displayJumpsInSet(aggregate: pd.DataFrame):
 
 
 def _displaySpeedSummary(aggregate: pd.DataFrame,
-                         allJumpsPlot: bp.Figure):
+                         allJumpsPlot: bp.figure,
+                         key = None):
     st.html('<h2>Speed summary</h2>')
     st.dataframe(totalResultsFrom(aggregate), hide_index = True)
-    st.bokeh_chart(allJumpsPlot, use_container_width=True)
+    # TODO: 00151
+    # st.bokeh_chart(allJumpsPlot, use_container_width=True)
+    streamlit_bokeh(allJumpsPlot, use_container_width=False, key=key)
 
 
 def _displaySpeedAngles(jumpResults: dict):
@@ -157,7 +162,7 @@ def main():
                 st.html('<h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend+"<br>If this was NOT a warm-up file, it's probably an ISC altitude violation; please report to Eugene/pr3d4t0r and attach the TRACK.CSV file" if badJumpLegend else '')+'</h3>')
                 if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                     displayJumpDataIn(jumpResult.table)
-                    plotJumpResult(tag, jumpResult)
+                    plotJumpResult(tag, jumpResult, key=tag+'x')
                     graphJumpResult(
                         allJumpsPlot,
                         jumpResult,
@@ -178,7 +183,7 @@ def main():
                     if len(aggregate) > 0:
                         _displayJumpsInSet(aggregate)
                         _displaySpeedAngles(jumpResults)
-                        _displaySpeedSummary(aggregate, allJumpsPlot)
+                        _displaySpeedSummary(aggregate, allJumpsPlot, key=tag)
                         # displayTrackOnMap(multipleSpeedJumpsTrajectories(jumpResults))
     else:
         st.write(fetchResource(SSSCORE_INSTRUCTIONS_MD).read())
