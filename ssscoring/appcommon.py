@@ -241,7 +241,7 @@ def plotJumpResult(tag: str,
     plot in the context of the application.
     """
     if jumpResult.data is not None:
-        plot = initializePlot(tag,backgroundColorName='#2c2c2c')
+        plot = initializePlot(tag, backgroundColorName='#2c2c2c')
         plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
         graphAltitude(plot, jumpResult)
         graphAngle(plot, jumpResult)

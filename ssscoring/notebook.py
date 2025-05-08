@@ -89,7 +89,7 @@ def initializePlot(jumpTitle: str,
     bi.curdoc().theme = 'dark_minimal'
     plot = bp.figure(title=jumpTitle,
                      height=height,
-#                      width=width,
+                     width=width,
                      sizing_mode='stretch_width', # https://docs.bokeh.org/en/latest/docs/first_steps/first_steps_4.html
                      x_axis_label=xLabel,
                      y_axis_label=yLabel,
@@ -98,18 +98,23 @@ def initializePlot(jumpTitle: str,
                      background_fill_color=backgroundColorName,
                      border_fill_color=backgroundColorName,
                    )
+    # Tests:
+    plot.outline_line_color = colorName
     plot.xaxis.axis_label_text_color=colorName
+    plot.xaxis.axis_line_color=colorName
     plot.xaxis.major_label_text_color=colorName
-    # plot.xaxis.axis_line_color=colorName
-    plot.xaxis.axis_line_color='red'
-    plot.xaxis.major_tick_line_color=colorName
-    plot.xaxis.minor_tick_line_color=colorName
+    plot.xaxis.axis_line_width=32
+    plot.xgrid.grid_line_color = colorName
+    plot.ygrid.grid_line_color = colorName
     plot.yaxis.axis_label_text_color=colorName
     plot.yaxis.major_label_text_color=colorName
-    plot.yaxis.axis_line_color=colorName
-    plot.yaxis.major_tick_line_color=colorName
-    plot.yaxis.minor_tick_line_color=colorName
     plot.title.text_color = colorName
+
+#     plot.xaxis.major_tick_line_color=colorName
+#     plot.xaxis.minor_tick_line_color=colorName
+#     plot.yaxis.axis_line_color=colorName
+#     plot.yaxis.major_tick_line_color=colorName
+#     plot.yaxis.minor_tick_line_color=colorName
     return plot
 
 
@@ -152,11 +157,11 @@ def _initLinearAxis(label: str,
     """
     linearAxis = bm.LinearAxis(
             axis_label = label,
-#             axis_label_text_color = colorName,
-#             axis_line_color = colorName,
-#             major_label_text_color = colorName,
-#             major_tick_line_color=colorName,
-#             minor_tick_line_color=colorName,
+            axis_label_text_color = colorName,
+            axis_line_color = colorName,
+            major_label_text_color = colorName,
+            major_tick_line_color=colorName,
+            minor_tick_line_color=colorName,
             y_range_name = rangeName,
     )
     return linearAxis
