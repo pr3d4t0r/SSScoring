@@ -5,6 +5,7 @@ SHELL=/bin/bash
 
 API_DOC_DIR="./docs"
 BUILD=./build
+BUILD_OS=$(shell uname)
 DEVPI_HOST=$(shell cat devpi-hostname.txt)
 DEVPI_PASSWORD=$(shell cat ./devpi-password.txt)
 DEVPI_USER=$(shell cat ./devpi-user.txt)
@@ -24,6 +25,7 @@ all: ALWAYS
 	make manpage
 	make docs
 	make package
+	make umountFlySight
 
 
 clean:
@@ -100,8 +102,8 @@ prune:
 # PyPI user name:  ciurana; pypi AT cime_net
 publish:
 	pip install -U twine
-	twine --no-color check $(DIST)/*
-	twine --no-color upload --verbose $(DIST)/*
+	twine --no-color check $(DIST)/*whl
+	twine --no-color upload --verbose $(DIST)/*whl
 
 
 refresh: ALWAYS
@@ -128,6 +130,14 @@ test: ALWAYS
 
 tools:
 	pip install -U devpi-client pip ptpython pudb pytest
+
+
+umountFlySight: ALWAYS
+	if [ "$(BUILD_OS)" = "Darwin" ]; then \
+		osacompile -o $(DIST)/umountFlySight.app umountFlySight.applescript; \
+		cp resources/FreeAgent.icns $(DIST)/umountFlySight.app/Contents/Resources/applet.icns; \
+		ls -Al $(DIST) | grep "\.app" ; \
+	fi
 
 
 upload:
