@@ -94,20 +94,20 @@ def initializePlot(jumpTitle: str,
                      y_axis_label=yLabel,
                      x_range=(0.0, xMax),
                      y_range=(0.0, yMax),
-#                      background_fill_color=backgroundColorName,
-#                      border_fill_color=backgroundColorName
+                     background_fill_color=backgroundColorName,
+                     border_fill_color=backgroundColorName
                      )
-#     plot.xaxis.axis_label_text_color=colorName
-#     plot.xaxis.major_label_text_color=colorName
-#     plot.xaxis.axis_line_color=colorName
-#     plot.xaxis.major_tick_line_color=colorName
-#     plot.xaxis.minor_tick_line_color=colorName
-#     plot.yaxis.axis_label_text_color=colorName
-#     plot.yaxis.major_label_text_color=colorName
-#     plot.yaxis.axis_line_color=colorName
-#     plot.yaxis.major_tick_line_color=colorName
-#     plot.yaxis.minor_tick_line_color=colorName
-#     plot.title.text_color = colorName
+    plot.xaxis.axis_label_text_color=colorName
+    plot.xaxis.major_label_text_color=colorName
+    plot.xaxis.axis_line_color=colorName
+    plot.xaxis.major_tick_line_color=colorName
+    plot.xaxis.minor_tick_line_color=colorName
+    plot.yaxis.axis_label_text_color=colorName
+    plot.yaxis.major_label_text_color=colorName
+    plot.yaxis.axis_line_color=colorName
+    plot.yaxis.major_tick_line_color=colorName
+    plot.yaxis.minor_tick_line_color=colorName
+    plot.title.text_color = colorName
     return plot
 
 
@@ -150,11 +150,11 @@ def _initLinearAxis(label: str,
     """
     linearAxis = bm.LinearAxis(
             axis_label = label,
-#             axis_label_text_color = colorName,
-#             axis_line_color = colorName,
-#             major_label_text_color = colorName,
-#             major_tick_line_color=colorName,
-#             minor_tick_line_color=colorName,
+            axis_label_text_color = colorName,
+            axis_line_color = colorName,
+            major_label_text_color = colorName,
+            major_tick_line_color=colorName,
+            minor_tick_line_color=colorName,
             y_range_name = rangeName,
     )
     return linearAxis
