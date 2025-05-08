@@ -234,7 +234,7 @@ def plotJumpResult(tag: str,
     An instance of `ssscoring.datatypes.JumpResults` with jump data.
     """
     if jumpResult.data is not None:
-        plot = initializePlot(tag)
+        plot = initializePlot(tag, backgroundColorName='#2c2c2c')
         plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
         graphAltitude(plot, jumpResult)
         graphAngle(plot, jumpResult)
