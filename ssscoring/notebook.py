@@ -110,6 +110,7 @@ def initializePlot(jumpTitle: str,
     plot.yaxis.major_label_text_color=colorName
     plot.title.text_color = colorName
 
+# TODO:  Bug reported in Streamlit.io forums - these have no effect!
 #     plot.xaxis.major_tick_line_color=colorName
 #     plot.xaxis.minor_tick_line_color=colorName
 #     plot.yaxis.axis_line_color=colorName
@@ -155,6 +156,7 @@ def _initLinearAxis(label: str,
     ------
     An instance of `bokeh.models.LinearAxis`.
     """
+    # TODO:  Bug reported in Streamlit.io forums - these have no effect!
     linearAxis = bm.LinearAxis(
             axis_label = label,
             axis_label_text_color = colorName,
