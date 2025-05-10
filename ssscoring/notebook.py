@@ -86,7 +86,7 @@ def initializePlot(jumpTitle: str,
         colorName
     A valid CSS color string.
     """
-    bi.curdoc().theme = 'dark_minimal'
+    # bi.curdoc().theme = 'dark_minimal'
     plot = bp.figure(title=jumpTitle,
                      height=height,
                      width=width,
@@ -101,21 +101,22 @@ def initializePlot(jumpTitle: str,
     # Tests:
     plot.outline_line_color = colorName
     plot.xaxis.axis_label_text_color=colorName
-    plot.xaxis.axis_line_color=colorName
-    plot.xaxis.major_label_text_color=colorName
-    plot.xaxis.axis_line_width=32
+    plot.xaxis.axis_line_color = colorName
+    plot.xaxis.major_label_text_color = colorName
+    plot.xaxis.axis_line_width = 1
     plot.xgrid.grid_line_color = colorName
     plot.ygrid.grid_line_color = colorName
-    plot.yaxis.axis_label_text_color=colorName
-    plot.yaxis.major_label_text_color=colorName
+    plot.yaxis.axis_label_text_color = colorName
+    plot.yaxis.major_label_text_color = colorName
     plot.title.text_color = colorName
-
+#
 # TODO:  Bug reported in Streamlit.io forums - these have no effect!
-#     plot.xaxis.major_tick_line_color=colorName
-#     plot.xaxis.minor_tick_line_color=colorName
-#     plot.yaxis.axis_line_color=colorName
-#     plot.yaxis.major_tick_line_color=colorName
-#     plot.yaxis.minor_tick_line_color=colorName
+#     plot.xaxis.major_tick_line_color = colorName
+#     plot.xaxis.minor_tick_line_color = colorName
+#     plot.xaxis.minor_tick_line_height = 40
+#     plot.yaxis.axis_line_color = colorName
+#     plot.yaxis.major_tick_line_color = colorName
+#     plot.yaxis.minor_tick_line_color = colorName
     return plot
 
 
@@ -162,8 +163,8 @@ def _initLinearAxis(label: str,
             axis_label_text_color = colorName,
             axis_line_color = colorName,
             major_label_text_color = colorName,
-            major_tick_line_color=colorName,
-            minor_tick_line_color=colorName,
+#             major_tick_line_color=colorName,
+#             minor_tick_line_color=colorName,
             y_range_name = rangeName,
     )
     return linearAxis

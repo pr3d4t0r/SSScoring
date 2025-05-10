@@ -250,7 +250,7 @@ def plotJumpResult(tag: str,
         graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
         # TODO:  00151
         # st.bokeh_chart(plot, use_container_width=True)
-        streamlit_bokeh(plot, use_container_width=True, key=key)
+        streamlit_bokeh(plot, use_container_width=True, key=key, theme='caliber')
 
 
 def initFileUploaderState(filesObject:str, uploaderKey:str ='uploaderKey'):

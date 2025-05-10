@@ -123,7 +123,7 @@ def _displaySpeedSummary(aggregate: pd.DataFrame,
     st.dataframe(totalResultsFrom(aggregate), hide_index = True)
     # TODO: 00151
     # st.bokeh_chart(allJumpsPlot, use_container_width=True)
-    streamlit_bokeh(allJumpsPlot, use_container_width=False, key=key)
+    streamlit_bokeh(allJumpsPlot, use_container_width=False, key=key, theme='caliber')
 
 
 def _displaySpeedAngles(jumpResults: dict):
