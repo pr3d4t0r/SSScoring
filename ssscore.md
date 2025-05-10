@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 % ssscore(1) Version 2.7.3 | Speed Skydiving Scoring command line tool
+=======
+% ssscore(1) Version 2.7.5 | Speed Skydiving Scoring command line tool
+>>>>>>> master
 
 Name
 ====
