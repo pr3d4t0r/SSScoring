@@ -154,7 +154,8 @@ def main():
                     st.toast('#### %s - %s' % (tag, str(jumpStatus)), icon='⚠️')
                 if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                     jumpResultsSubset[tag] = jumpResult
-                st.html('<h3>'+jumpStatusInfo+scoringInfo+(badJumpLegend+"<br>If this was NOT a warm-up file, it's probably an ISC altitude violation; please report to Eugene/pr3d4t0r and attach the TRACK.CSV file" if badJumpLegend else '')+'</h3>')
+                st.html('<h3>'+jumpStatusInfo+scoringInfo+(str(badJumpLegend)))
+                st.html("<br>If this was NOT a warm-up file, it's probably an ISC altitude violation; please report to Eugene/pr3d4t0r and attach the TRACK.CSV file</h3>" if jumpStatus in [ JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT, JumpStatus.WARM_UP_FILE, ] else '</h3>')
                 if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                     displayJumpDataIn(jumpResult.table)
                     plotJumpResult(tag, jumpResult)

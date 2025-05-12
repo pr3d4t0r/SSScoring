@@ -70,6 +70,7 @@ libupdate:
 
 local:
 	./dzresource
+	pip install -r $(REQUIREMENTS) -e .
 	pip install -e .
 
 
