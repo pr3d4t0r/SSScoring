@@ -6,7 +6,7 @@
 Process a group of jumps uploaded from a file uploader.
 """
 
-# from ssscoring.mapview import multipleSpeedJumpsTrajectories
+from ssscoring.mapview import multipleSpeedJumpsTrajectories
 from ssscoring.appcommon import displayJumpDataIn
 from ssscoring.appcommon import displayTrackOnMap
 from ssscoring.appcommon import fetchResource
@@ -181,6 +181,8 @@ def main():
                         _displaySpeedAngles(jumpResults)
                         _displaySpeedSummary(aggregate, allJumpsPlot)
                         # displayTrackOnMap(multipleSpeedJumpsTrajectories(jumpResults))
+                        with st.expander('**All jumps trajectories**'):
+                            displayTrackOnMap(multipleSpeedJumpsTrajectories(jumpResults))
     else:
         st.write(fetchResource(SSSCORE_INSTRUCTIONS_MD).read())
 
