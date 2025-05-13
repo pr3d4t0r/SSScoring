@@ -122,7 +122,9 @@ def _displaySpeedSummary(aggregate: pd.DataFrame,
     st.html('<h2>Speed summary</h2>')
     st.dataframe(totalResultsFrom(aggregate), hide_index = True)
     # TODO: 00151
+    # https://github.com/streamlit/streamlit/issues/11085#issuecomment-2802310448
     # st.bokeh_chart(allJumpsPlot, use_container_width=True)
+    # https://github.com/streamlit/streamlit/issues/11346 - BUG reported here by us tomatoes.
     streamlit_bokeh(allJumpsPlot, use_container_width=False, key=key, theme='caliber')
 
 
