@@ -4,6 +4,8 @@
 from ssscoring.calc import convertFlySight2SSScoring
 from ssscoring.calc import getFlySightDataFromCSVFileName
 from ssscoring.calc import processJump
+from ssscoring.errors import SSScoringError
+from ssscoring.notebook import convertHexColorToRGB
 from ssscoring.notebook import graphJumpResult
 from ssscoring.notebook import initializePlot
 from ssscoring.notebook import validationWindowDataFrom
@@ -50,5 +52,21 @@ def test_validationWindowDataFrom():
     assert len(windowData.data['x'])
 
 
+def test_convertHexColorToRGB():
+    color = '#1041f0'
+    v = convertHexColorToRGB(color)
+    assert v == [ 16, 65, 240, ]
+
+    with pytest.raises(SSScoringError):
+        convertHexColorToRGB('1234568')
+
+    with pytest.raises(ValueError):
+        convertHexColorToRGB('#1041g0')
+
+    with pytest.raises(TypeError):
+        convertHexColorToRGB(42)
+
+
 # test_validationWindowDataFrom()
+# test_convertHexColorToRGB()
 

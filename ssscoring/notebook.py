@@ -9,8 +9,8 @@ from ssscoring.constants import DEFAULT_SPEED_ACCURACY_SCALE
 from ssscoring.constants import MAX_ALTITUDE_FT
 from ssscoring.constants import SPEED_ACCURACY_THRESHOLD
 from ssscoring.datatypes import PerformanceWindow
+from ssscoring.errors import SSScoringError
 
-import bokeh.io as bi
 import bokeh.models as bm
 import bokeh.plotting as bp
 import pandas as pd
@@ -25,7 +25,9 @@ with Bokeh.
 """
 
 
-SPEED_COLORS = colors = ('limegreen', 'blue', 'tomato', 'turquoise', 'deepskyblue', 'forestgreen', 'coral', 'darkcyan',)
+# Ref:  https://www.w3schools.com/colors/colors_groups.asp
+# Ref: https://docs.bokeh.org/en/latest/docs/reference/colors.html#module-bokeh.colors
+SPEED_COLORS = colors = ('#32cd32', '#0000ff', '#ff6347', '#40e0d0', '#00bfff', '#22b822', '#ff7f50', '#008b8b',)
 """
 Colors used for tracking the lines in a multi-jump plot, so that each track is
 associated with a different color and easier to visualize.  8 distinct colors,
@@ -372,4 +374,37 @@ def graphAngle(plot,
     """
     data = jumpResult.data
     plot.line(data.plotTime, data.speedAngle, legend_label = label, line_width = 2, line_color = lineColor, y_range_name = rangeName)
+
+
+def convertHexColorToRGB(color: str) -> list:
+    """
+    Converts a color in the format `#a0b1c2` to its RGB equivalent as a list
+    of three values 0-255.
+
+    Arguments
+    ---------
+        color
+    A `str` in the form '#xxyyzz` where xx, yy, and zz are values in the hex
+    range 00-FF.  color is case insensitive.
+
+    Returns
+    -------
+    A list of 3 integers, each in the range 0-255 corresponding to the hex
+    color value.
+
+    Raises
+    ------
+    `SSScoringError' if `color` is an invalid hex-encoded textual RGB value.
+    The string value of the exception describes the error cause.
+
+    `ValueError` if the characters that make the hex value are not in the
+    range 0-9, a-f.
+    """
+    if not isinstance(color, str):
+        raise TypeError('Invalid color type - must be str')
+    color = color.replace('#', '')
+    if len(color) != 6:
+        raise SSScoringError('Invalid hex value length')
+    result = [ int(color[x:x+2], 16) for x in range(0, len(color), 2) ]
+    return result
 
