@@ -80,6 +80,10 @@ def speedJumpTrajectory(jumpResult: JumpResults) -> pdk.Deck:
     """
     if jumpResult.data is not None:
         workData = jumpResult.data.copy()
+        scoresData = pd.DataFrame(list(jumpResult.scores.items()), columns=[ 'score', 'plotTime', ])
+        workData = pd.merge(workData, scoresData, on='plotTime', how='left')
+        workData.vKMh = workData.vKMh.apply(lambda x: round(x, 2))
+        workData.speedAngle = workData.speedAngle.apply(lambda x: round(x, 2))
         maxSpeedTime = _resolveMaxSpeedTimeFrom(jumpResult)
         layers = [
             pdk.Layer(
@@ -117,7 +121,7 @@ def speedJumpTrajectory(jumpResult: JumpResults) -> pdk.Deck:
         ]
         viewBox = viewPointBox(workData)
         tooltip = {
-            'html': '<b>plotTime:</b> {plotTime} s<br><b>Speed:</b> {vKMh} km/h<br><b>speedAngle:</b> {speedAngle}º',
+            'html': '<b>plotTime:</b> {plotTime} s<br><b>Score:</b> {score} km/h<br><b>Speed:</b> {vKMh} km/h<br><b>speedAngle:</b> {speedAngle}º',
             'style': {
                 'backgroundColor': 'steelblue',
                 'color': 'white',
