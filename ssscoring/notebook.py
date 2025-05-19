@@ -35,15 +35,6 @@ corresponding to each jump in a competition.
 """
 
 
-# *** global initialization ***
-
-# bp.output_notebook(hide_banner = True)
-# bp.output_file('/dev/null', mode='inline')
-# TODO: make this configurable:
-# bi.curdoc().theme = 'light_minimal'
-# bi.curdoc().theme = 'dark_minimal'
-
-
 # *** functions ***
 
 def initializePlot(jumpTitle: str,

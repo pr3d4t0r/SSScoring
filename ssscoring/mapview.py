@@ -59,7 +59,6 @@ def _resolveMaxSpeedTimeFrom(jumpResult: JumpResults) -> float:
 
 
 def speedJumpTrajectory(jumpResult: JumpResults) -> pdk.Deck:
-    # TODO:  https://en.wikipedia.org/wiki/X11_color_names
     """
     Build the layers for a PyDeck map showing a jumper's trajectory.
 
@@ -107,7 +106,6 @@ def speedJumpTrajectory(jumpResult: JumpResults) -> pdk.Deck:
             pdk.Layer(
                 'ScatterplotLayer',
                 data=workData,
-                # get_color=[ 0, 192, 0, 255 ],
                 get_color=[ 0x64, 0x95, 0xed, 255 ],
                 get_position=[ 'longitude', 'latitude', ],
                 get_radius=2,
@@ -169,7 +167,6 @@ def multipleSpeedJumpsTrajectories(jumpResults):
             pdk.Layer(
                 'ScatterplotLayer',
                 data=workData,
-                # get_color=[ 0x64, 0x95, 0xed, 255 ],
                 get_color = convertHexColorToRGB(SPEED_COLORS[mixColor]),
                 get_position=[ 'longitude', 'latitude', ],
                 get_radius=2),
