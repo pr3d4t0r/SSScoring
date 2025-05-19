@@ -6,7 +6,7 @@
 Process a group of jumps uploaded from a file uploader.
 """
 
-# from ssscoring.mapview import multipleSpeedJumpsTrajectories
+from ssscoring.mapview import multipleSpeedJumpsTrajectories
 from ssscoring.appcommon import displayJumpDataIn
 from ssscoring.appcommon import displayTrackOnMap
 from ssscoring.appcommon import fetchResource
@@ -63,10 +63,10 @@ def _displayAllJumpDataIn(data: pd.DataFrame):
             hide_index=True)
 
 
-def _displayScoresIn(rawData: dict):
-    if rawData is not None:
+def _displayScoresIn(scoresData: dict):
+    if scoresData is not None:
         st.html('<h3>All 3-sec sliding window scores</h3>')
-        data = pd.DataFrame.from_dict({ 'time': rawData.values(), 'score': rawData.keys(), })
+        data = pd.DataFrame.from_dict({ 'time': scoresData.values(), 'score': scoresData.keys(), })
         data.time = data.time.apply(lambda x: '%.2f' % x)
         st.dataframe(data, hide_index=True)
 
@@ -127,6 +127,11 @@ def _displaySpeedAngles(jumpResults: dict):
         st.dataframe(angles)
 
 
+def _displayAllTracksOnMap(jumpResults: dict):
+    with st.expander('**All jumps trajectories**'):
+        displayTrackOnMap(multipleSpeedJumpsTrajectories(jumpResults))
+
+
 def main():
     if not isStreamlitHostedApp():
         st.set_page_config(layout = 'wide')
@@ -180,7 +185,7 @@ def main():
                         _displayJumpsInSet(aggregate)
                         _displaySpeedAngles(jumpResults)
                         _displaySpeedSummary(aggregate, allJumpsPlot)
-                        # displayTrackOnMap(multipleSpeedJumpsTrajectories(jumpResults))
+                        _displayAllTracksOnMap(jumpResults)
     else:
         st.write(fetchResource(SSSCORE_INSTRUCTIONS_MD).read())
 
