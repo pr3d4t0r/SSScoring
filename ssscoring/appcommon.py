@@ -272,7 +272,8 @@ def initFileUploaderState(filesObject:str, uploaderKey:str ='uploaderKey'):
         st.session_state[uploaderKey] = 0
 
 
-def displayTrackOnMap(deck: pdk.Deck):
+def displayTrackOnMap(deck: pdk.Deck,
+                      displayScore=True):
     """
     Displays a track map drawn using PyDeck.
 
@@ -280,9 +281,13 @@ def displayTrackOnMap(deck: pdk.Deck):
     ---------
         deck
     A PyDeck initialized with map layers.
+
+        displayScore
+    If `True`, display the max score point; else display the max speed point.
     """
     if deck is not None:
-        st.write('Brightest green point shows the max speed point.  Exit at orange point.  Each track dot is 4 m in diameter.')
+        label = 'score' if displayScore else 'speed'
+        st.write('Brightest point shows the max **%s** point.  Exit at orange point.  Each track dot is 4 m in diameter.' % label)
         st.pydeck_chart(deck)
 
 

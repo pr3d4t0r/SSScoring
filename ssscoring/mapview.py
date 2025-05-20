@@ -52,13 +52,20 @@ def viewPointBox(data: pd.DataFrame) -> pd.DataFrame:
     return result
 
 
-def _resolveMaxSpeedTimeFrom(jumpResult: JumpResults) -> float:
+def _resolveMaxScoreTimeFrom(jumpResult: JumpResults) -> float:
     plotTime = jumpResult.scores[jumpResult.score]
 
     return plotTime
 
 
-def speedJumpTrajectory(jumpResult: JumpResults) -> pdk.Deck:
+def _resolveMaxSpeedTimeFrom(jumpResult: JumpResults) -> float:
+    rowIndex = jumpResult.data.vKMh.idxmax()
+    plotTime = jumpResult.data.loc[rowIndex, 'plotTime']
+    return plotTime
+
+
+def speedJumpTrajectory(jumpResult: JumpResults,
+                        displayScorePoint: bool=True) -> pdk.Deck:
     """
     Build the layers for a PyDeck map showing a jumper's trajectory.
 
@@ -83,7 +90,14 @@ def speedJumpTrajectory(jumpResult: JumpResults) -> pdk.Deck:
         workData = pd.merge(workData, scoresData, on='plotTime', how='left')
         workData.vKMh = workData.vKMh.apply(lambda x: round(x, 2))
         workData.speedAngle = workData.speedAngle.apply(lambda x: round(x, 2))
-        maxSpeedTime = _resolveMaxSpeedTimeFrom(jumpResult)
+        if displayScorePoint:
+            maxValueTime = _resolveMaxScoreTimeFrom(jumpResult)
+            maxColorOuter = [ 0, 255, 0, ]
+            maxCollorDot = [ 0, 128, 0, ]
+        else:
+            maxValueTime = _resolveMaxSpeedTimeFrom(jumpResult)
+            maxColorOuter = [ 255, 0, 0, 255, ]  # red
+            maxCollorDot = [ 255, 255, 0, 255, ]  # yellow
         layers = [
             pdk.Layer(
                 'ScatterplotLayer',
@@ -99,8 +113,8 @@ def speedJumpTrajectory(jumpResult: JumpResults) -> pdk.Deck:
                 get_radius=8),
             pdk.Layer(
                 'ScatterplotLayer',
-                data=workData[workData.plotTime == maxSpeedTime],
-                get_color=[ 0, 255, 0, ],
+                data=workData[workData.plotTime == maxValueTime],
+                get_color=maxColorOuter,
                 get_position=[ 'longitude', 'latitude', ],
                 get_radius=12),
             pdk.Layer(
@@ -112,8 +126,8 @@ def speedJumpTrajectory(jumpResult: JumpResults) -> pdk.Deck:
                 pickable=True),
             pdk.Layer(
                 'ScatterplotLayer',
-                data=workData[workData.plotTime == maxSpeedTime],
-                get_color=[ 0, 128, 0, ],
+                data=workData[workData.plotTime == maxValueTime],
+                get_color=maxCollorDot,
                 get_position=[ 'longitude', 'latitude', ],
                 get_radius=4),
         ]
@@ -137,13 +151,29 @@ def speedJumpTrajectory(jumpResult: JumpResults) -> pdk.Deck:
 
 def multipleSpeedJumpsTrajectories(jumpResults):
     """
-    **EXPERIMENTAL**
+    Build all the layers for a PyDeck map showing the trajectories of every jump
+    in the results set.
+
+    Arguments
+    ---------
+        jumpResults
+    A dictionary of all the jump results after processing.
+
+    Returns
+    -------
+    A PyDeck `deck` instance ready for rendering using PyDeck or Streamlit
+    mapping facilities.
+
+    See
+    ---
+    `st.pydeck_chart`
+    `st.map`
     """
     mapLayers = list()
     mixColor = 0
     for result in jumpResults.values():
         workData = result.data.copy()
-        maxSpeedTime = _resolveMaxSpeedTimeFrom(result)
+        maxScoreTime = _resolveMaxScoreTimeFrom(result)
         mixColor = (mixColor+1)%len(SPEED_COLORS)
         layers = [
             pdk.Layer(
@@ -160,7 +190,7 @@ def multipleSpeedJumpsTrajectories(jumpResults):
                 get_radius=8),
             pdk.Layer(
                 'ScatterplotLayer',
-                data=workData[workData.plotTime == maxSpeedTime],
+                data=workData[workData.plotTime == maxScoreTime],
                 get_color=[ 0, 255, 0, ],
                 get_position=[ 'longitude', 'latitude', ],
                 get_radius=12),
@@ -172,7 +202,7 @@ def multipleSpeedJumpsTrajectories(jumpResults):
                 get_radius=2),
             pdk.Layer(
                 'ScatterplotLayer',
-                data=workData[workData.plotTime == maxSpeedTime],
+                data=workData[workData.plotTime == maxScoreTime],
                 get_color=[ 0, 128, 0, ],
                 get_position=[ 'longitude', 'latitude', ],
                 get_radius=4),
