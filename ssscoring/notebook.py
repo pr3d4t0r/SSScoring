@@ -5,6 +5,7 @@
 """
 
 
+from ssscoring.constants import DEFAULT_PLOT_MAX_V_SCALE
 from ssscoring.constants import DEFAULT_SPEED_ACCURACY_SCALE
 from ssscoring.constants import MAX_ALTITUDE_FT
 from ssscoring.constants import SPEED_ACCURACY_THRESHOLD
@@ -43,7 +44,7 @@ def initializePlot(jumpTitle: str,
                    xLabel='seconds from exit',
                    yLabel='km/h',
                    xMax=35.0,
-                   yMax=550.0,
+                   yMax=DEFAULT_PLOT_MAX_V_SCALE,
                    backgroundColorName='#1a1a1a',
                    colorName=DEFAULT_AXIS_COLOR_BOKEH):
     """
@@ -70,7 +71,7 @@ def initializePlot(jumpTitle: str,
     The maximum rnage for the X axis.  Default = 40.0
 
         yMax: float
-    The maximum range for the Y axis.  Default = 550
+    The maximum range for the Y axis.  Default = `DEFAULT_PLOT_MAX_V_SCALE`
 
         backgroundColorName
     A string with the CSS RGB value of the background color or its CSS color

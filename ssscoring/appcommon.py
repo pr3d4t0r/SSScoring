@@ -11,6 +11,8 @@ from io import StringIO
 from ssscoring import __VERSION__
 from ssscoring.calc import isValidMaximumAltitude
 from ssscoring.calc import isValidMinimumAltitude
+from ssscoring.constants import DEFAULT_PLOT_INCREMENT
+from ssscoring.constants import DEFAULT_PLOT_MAX_V_SCALE
 from ssscoring.constants import DZ_DIRECTORY
 from ssscoring.constants import FLYSIGHT_FILE_ENCODING
 from ssscoring.constants import M_2_FT
@@ -234,7 +236,8 @@ def plotJumpResult(tag: str,
     An instance of `ssscoring.datatypes.JumpResults` with jump data.
     """
     if jumpResult.data is not None:
-        plot = initializePlot(tag, backgroundColorName='#2c2c2c')
+        yMax = DEFAULT_PLOT_MAX_V_SCALE if jumpResult.score <= DEFAULT_PLOT_MAX_V_SCALE else jumpResult.score + DEFAULT_PLOT_INCREMENT
+        plot = initializePlot(tag, backgroundColorName='#2c2c2c', yMax=yMax)
         plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
         graphAltitude(plot, jumpResult)
         graphAngle(plot, jumpResult)
