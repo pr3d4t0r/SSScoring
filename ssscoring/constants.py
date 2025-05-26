@@ -16,6 +16,20 @@ BREAKOFF_ALTITUDE = 1707.0
 Breakoff altitude or hard deck.
 """
 
+DEFAULT_PLOT_INCREMENT = 75.0
+"""
+Used to adjust the plot's max scale to `score` + `DEFAULT_PLOT_INCREMENT` so
+that the whole jump progression is visible in the plot.
+"""
+
+
+DEFAULT_PLOT_MAX_V_SCALE = 550.0
+"""
+Default speed plot scale max is set to 550 km/h, but there is evidence it can
+be higher and adjusted on-the-fly based on jump results.
+"""
+
+
 DEFAULT_SPEED_ACCURACY_SCALE = 5.0
 """
 Default speed accuracy scale set to 5, to make it visible in plots.  This value

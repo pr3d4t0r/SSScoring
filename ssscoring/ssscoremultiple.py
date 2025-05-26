@@ -6,7 +6,6 @@
 Process a group of jumps uploaded from a file uploader.
 """
 
-from ssscoring.mapview import multipleSpeedJumpsTrajectories
 from ssscoring.appcommon import displayJumpDataIn
 from ssscoring.appcommon import displayTrackOnMap
 from ssscoring.appcommon import fetchResource
@@ -20,11 +19,14 @@ from ssscoring.calc import collateAnglesByTimeFromExit
 from ssscoring.calc import dropNonSkydiveDataFrom
 from ssscoring.calc import processAllJumpFiles
 from ssscoring.calc import totalResultsFrom
+from ssscoring.constants import DEFAULT_PLOT_INCREMENT
+from ssscoring.constants import DEFAULT_PLOT_MAX_V_SCALE
 from ssscoring.constants import M_2_FT
-from ssscoring.constants import SSSCORE_INSTRUCTIONS_MD
 from ssscoring.constants import SPEED_ACCURACY_THRESHOLD
+from ssscoring.constants import SSSCORE_INSTRUCTIONS_MD
 from ssscoring.datatypes import JumpStatus
 from ssscoring.datatypes import PerformanceWindow
+from ssscoring.mapview import multipleSpeedJumpsTrajectories
 from ssscoring.mapview import speedJumpTrajectory
 from ssscoring.notebook import SPEED_COLORS
 from ssscoring.notebook import graphJumpResult
@@ -132,6 +134,11 @@ def _displayAllTracksOnMap(jumpResults: dict):
         displayTrackOnMap(multipleSpeedJumpsTrajectories(jumpResults))
 
 
+def _maxSpeedScaleFrom(jumpResults: dict) -> float:
+    maxScore = max(result.score for result in jumpResults.values())
+    return DEFAULT_PLOT_MAX_V_SCALE if maxScore <= DEFAULT_PLOT_MAX_V_SCALE else maxScore + DEFAULT_PLOT_INCREMENT
+
+
 def main():
     if not isStreamlitHostedApp():
         st.set_page_config(layout = 'wide')
@@ -140,7 +147,7 @@ def main():
 
     if st.session_state.trackFiles:
         jumpResults = processAllJumpFiles(st.session_state.trackFiles, altitudeDZMeters=st.session_state.elevation)
-        allJumpsPlot = initializePlot('All jumps', backgroundColorName='#2c2c2c')
+        allJumpsPlot = initializePlot('All jumps', backgroundColorName='#2c2c2c', yMax=_maxSpeedScaleFrom(jumpResults))
         mixColor = 0
         jumpResultsSubset = dict()
         resultTags = sorted(list(jumpResults.keys()), reverse=True)
