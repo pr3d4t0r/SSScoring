@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Linear Frequency Beep Generator</title>
+  <style>
+    body { font-family: sans-serif; padding: 30px; }
+    button { padding: 10px 30px; font-size: 1.1em; }
+    #status { margin-top: 1em; }
+  </style>
+</head>
+<body>
+  <button id="playBtn">Play Beep Sequence</button>
+  <div id="status"></div>
+  <script>
+    // Constants
+    const START_FREQ = 150;
+    const END_FREQ = 1850;
+    const INITIAL_DURATION = 15.0; // seconds
+    const BEEP_DURATION = 0.1;     // seconds
+    const BEEP_PAUSE = 0.1;        // seconds
+    const FINAL_FREQ = 1850;
+    const END_DURATION = 10.0;     // seconds (15-25s)
+    const FINAL_BEEP_PAUSE = 0.2;  // seconds
+
+    let audioCtx = null;
+
+    function playBeepSequence() {
+      if (!window.AudioContext && !window.webkitAudioContext) {
+        document.getElementById('status').textContent = 'Web Audio API not supported.';
+        return;
+      }
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const now = audioCtx.currentTime;
+      let beepIndex = 0;
+      let currentTime = now;
+
+      // Part 1: 0-15s - Ramp frequency from 150 to 1850 Hz in steps
+      const steps1 = Math.floor(INITIAL_DURATION / (BEEP_DURATION + BEEP_PAUSE));
+      for (let i = 0; i < steps1; i++) {
+        const freq = START_FREQ + (END_FREQ - START_FREQ) * (i / steps1);
+        scheduleBeep(freq, currentTime, BEEP_DURATION);
+        currentTime += BEEP_DURATION + BEEP_PAUSE;
+      }
+
+      // Part 2: 15-25s - 1850 Hz, 0.1s beep + 0.2s pause
+      let steps2 = Math.floor(END_DURATION / (BEEP_DURATION + FINAL_BEEP_PAUSE));
+      for (let i = 0; i < steps2; i++) {
+        scheduleBeep(FINAL_FREQ, currentTime, BEEP_DURATION);
+        currentTime += BEEP_DURATION + FINAL_BEEP_PAUSE;
+      }
+
+      // Auto-close context after sequence ends
+      setTimeout(() => {
+        audioCtx && audioCtx.close();
+        document.getElementById('status').textContent = 'Sequence finished.';
+      }, (INITIAL_DURATION + END_DURATION) * 1000 + 200);
+
+      document.getElementById('status').textContent = 'Playing sequence...';
+    }
+
+    function scheduleBeep(freq, startTime, duration) {
+      let oscillator = audioCtx.createOscillator();
+      let gain = audioCtx.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.value = freq;
+      gain.gain.value = 1;
+
+      oscillator.connect(gain).connect(audioCtx.destination);
+
+      oscillator.start(startTime);
+      oscillator.stop(startTime + duration);
+
+      // Ensure gain is 0 after beep
+      gain.gain.setValueAtTime(1, startTime);
+      gain.gain.setValueAtTime(0, startTime + duration + 0.01);
+
+      oscillator.onended = () => {
+        oscillator.disconnect();
+        gain.disconnect();
+      };
+    }
+
+    document.getElementById('playBtn').onclick = () => {
+      playBeepSequence();
+    };
+  </script>
+</body>
+</html>
