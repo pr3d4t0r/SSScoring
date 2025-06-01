@@ -205,7 +205,8 @@ def interpretJumpResult(tag: str,
     else:
         scoringInfo = 'Max speed = {0:,.0f}; '.format(maxSpeed)+('exit at %d m (%d ft)<br>Validation window starts at %d m (%d ft)<br>End scoring window at %d m (%d ft)<br>' % \
                         (window.start, M_2_FT*window.start, window.validationStart, M_2_FT*window.validationStart, window.end, M_2_FT*window.end))
-    if (processBadJump and jumpStatus != JumpStatus.OK and jumpStatus != JumpStatus.WARM_UP_FILE) or jumpStatus == JumpStatus.OK:
+    if (processBadJump and jumpStatus != JumpStatus.OK and jumpStatus != JumpStatus.WARM_UP_FILE and jumpStatus != JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT) or jumpStatus == JumpStatus.OK:
+        st.write(jumpStatus)
         jumpStatusInfo = '<span style="color: %s">%s jump - %s - %.02f km/h</span><br>' % ('green', tag, 'VALID', jumpResult.score)
         belowMaxAltitude = isValidMaximumAltitude(jumpResult.data.altitudeAGL.max())
         badJumpLegend = None
@@ -236,7 +237,10 @@ def plotJumpResult(tag: str,
     An instance of `ssscoring.datatypes.JumpResults` with jump data.
     """
     if jumpResult.data is not None:
-        yMax = DEFAULT_PLOT_MAX_V_SCALE if jumpResult.score <= DEFAULT_PLOT_MAX_V_SCALE else jumpResult.score + DEFAULT_PLOT_INCREMENT
+        try:
+            yMax = DEFAULT_PLOT_MAX_V_SCALE if jumpResult.score <= DEFAULT_PLOT_MAX_V_SCALE else jumpResult.score + DEFAULT_PLOT_INCREMENT
+        except TypeError:
+            yMax = DEFAULT_PLOT_MAX_V_SCALE
         plot = initializePlot(tag, backgroundColorName='#2c2c2c', yMax=yMax)
         plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
         graphAltitude(plot, jumpResult)

@@ -135,8 +135,11 @@ def _displayAllTracksOnMap(jumpResults: dict):
 
 
 def _maxSpeedScaleFrom(jumpResults: dict) -> float:
-    maxScore = max(result.score for result in jumpResults.values())
-    return DEFAULT_PLOT_MAX_V_SCALE if maxScore <= DEFAULT_PLOT_MAX_V_SCALE else maxScore + DEFAULT_PLOT_INCREMENT
+    maxScore = max(result.score if result.score != None else 0 for result in jumpResults.values())
+    try:
+        return DEFAULT_PLOT_MAX_V_SCALE if maxScore <= DEFAULT_PLOT_MAX_V_SCALE else maxScore + DEFAULT_PLOT_INCREMENT
+    except TypeError:
+        return DEFAULT_PLOT_MAX_V_SCALE
 
 
 def main():
@@ -167,7 +170,7 @@ def main():
                 if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                     jumpResultsSubset[tag] = jumpResult
                 st.html('<h3>'+jumpStatusInfo+scoringInfo+(str(badJumpLegend)))
-                st.html("<br>If this was NOT a warm-up file, it's probably an ISC altitude violation; please report to Eugene/pr3d4t0r and attach the TRACK.CSV file</h3>" if jumpStatus in [ JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT, JumpStatus.WARM_UP_FILE, ] else '</h3>')
+                st.html("<br>If this was NOT a warm-up file, it's probably an ISC altitude violation; please report to Eugene/pr3d4t0r and attach the TRACK.CSV file</h3>" if jumpStatus in [ JumpStatus.WARM_UP_FILE, ] else '</h3>')
                 if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                     displayJumpDataIn(jumpResult.table)
                     st.write('Max score = crosshairs.  Max speed = diamond.')
@@ -176,7 +179,7 @@ def main():
                         allJumpsPlot,
                         jumpResult,
                         lineColor=SPEED_COLORS[mixColor],
-                        legend='%s = %.2f' % (tag, jumpResult.score),
+                        legend='%s = %.2f' % (tag, jumpResult.score if jumpResult.score else -1.0),
                         showIt=False
                     )
                     st.session_state.displayScorePoint = st.toggle('Display max score / max speed point', value=True, help='Show the fastest speed or score point along the flight path', key=tag)
