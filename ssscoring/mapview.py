@@ -84,7 +84,7 @@ def speedJumpTrajectory(jumpResult: JumpResults,
     `st.pydeck_chart`
     `st.map`
     """
-    if jumpResult.data is not None:
+    if jumpResult.data is not None and jumpResult.score != None and jumpResult.scores != None:
         workData = jumpResult.data.copy()
         scoresData = pd.DataFrame(list(jumpResult.scores.items()), columns=[ 'score', 'plotTime', ])
         workData = pd.merge(workData, scoresData, on='plotTime', how='left')
@@ -172,42 +172,43 @@ def multipleSpeedJumpsTrajectories(jumpResults):
     mapLayers = list()
     mixColor = 0
     for result in jumpResults.values():
-        workData = result.data.copy()
-        maxScoreTime = _resolveMaxScoreTimeFrom(result)
-        mixColor = (mixColor+1)%len(SPEED_COLORS)
-        layers = [
-            pdk.Layer(
-                'ScatterplotLayer',
-                data=workData.head(1),
-                get_color=[ 255, 126, 0, 255 ],
-                get_position=[ 'longitude', 'latitude', ],
-                get_radius=8),
-            pdk.Layer(
-                'ScatterplotLayer',
-                data=workData.tail(1),
-                get_color=[ 0, 192, 0, 160 ],
-                get_position=[ 'longitude', 'latitude', ],
-                get_radius=8),
-            pdk.Layer(
-                'ScatterplotLayer',
-                data=workData[workData.plotTime == maxScoreTime],
-                get_color=[ 0, 255, 0, ],
-                get_position=[ 'longitude', 'latitude', ],
-                get_radius=12),
-            pdk.Layer(
-                'ScatterplotLayer',
-                data=workData,
-                get_color = convertHexColorToRGB(SPEED_COLORS[mixColor]),
-                get_position=[ 'longitude', 'latitude', ],
-                get_radius=2),
-            pdk.Layer(
-                'ScatterplotLayer',
-                data=workData[workData.plotTime == maxScoreTime],
-                get_color=[ 0, 128, 0, ],
-                get_position=[ 'longitude', 'latitude', ],
-                get_radius=4),
-        ]
-        mapLayers += layers
+        if result.scores != None:
+            workData = result.data.copy()
+            maxScoreTime = _resolveMaxScoreTimeFrom(result)
+            mixColor = (mixColor+1)%len(SPEED_COLORS)
+            layers = [
+                pdk.Layer(
+                    'ScatterplotLayer',
+                    data=workData.head(1),
+                    get_color=[ 255, 126, 0, 255 ],
+                    get_position=[ 'longitude', 'latitude', ],
+                    get_radius=8),
+                pdk.Layer(
+                    'ScatterplotLayer',
+                    data=workData.tail(1),
+                    get_color=[ 0, 192, 0, 160 ],
+                    get_position=[ 'longitude', 'latitude', ],
+                    get_radius=8),
+                pdk.Layer(
+                    'ScatterplotLayer',
+                    data=workData[workData.plotTime == maxScoreTime],
+                    get_color=[ 0, 255, 0, ],
+                    get_position=[ 'longitude', 'latitude', ],
+                    get_radius=12),
+                pdk.Layer(
+                    'ScatterplotLayer',
+                    data=workData,
+                    get_color = convertHexColorToRGB(SPEED_COLORS[mixColor]),
+                    get_position=[ 'longitude', 'latitude', ],
+                    get_radius=2),
+                pdk.Layer(
+                    'ScatterplotLayer',
+                    data=workData[workData.plotTime == maxScoreTime],
+                    get_color=[ 0, 128, 0, ],
+                    get_position=[ 'longitude', 'latitude', ],
+                    get_radius=4),
+            ]
+            mapLayers += layers
     viewBox = viewPointBox(workData)
     deck = pdk.Deck(
         map_style = None,

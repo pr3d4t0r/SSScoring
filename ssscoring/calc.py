@@ -531,12 +531,12 @@ def processJump(data: pd.DataFrame) -> JumpResults:
         score = None
         scores = None
         table = None
+        baseTime = workData.iloc[0].timeUnix
+        workData['plotTime'] = round(workData.timeUnix-baseTime, 2)
         if jumpStatus == JumpStatus.OK:
             table = None
             table = jumpAnalysisTable(workData)
             maxSpeed = data.vKMh.max()
-            baseTime = workData.iloc[0].timeUnix
-            workData['plotTime'] = round(workData.timeUnix-baseTime, 2)
             score, scores = calcScoreISC(workData)
         else:
             maxSpeed = -1

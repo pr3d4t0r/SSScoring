@@ -297,10 +297,11 @@ def graphJumpResult(plot,
             _plotSpeedAccuracy(plot, data, jumpResult.window)
             # TODO:  vertical line at time of max score?  Delete this if present after 20250601
             # _graphSegment(plot, scores[score], 0.0, scores[score], score, 1, 'darkseagreen')
-            _graphSegment(plot, scores[score]+1.5, 0.0, scores[score]+1.5, score, 1, 'darkseagreen')
-            _graphSegment(plot, scores[score]-1.5, 0.0, scores[score]-1.5, score, 1, 'darkseagreen')
-            plot.scatter(x = [ scores[score], ], y = [ score, ], marker = 'circle_cross', size = [ 15, ], line_color = 'limegreen', fill_color = 'darkgreen', line_width = 2)
-            plot.scatter(x = [ t, ], y = [ maxSpeed, ], marker = 'diamond_dot', size = [ 20, ], line_color = 'yellow', fill_color = 'red', line_width = 2)
+            if scores != None:
+                _graphSegment(plot, scores[score]+1.5, 0.0, scores[score]+1.5, score, 1, 'darkseagreen')
+                _graphSegment(plot, scores[score]-1.5, 0.0, scores[score]-1.5, score, 1, 'darkseagreen')
+                plot.scatter(x = [ scores[score], ], y = [ score, ], marker = 'circle_cross', size = [ 15, ], line_color = 'limegreen', fill_color = 'darkgreen', line_width = 2)
+                plot.scatter(x = [ t, ], y = [ maxSpeed, ], marker = 'diamond_dot', size = [ 20, ], line_color = 'yellow', fill_color = 'red', line_width = 2)
 
 
 def graphAltitude(plot,
