@@ -49,6 +49,11 @@ devpi:
 	@[[ -e "pip.conf-bak" ]] && rm -f "pip.conf-bak"
 
 
+dockerize: ALWAYS
+	echo "$(VERSION)" > ./docker/dockerimageversion.txt
+	echo "pr3d4t0r/ssscore" > ./docker/dockerimagename.txt
+
+
 # [[ -e ".env" ]] && mv ".env" "_env"
 # [[ -e "_env" ]] && mv "_env" ".env"
 docs: ALWAYS
@@ -105,6 +110,7 @@ publish:
 	pip install -U twine
 	twine --no-color check $(DIST)/*whl
 	twine --no-color upload --verbose $(DIST)/*whl
+	make dockerize
 
 
 refresh: ALWAYS
