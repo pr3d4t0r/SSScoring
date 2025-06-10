@@ -14,7 +14,7 @@ services:
                     memory: '4G'
         environment:
             GRANT_SUDO: 'yes'
-        image: 'pr3d4t0r/ssscore'
+        image: 'pr3d4t0r/ssscore:latest'
         mem_reservation: '4G'
         ports:
             - 8501:8501

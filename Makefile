@@ -52,6 +52,7 @@ devpi:
 dockerize: ALWAYS
 	echo "$(VERSION)" > ./docker/dockerimageversion.txt
 	echo "pr3d4t0r/ssscore" > ./docker/dockerimagename.txt
+	$(MAKE) -C ./docker all
 
 
 # [[ -e ".env" ]] && mv ".env" "_env"
