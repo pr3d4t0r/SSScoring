@@ -6,12 +6,12 @@
 Process a group of jumps uploaded from a file uploader.
 """
 
+from ssscoring import __VERSION__
 from ssscoring.appcommon import displayJumpDataIn
 from ssscoring.appcommon import displayTrackOnMap
 from ssscoring.appcommon import fetchResource
 from ssscoring.appcommon import initFileUploaderState
 from ssscoring.appcommon import interpretJumpResult
-from ssscoring.appcommon import isStreamlitHostedApp
 from ssscoring.appcommon import plotJumpResult
 from ssscoring.appcommon import setSideBarAndMain
 from ssscoring.calc import aggregateResults
@@ -143,8 +143,10 @@ def _maxSpeedScaleFrom(jumpResults: dict) -> float:
 
 
 def main():
-    if not isStreamlitHostedApp():
-        st.set_page_config(layout = 'wide')
+    st.set_page_config(
+        layout = 'wide',
+        page_title='SSScore %s' % __VERSION__,
+    )
     initFileUploaderState('trackFiles')
     setSideBarAndMain('🔢', False, _selectDZState)
 
