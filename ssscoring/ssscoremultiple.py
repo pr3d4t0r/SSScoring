@@ -201,7 +201,7 @@ def main():
                         _displaySpeedSummary(aggregate, allJumpsPlot)
                         _displayAllTracksOnMap(jumpResults)
     else:
-        st.write(fetchResource(SSSCORE_INSTRUCTIONS_MD).read())
+        st.write(fetchResource(SSSCORE_INSTRUCTIONS_MD).read(), unsafe_allow_html=True)
 
 
 if '__main__' == __name__:
