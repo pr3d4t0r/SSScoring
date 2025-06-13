@@ -4,6 +4,7 @@
 SHELL=/bin/bash
 
 API_DOC_DIR="./docs"
+APP_CONFIG_FILE="config.toml"
 BUILD=./build
 BUILD_OS=$(shell uname)
 DEVPI_HOST=$(shell cat devpi-hostname.txt)
@@ -52,6 +53,7 @@ devpi:
 dockerize: ALWAYS
 	echo "$(VERSION)" > ./docker/dockerimageversion.txt
 	echo "pr3d4t0r/ssscore" > ./docker/dockerimagename.txt
+	cp $(APP_CONFIG_FILE) ./docker
 	$(MAKE) -C ./docker all
 
 
@@ -75,7 +77,7 @@ libupdate:
 
 
 local:
-	./dzresource
+	./tools/dzresource
 	pip install -r $(REQUIREMENTS) -e .
 	pip install -e .
 
@@ -95,7 +97,7 @@ nuke: ALWAYS
 # Reference:  https://setuptools.pypa.io/en/latest/userguide/index.html
 package:
 	pip install -r $(REQUIREMENTS)
-	./dzresource
+	./tools/dzresource
 	python -m build --wheel
 
 
@@ -111,6 +113,7 @@ publish:
 	pip install -U twine
 	twine --no-color check $(DIST)/*whl
 	twine --no-color upload --verbose $(DIST)/*whl
+	sleep 3
 	make dockerize
 
 
@@ -131,9 +134,11 @@ targets:
 
 test: ALWAYS
 	@echo "Version = $(VERSION)"
+	cp $(APP_CONFIG_FILE) ~/.streamlit
 	pytest
 	rm -Rfv $$(find $(PACKAGE)/ | awk '/__pycache__$$/')
 	rm -Rfv $$(find tests | awk '/__pycache__$$/')
+	rm ~/.streamlit/$(APP_CONFIG_FILE)
 
 
 tools:

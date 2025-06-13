@@ -268,7 +268,7 @@
 </span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a>                        <span class="n">_displaySpeedSummary</span><span class="p">(</span><span class="n">aggregate</span><span class="p">,</span> <span class="n">allJumpsPlot</span><span class="p">)</span>
 </span><span id="L-202"><a href="#L-202"><span class="linenos">202</span></a>                        <span class="n">_displayAllTracksOnMap</span><span class="p">(</span><span class="n">jumpResults</span><span class="p">)</span>
 </span><span id="L-203"><a href="#L-203"><span class="linenos">203</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a>        <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fetchResource</span><span class="p">(</span><span class="n">SSSCORE_INSTRUCTIONS_MD</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+</span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a>        <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fetchResource</span><span class="p">(</span><span class="n">SSSCORE_INSTRUCTIONS_MD</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">unsafe_allow_html</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a>
 </span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a>
 </span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a><span class="k">if</span> <span class="s1">&#39;__main__&#39;</span> <span class="o">==</span> <span class="vm">__name__</span><span class="p">:</span>
@@ -347,7 +347,7 @@
 </span><span id="main-202"><a href="#main-202"><span class="linenos">202</span></a>                        <span class="n">_displaySpeedSummary</span><span class="p">(</span><span class="n">aggregate</span><span class="p">,</span> <span class="n">allJumpsPlot</span><span class="p">)</span>
 </span><span id="main-203"><a href="#main-203"><span class="linenos">203</span></a>                        <span class="n">_displayAllTracksOnMap</span><span class="p">(</span><span class="n">jumpResults</span><span class="p">)</span>
 </span><span id="main-204"><a href="#main-204"><span class="linenos">204</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="main-205"><a href="#main-205"><span class="linenos">205</span></a>        <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fetchResource</span><span class="p">(</span><span class="n">SSSCORE_INSTRUCTIONS_MD</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+</span><span id="main-205"><a href="#main-205"><span class="linenos">205</span></a>        <span class="n">st</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fetchResource</span><span class="p">(</span><span class="n">SSSCORE_INSTRUCTIONS_MD</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">unsafe_allow_html</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span></pre></div>
 
 

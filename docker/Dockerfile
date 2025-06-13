@@ -5,6 +5,7 @@ FROM                --platform=$PLATFORM python:latest
 LABEL               maintainer="ssscoring AT cime.net"
 ARG                 SERVICE_ACCOUNT="ssscore"
 ARG                 VERSION="0.0.0"
+ARG                 APP_CONFIG_DIR="/home/$SERVICE_ACCOUNT/.streamlit"
 
 
 USER            root
@@ -24,10 +25,15 @@ RUN                 useradd -b /home/$SERVICE_ACCOUNT -m -d /home/$SERVICE_ACCOU
 RUN                 pip install -U pip \
                         ssscoring==$VERSION
 
-USER            $SERVICE_ACCOUNT
 WORKDIR         /home/$SERVICE_ACCOUNT
+RUN             mkdir $APP_CONFIG_DIR
 COPY            app.py /home/$SERVICE_ACCOUNT
+COPY            config.toml $APP_CONFIG_DIR
+RUN             chown $SERVICE_ACCOUNT:$SERVICE_ACCOUNT app.py
+RUN             chown -Rfv $SERVICE_ACCOUNT:$SERVICE_ACCOUNT $APP_CONFIG_DIR
 
+
+USER            $SERVICE_ACCOUNT
 HEALTHCHECK     CMD curl --fail http://localhost:8501/_stcore/health
 ENTRYPOINT      [ "streamlit", "run", "/home/ssscore/app.py", "--server.address=0.0.0.0" ]
 
