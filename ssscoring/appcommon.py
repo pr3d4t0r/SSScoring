@@ -379,3 +379,34 @@ def setSideBarAndMain(icon: str, singleTrack: bool, selectDZState):
     st.sidebar.link_button('Report missing DZ', 'https://github.com/pr3d4t0r/SSScoring/issues/new?template=report-missing-dz.md', icon=':material/breaking_news_alt_1:')
     st.sidebar.link_button('Feature request or bug report', 'https://github.com/pr3d4t0r/SSScoring/issues/new?template=Blank+issue', icon=':material/breaking_news_alt_1:')
 
+
+def setSideBarDeprecated(icon: str):
+    """
+    Set a disabled version of the sidebar to maintain UX compatibility with the
+    actual app, used when the main screen is configured to display an end-user
+    message like "we moved to a new domain."
+
+    Arguments
+    ---------
+        icon
+    A meaningful Emoji associated with the the side bar's title.
+    """
+    dropZones = initDropZonesFromResource()
+    st.session_state.currentDropZone = None
+    elevation = None
+    st.sidebar.title('%s SSScore %s' % (icon, __VERSION__))
+    st.session_state.processBadJump = st.sidebar.checkbox('Process bad jumps', value=True, help='Display results from invalid jumps', disabled=True)
+    st.session_state.currentDropZone = st.sidebar.selectbox('Select the drop zone:', dropZones.dropZone, index=None, disabled=True)
+    elevation = st.sidebar.number_input('...or enter the DZ elevation in meters:', min_value=0.0, max_value=4000.0, value='min', format='%.2f', disabled=True)
+    if st.session_state.currentDropZone:
+        st.session_state.elevation = dropZones[dropZones.dropZone == st.session_state.currentDropZone ].iloc[0].elevation
+    elif elevation != None and elevation != 0.0:
+        st.session_state.elevation= elevation
+    else:
+        st.session_state.elevation = None
+        st.session_state.trackFiles = None
+    st.sidebar.metric('Elevation', value='%.1f m' % (0.0 if st.session_state.elevation == None else st.session_state.elevation))
+    trackFile = st.sidebar.file_uploader('Track file', type=[ 'csv', ], disabled=True)
+    st.sidebar.button('Clear', disabled=True)
+    st.sidebar.button('Display DZ coordinates', disabled=True)
+
