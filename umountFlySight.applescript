@@ -4,7 +4,7 @@
 
 -- Constants
 
-property FLYSIGHT_SIG_FILE : "CONFIG.TXT"
+property FLYSIGHT_SIG_FILE : "FLYSIGHT.TXT"
 property MOUNT_POINT : "/Volumes"
 property OS : "Darwin"
 

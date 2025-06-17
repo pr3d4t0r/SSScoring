@@ -71,7 +71,7 @@ required to ensure smooth operation:
         ssl_prefer_server_ciphers   on;
 
         location / {
-            proxy_pass          http://192.168.0.240:8808;
+            proxy_pass          http://192.168.0.240:8908;
             proxy_set_header    Host $host;
             proxy_set_header    X-Real-IP $remote_addr;
             proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -88,9 +88,9 @@ required to ensure smooth operation:
 Pay particular attention to the `location` directive and configuration.  In this
 example:
 
-- The SSScore container opens port 8808, not 8501, because there are other
+- The SSScore container opens port 8908, not 8501, because there are other
   containers running behind the same SSL reverse proxy and the hosting
-  organization defined the ports range 8800 - 8899 for services.
+  organization defined the ports range 8900 - 8999 for services.
 - Include all the headers
 - Look at the Streamlit-specific headers and configuration and ensure those
   are present in your configuration.
