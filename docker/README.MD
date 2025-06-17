@@ -15,6 +15,18 @@ This creates a new image, tags it to the Docker Hub repository specified in
 different repository.
 
 
+### Build from the main `Makefile`
+
+From the project directory:
+
+```sh
+make dockerize
+```
+
+This ensures matching of the package and image versions, builds, and pushes the
+image to Docker Hub.
+
+---
 ## Running the Docker image
 
 To run a SSScore container execute:
@@ -31,6 +43,7 @@ The container will try to allocate 4 CPUs and 4 GB of RAM at the start.  These
 seem to be more than enough resources for even large numbers of SMD track files.
 
 
+---
 ## Running the Docker image in a server
 
 1. Ngnix is the SSScoring project preferred reverse SSL proxy
@@ -76,7 +89,7 @@ Pay particular attention to the `location` directive and configuration.  In this
 example:
 
 - The SSScore container opens port 8808, not 8501, because there are other
-  containers running behind the same SSL reverse proxy and the hosting 
+  containers running behind the same SSL reverse proxy and the hosting
   organization defined the ports range 8800 - 8899 for services.
 - Include all the headers
 - Look at the Streamlit-specific headers and configuration and ensure those
