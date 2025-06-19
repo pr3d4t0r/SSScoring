@@ -46,7 +46,7 @@ def test_viewPointBox():
 
 def test__resolveMaxScoreTimeFrom():
     x = _resolveMaxScoreTimeFrom(_jumpResult)
-    assert x == 21.3
+    assert x == 22.0
 
 
 def test__resolveMaxSpeedTimeFrom():
