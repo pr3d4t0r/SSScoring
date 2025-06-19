@@ -1,4 +1,4 @@
-% ssscoring(3) Version 2.8.9 | Speed Skydiving Scoring API documentation
+% ssscoring(3) Version 2.8.17 | Speed Skydiving Scoring API documentation
 
 Name
 ====
@@ -245,9 +245,11 @@ Contributors
 |------|--------|
 |Jochen Althoff|@Quadriga14193|
 |Eugene Ciurana|@pr3d4t0r|
+|Michael Cooper|@FlySight|
 |Nik Daniel|n/a|
 |Alexey Galda|@alexgalda|
 |Marco Hepp|n/a|
+|Stepan Sgibnev|@kotek14|
 
 
 See Also

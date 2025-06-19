@@ -17,7 +17,7 @@ elevation,lat,lon,name,country,DZ
 188,41.3997,-88.7939,Ottawa,USA,Skydive Chicago
 240,42.7032,-87.9589,Sturtevant,USA,Skydive Midwest
 15,29.3569,-95.4594,Rosharon,USA,Skydive Spaceland Houston
-27,28.228,-82.156,Zephyrhills,USA,Skydive City
+27,28.228,-82.156,Zephyrhills,USA,Skydive City Zephyrhills
 140,-36.784904,145.039509,Bailieston,AUS,Skydive Nagambie
 18,38.2024417,-121.2691417,Lodi,USA,Skydive Lodi Parachute Center
 13,37.02865,15.243458,Siracusa,ITA,SkydiveSicilia Siracusa
@@ -253,3 +253,5 @@ elevation,lat,lon,name,country,DZ
 9,59.58200212744969,16.50168799813618,Västerås,SWE,Fallskärmsklubben Aros
 20,55.923415066618475,14.095702226806454,Everöd,SWE,Skånes Fallskärmsklubb
 3,34.7337586,-76.6603547,Beauford NC,USA,Crystal Coast Skydiving
+24,52.43500736999359,1.6178792409503804,Suffolk,GBR,UK Parachuting Beccles
+368,40.89781123032923,-82.25702384492351,Ashland OH,USA,AerOhio

@@ -2,6 +2,7 @@
 40,Aarhus,56.31325799,10.6151104,20.0,Aarhus,DEN
 62,Abbotsford,49.09533273,-122.3131299,6.0,Abbotsford,CAN
 161,Adrenalin Skydive,-34.809077,149.726989,653.0,Goulburn,AUS
+255,AerOhio,40.89781123032923,-82.25702384492351,368.0,Ashland OH,USA
 241,Aero Parachute sport GmbH,51.408333,9.3775,277.0,Calden,GER
 175,Aeroclub Menzelinsk,55.720724,53.060472,119.0,Menzelinsk,RUS
 197,Aerodrom Borodyanka,50.667,29.915001,141.0,Borodyanka,UKR
@@ -153,7 +154,7 @@
 171,Skydive California,37.7313264,-121.3355889,11.0,Tracy,USA
 148,Skydive Carolina,34.790534,-81.195579,195.0,Chester,USA
 15,Skydive Chicago,41.3997,-88.7939,188.0,Ottawa,USA
-18,Skydive City,28.228,-82.156,27.0,Zephyrhills,USA
+18,Skydive City Zephyrhills,28.228,-82.156,27.0,Zephyrhills,USA
 222,Skydive Costa d'Argento,42.494951,11.239309,7.0,Orbetello,ITA
 2,Skydive Deland,29.067,-81.2837,24.0,DeLand,USA
 50,Skydive Dubai Desert,24.88522721,55.54800689,157.0,Dubai Desert,UAE
@@ -247,6 +248,7 @@
 83,Thai Sky Adventures,13.14059043,101.0450149,68.0,Pattaya,THA
 117,Thalmaessing,49.06426607,11.20835334,577.0,Thalmaessing,GER
 115,Turinskaya Sloboda,57.60180137,64.36770558,71.0,Turinskaya Sloboda,RUS
+254,UK Parachuting Beccles,52.43500736999359,1.6178792409503804,24.0,Suffolk,GBR
 46,Vaduleni,47.06611354,29.09283757,160.0,Vaduleni,MDA
 206,Vannes,47.723301,-2.71856,134.0,Vannes,FRA
 53,Vatulino,55.66244577,36.13871098,195.0,Vatulino,RUS

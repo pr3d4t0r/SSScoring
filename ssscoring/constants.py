@@ -174,6 +174,12 @@ The package resources in the manifest or package wheel resources.
 """
 
 
+SAMPLE_RATE = 0.2
+"""
+Expected interval, in seconds, for the FlySight sample rate.
+"""
+
+
 SCORING_INTERVAL = 3.0
 """
 Scoring is based on the maximum speed the jumper attained within the `VALIDATION_WINDOW_LENGTH`
@@ -188,15 +194,22 @@ SkyTraX GPS + barometric SMD v1 CSV file headers.
 """
 
 
+SPEED_ACCURACY_THRESHOLD = 3.0
+"""
+Speed accuracy for the FlySight device.
+"""
+
+
 SSSCORE_INSTRUCTIONS_MD = 'instructions.md'
 """
 Markdown representation of the end-user instructions on how to use SSScore.
 """
 
 
-SPEED_ACCURACY_THRESHOLD = 3.0
+SSSCORE_MOVED_DOMAIN_MD = 'moved-2-new-domain.md'
 """
-Speed accuracy for the FlySight device.
+Markdown representation of the end-user instructions to go to the new SSScore
+domain.
 """
 
 

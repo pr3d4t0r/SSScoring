@@ -1,6 +1,8 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 from geopy import distance
+from ssscoring.constants import SAMPLE_RATE
+from ssscoring.constants import SCORING_INTERVAL
 from ssscoring.datatypes import JumpResults
 from ssscoring.notebook import SPEED_COLORS
 from ssscoring.notebook import convertHexColorToRGB
@@ -53,9 +55,10 @@ def viewPointBox(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def _resolveMaxScoreTimeFrom(jumpResult: JumpResults) -> float:
-    plotTime = jumpResult.scores[jumpResult.score]
-
-    return plotTime
+    scoreTime = jumpResult.scores[jumpResult.score]
+    workData = jumpResult.data.reset_index(drop=True).copy()
+    ref = workData.index[workData.plotTime == scoreTime][0]+round(SCORING_INTERVAL/SAMPLE_RATE/2.0)-1
+    return workData.iloc[ref].plotTime
 
 
 def _resolveMaxSpeedTimeFrom(jumpResult: JumpResults) -> float:
@@ -133,7 +136,9 @@ def speedJumpTrajectory(jumpResult: JumpResults,
         ]
         viewBox = viewPointBox(workData)
         tooltip = {
-            'html': '<b>plotTime:</b> {plotTime} s<br><b>Score:</b> {score} km/h<br><b>Speed:</b> {vKMh} km/h<br><b>speedAngle:</b> {speedAngle}º',
+            # TODO:  Figure out how to plot the score @ plotTime here.
+            # 'html': '<b>plotTime:</b> {plotTime} s<br><b>Score:</b> {score} km/h<br><b>Speed:</b> {vKMh} km/h<br><b>speedAngle:</b> {speedAngle}º',
+            'html': '<b>plotTime:</b> {plotTime} s<br><b>Speed:</b> {vKMh} km/h<br><b>speedAngle:</b> {speedAngle}º',
             'style': {
                 'backgroundColor': 'steelblue',
                 'color': 'white',
