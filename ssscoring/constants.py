@@ -174,6 +174,12 @@ The package resources in the manifest or package wheel resources.
 """
 
 
+SAMPLE_RATE = 0.2
+"""
+Expected interval, in seconds, for the FlySight sample rate.
+"""
+
+
 SCORING_INTERVAL = 3.0
 """
 Scoring is based on the maximum speed the jumper attained within the `VALIDATION_WINDOW_LENGTH`
