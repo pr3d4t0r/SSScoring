@@ -6,10 +6,15 @@
 showErrorDetails = 'type'
 toolbarMode = 'viewer'
 
+# [global]
+# developmentMode=false
+
 [logger]
 level = 'critical'
 
-[theme]
-base = 'dark'
+[server]
+port = 8080
 
+[theme]
+base = 'light'
 

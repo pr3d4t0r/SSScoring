@@ -71,3 +71,28 @@ ssscoring = [
     'resources/moved-2-new-domain.md',
 ]
 
+
+# https://cx-freeze.readthedocs.io/en/stable/index.html
+# cxfreeze --script SSScore_app.py --target-dir ./dist/SSScore.app
+# cxfreeze  bdist_mac 
+[tool.cxfreeze]
+executables = [
+    { script = 'SSScore_app.py', base = 'console' }
+]
+
+
+[tool.cxfreeze.bdist_mac]
+bundle_name = 'SSScoreXXX'
+
+
+[tool.cxfreeze.build_exe]
+include_files = [
+    # 'config.toml',
+    'ssscrunner.py',
+]
+packages = [
+    'pydeck',
+    'streamlit',
+    'ssscoring'
+]
+
