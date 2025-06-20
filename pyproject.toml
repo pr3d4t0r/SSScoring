@@ -74,7 +74,7 @@ ssscoring = [
 
 # https://cx-freeze.readthedocs.io/en/stable/index.html
 # cxfreeze --script SSScore_app.py --target-dir ./dist/SSScore.app
-# cxfreeze  bdist_mac 
+# cxfreeze  bdist_mac
 [tool.cxfreeze]
 executables = [
     { script = 'SSScore_app.py', base = 'console' }
