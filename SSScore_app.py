@@ -21,7 +21,7 @@ def _resolveRunnerPathFrom(bundlePath: str) -> str:
     # runnerPath = Path(runnerPath).joinpath('Resources', 'ssscrunner.py')
     runnerPath = Path(runnerPath).joinpath('MacOS', 'ssscrunner.py')
     return runnerPath.as_posix()
-    
+
 
 # *** main ***
 
