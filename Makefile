@@ -27,6 +27,7 @@ all: ALWAYS
 	make docs
 	make package
 	make umountFlySight
+	make DumbDriver
 
 
 clean:
@@ -63,6 +64,14 @@ docs: ALWAYS
 	pip install -U pdoc
 	mkdir -p $(API_DOC_DIR)
 	VERSION="$(VERSION)" PDOC_ALLOW_EXEC=1 pdoc --logo="https://github.com/pr3d4t0r/SSScoring/blob/master/assets/ssscoring-logo.png?raw=true" --favicon="https://cime.net/upload_area/favicon.ico" -n -o $(API_DOC_DIR) -t ./resources $(PACKAGE)
+
+
+DumbDriver: ALWAYS
+	if [ "$(BUILD_OS)" = "Darwin" ]; then \
+		osacompile -o $(DIST)/DumbDriver.app DumbDriver.applescript; \
+		cp resources/DumbDriver.icns $(DIST)/DumbDriver.app/Contents/Resources/applet.icns; \
+		ls -Al $(DIST) | grep "\.app" ; \
+	fi
 
 
 install:
