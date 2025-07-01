@@ -27,11 +27,16 @@ def _resolveRunnerPathFrom(bundlePath: str) -> str:
 
 if '__main__' == __name__:
     bundlePath = sys.argv[0]
+#     sys.argv = [
+#         'streamlit',
+#         'run',
+#         _resolveRunnerPathFrom(bundlePath),
+#         '--global.developmentMode=false',
+#     ]
     sys.argv = [
         'streamlit',
         'run',
-        _resolveRunnerPathFrom(bundlePath),
-        '--global.developmentMode=false',
+        'ssscrunner.py',
     ]
     sys.exit(stcli.main())
 
