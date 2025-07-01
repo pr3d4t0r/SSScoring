@@ -4,8 +4,10 @@
 from pathlib import Path
 from pathlib import PurePath
 
+import os
 import sys
 
+import streamlit.web.bootstrap
 import streamlit.web.cli as stcli
 
 
@@ -33,10 +35,29 @@ if '__main__' == __name__:
 #         _resolveRunnerPathFrom(bundlePath),
 #         '--global.developmentMode=false',
 #     ]
+
+    # Set environment variables to ensure production mode and specify the port
+    os.environ["STREAMLIT_DEVELOPMENT_MODE"] = "false"  # This disables development mode
+    os.environ["STREAMLIT_ENV"] = "production"
+    os.environ["STREAMLIT_SERVER_ADDRESS"] = "localhost"
+    os.environ["STREAMLIT_SERVER_HEADLESS"] = "true"
+    os.environ["STREAMLIT_SERVER_PORT"] = "8005"
+
     sys.argv = [
         'streamlit',
         'run',
         'ssscrunner.py',
+        '--server.port=8005',
+        '--server.headless=true',
+        '--server.address=localhost',
+        '--server.headless=true',
+        '--server.env=production',
     ]
     sys.exit(stcli.main())
+#     streamlit.web.bootstrap.run(
+#         'ssscrunner.py',
+#         False,
+#         sys.argv[1:],
+#         {},
+#     )
 
