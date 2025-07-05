@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
 
+# https://github.com/ncrevois/streamlit_dash
+# https://discuss.streamlit.io/t/theme-defined-in-the-config-toml-file-is-not-applying-when-the-app-is-packaged-using-pyinstaller/79699
+
 from pathlib import Path
 from pathlib import PurePath
 
