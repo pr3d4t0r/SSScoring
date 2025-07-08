@@ -71,4 +71,5 @@ repeat with workDirectory in workDirectories
     notifyUserWorkWith("Processing FlySight mount: " & workDirectory)
     ejectFlySight(workDirectory)
 end repeat
+notifyUserWorkWith("All FlySights unmounted")
 

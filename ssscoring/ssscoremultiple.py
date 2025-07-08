@@ -117,7 +117,7 @@ def _displayJumpsInSet(aggregate: pd.DataFrame):
 
 
 def _displaySpeedSummary(aggregate: pd.DataFrame,
-                         allJumpsPlot: bp.Figure):
+                         allJumpsPlot):
     st.html('<h2>Speed summary</h2>')
     st.dataframe(totalResultsFrom(aggregate), hide_index = True)
     st.bokeh_chart(allJumpsPlot, use_container_width=True)
