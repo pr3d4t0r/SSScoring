@@ -176,7 +176,9 @@ def multipleSpeedJumpsTrajectories(jumpResults):
     """
     mapLayers = list()
     mixColor = 0
-    for result in jumpResults.values():
+    resultTags = sorted(list(jumpResults.keys()), reverse=True)
+    for tag in resultTags:
+        result = jumpResults[tag]
         if result.scores != None:
             workData = result.data.copy()
             maxScoreTime = _resolveMaxScoreTimeFrom(result)
