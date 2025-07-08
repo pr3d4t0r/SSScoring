@@ -181,15 +181,29 @@ def multipleSpeedJumpsTrajectories(jumpResults):
         result = jumpResults[tag]
         if result.scores != None:
             workData = result.data.copy()
+            exitPointData = workData.head(1)
+            exitPointData['label'] = tag
             maxScoreTime = _resolveMaxScoreTimeFrom(result)
             mixColor = (mixColor+1)%len(SPEED_COLORS)
             layers = [
                 pdk.Layer(
                     'ScatterplotLayer',
-                    data=workData.head(1),
+                    data=exitPointData,
                     get_color=[ 255, 126, 0, 255 ],
                     get_position=[ 'longitude', 'latitude', ],
+                    pickable=True,
                     get_radius=8),
+                pdk.Layer(
+                    'TextLayer',
+                    data=exitPointData,
+                    get_position=[ 'longitude', 'latitude', ],
+                    get_text='label',
+                    # get_color=convertHexColorToRGB(SPEED_COLORS[mixColor]),
+                    get_color=[ 255, 255, 255, 255, ],
+                    get_background_color=[ 0, 0, 0, 255, ],
+                    background=True,
+                    get_size=12,
+                ),
                 pdk.Layer(
                     'ScatterplotLayer',
                     data=workData.tail(1),
@@ -220,7 +234,7 @@ def multipleSpeedJumpsTrajectories(jumpResults):
     deck = pdk.Deck(
         map_style = None,
         initial_view_state=pdk.data_utils.compute_view(viewBox[['longitude', 'latitude',]]),
-        layers=mapLayers
+        layers=mapLayers,
     )
     return deck
 
