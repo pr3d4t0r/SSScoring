@@ -66,6 +66,7 @@ dependencies = { file = 'requirements.txt' }
 
 [tool.setuptools.package-data]
 ssscoring = [
+    'resources/config.toml',
     'resources/drop-zones-loc-elev.csv',
     'resources/instructions.md',
     'resources/moved-2-new-domain.md',
@@ -82,10 +83,11 @@ executables = [
 
 
 [tool.cxfreeze.bdist_mac]
-bundle_name = 'SSScoreXXX'
+bundle_name = 'SSScore'
 
 
 [tool.cxfreeze.build_exe]
+build_exe = 'dist'
 include_files = [
     # 'config.toml',
     'ssscrunner.py',

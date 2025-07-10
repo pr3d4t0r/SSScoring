@@ -1,0 +1,13 @@
+# See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
+
+[global]
+developmentMode = false
+
+[server]
+# address = 'localhost'
+# headless = true
+port = 8509
+
+[browser]
+serverPost = 8509
+

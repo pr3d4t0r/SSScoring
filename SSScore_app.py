@@ -8,6 +8,7 @@ from pathlib import PurePath
 import os
 import sys
 
+import streamlit.runtime.scriptrunner.magic_funcs # For PyInstaller
 import streamlit.web.bootstrap
 
 
@@ -20,8 +21,8 @@ def _resolveRunnerPathFrom(bundlePath: str) -> str:
         if dir == 'MacOS':
             break
         runnerPath /= dir
-    # runnerPath = Path(runnerPath).joinpath('Resources', 'ssscrunner.py')
-    runnerPath = Path(runnerPath).joinpath('MacOS', 'ssscrunner.py')
+    runnerPath = Path(runnerPath).joinpath('Resources', 'ssscrunner.py')
+    # runnerPath = Path(runnerPath).joinpath('MacOS', 'ssscrunner.py')
     return runnerPath.as_posix()
 
 
@@ -30,12 +31,8 @@ def _resolveRunnerPathFrom(bundlePath: str) -> str:
 if '__main__' == __name__:
     bundlePath = sys.argv[0]
     print('bundlePath = %s' % bundlePath)
-    # Set environment variables to ensure production mode and specify the port
-    os.environ["STREAMLIT_DEVELOPMENT_MODE"] = "false"  # This disables development mode
-    os.environ["STREAMLIT_ENV"] = "production"
-    os.environ["STREAMLIT_SERVER_ADDRESS"] = "localhost"
-    os.environ["STREAMLIT_SERVER_HEADLESS"] = "true"
-    os.environ["STREAMLIT_SERVER_PORT"] = "8005"
+    # os.chdir('/Users/ciurana/development/SSScoring/dist/SSScore_app')
+    print('current directory = %s' % os.getcwd())
 
     sys.argv = [
         'streamlit',
