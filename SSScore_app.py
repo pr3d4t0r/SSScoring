@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#.!/usr/bin/env python3
 # See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
 
 
@@ -18,10 +18,12 @@ def _resolveRunnerPathFrom(bundlePath: str) -> str:
     path = PurePath(bundlePath)
     runnerPath = Path()
     for dir in path.parts:
-        if dir == 'MacOS':
+        # if dir == 'MacOS':
+        if dir == 'SSScore_app':
             break
         runnerPath /= dir
-    runnerPath = Path(runnerPath).joinpath('Resources', 'ssscrunner.py')
+    # runnerPath = Path(runnerPath).joinpath('_internal', 'ssscrunner.py')
+    runnerPath = Path(runnerPath) / 'SSScore_app' / '_internal' / 'ssscrunner.py'
     # runnerPath = Path(runnerPath).joinpath('MacOS', 'ssscrunner.py')
     return runnerPath.as_posix()
 
@@ -33,6 +35,7 @@ if '__main__' == __name__:
     print('bundlePath = %s' % bundlePath)
     # os.chdir('/Users/ciurana/development/SSScoring/dist/SSScore_app')
     print('current directory = %s' % os.getcwd())
+    print('expected runner directory = %s' % _resolveRunnerPathFrom(bundlePath))
 
     sys.argv = [
         'streamlit',
@@ -40,7 +43,9 @@ if '__main__' == __name__:
         'ssscrunner.py',
     ]
     streamlit.web.bootstrap.run(
-        'ssscrunner.py',
+        # TODO:  fix this
+        # '_internal/ssscrunner.py', # THIS WORKS FINE IN VIRTUAL ENV
+        _resolveRunnerPathFrom(bundlePath),
         False,
         sys.argv[1:],
         {},

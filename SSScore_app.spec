@@ -17,6 +17,8 @@ datas = [('/Users/ciurana/Python-3_13_4/lib/Python3.13/site-packages/plotly/vali
 datas += copyMetadata('streamlit')
 datas += collectDataFiles('plotly', includes=['validators/*.json'])
 datas += [ ( '%s/streamlit/static' % site_packages, 'streamlit/static' ) ]
+# datas += [ ( 'ssscrunner.py', 'SSScore_app') ]
+datas += [ ( 'ssscrunner.py', '.') ]
 
 plotlyPath = Path(site.getusersitepackages()) / 'plotly' / 'validators' / '_validators.json'
 
