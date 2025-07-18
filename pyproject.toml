@@ -38,6 +38,16 @@ requires-python = '>=3.9.9'
 version = '3.0.0'
 
 
+[project.optional-dependencies]
+dev = [
+    'ptpython',
+    'pudb',
+    'pyinstaller',
+    'pytest',
+    'pytest-cov',
+]
+
+
 [project.scripts]
 ssscore = 'ssscoring.cli:_ssscoreCommand'
 
@@ -62,6 +72,7 @@ packages = [
 
 [tool.setuptools.dynamic]
 dependencies = { file = 'requirements.txt' }
+optional_dependencies = { file = 'dev-requirements.txt' }
 
 
 [tool.setuptools.package-data]
