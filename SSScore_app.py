@@ -3,13 +3,19 @@
 
 
 from pathlib import Path
-from pathlib import PurePath
+
+from ssscoring.appcommon import fetchResource
 
 import os
 import sys
 
 import streamlit.runtime.scriptrunner.magic_funcs # For PyInstaller
 import streamlit.web.bootstrap
+
+
+# *** constants ***
+
+STREAMLIT_CONFIG = 'config.toml'
 
 
 # *** functions ***
@@ -45,6 +51,21 @@ def _assertStreamlitDir():
     else:
         msg += 'OK'
     print(msg)
+    return dir
+
+
+def _assertMinimalConfig():
+    configPath = _assertStreamlitDir() / STREAMLIT_CONFIG
+    msg = '%s: ' % configPath.as_posix()
+    if not configPath.exists():
+        buffer = fetchResource(STREAMLIT_CONFIG).read()
+        with open(configPath.as_posix(), 'w') as output:
+            output.write(buffer)
+        msg += 'created'
+    else:
+        'OK'
+    print(msg)
+    return configPath
 
 
 # *** main ***
@@ -55,6 +76,7 @@ if __name__ == '__main__':
     print('current directory = %s' % os.getcwd())
     print('expected runner path = %s' % _resolveRunnerPath())
     _assertStreamlitDir()
+    _assertMinimalConfig()
 
     runnerPath = _resolveRunnerPath()
     sys.argv = [
