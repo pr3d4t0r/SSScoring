@@ -7,6 +7,7 @@ from pathlib import Path
 from ssscoring.appcommon import fetchResource
 
 import os
+import platform
 import sys
 
 import streamlit.runtime.scriptrunner.magic_funcs # For PyInstaller
@@ -77,6 +78,7 @@ if __name__ == '__main__':
     print('expected runner path = %s' % _resolveRunnerPath())
     _assertStreamlitDir()
     _assertMinimalConfig()
+    print('Python %s' % platform.python_version())
 
     runnerPath = _resolveRunnerPath()
     sys.argv = [
