@@ -40,7 +40,7 @@ def _assertStreamlitDir():
     dir = Path(os.environ['HOME']) / '.streamlit'
     msg = '%s: ' % dir.as_posix()
     if not dir.exists():
-        os.makedirs(dir.as_posiz(), exist_ok=True)
+        os.makedirs(dir.as_posix(), exist_ok=True)
         msg += '...created'
     else:
         msg += 'OK'
