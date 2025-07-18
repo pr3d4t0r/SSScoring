@@ -36,30 +36,26 @@ def _resolveRunnerPath() -> str:
     return (basePath / 'ssscrunner.py').as_posix()
 
 
+def _assertStreamlitDir():
+    dir = Path(os.environ['HOME']) / '.streamlit'
+    msg = '%s: ' % dir.as_posix()
+    if not dir.exists():
+        os.makedirs(dir.as_posiz(), exist_ok=True)
+        msg += '...created'
+    else:
+        msg += 'OK'
+    print(msg)
+
+
 # *** main ***
 
-if '__main__' == __name__:
+if __name__ == '__main__':
     bundlePath = sys.argv[0]
     print('bundlePath = %s' % bundlePath)
     print('current directory = %s' % os.getcwd())
     print('expected runner path = %s' % _resolveRunnerPath())
+    _assertStreamlitDir()
 
-#     sys.argv = [
-#         'streamlit',
-#         'run',
-#         'ssscrunner.py',
-#     ]
-#     streamlit.web.bootstrap.run(
-#         # TODO:  fix this
-#         # '_internal/ssscrunner.py', # THIS WORKS FINE IN VIRTUAL ENV
-#         _resolveRunnerPathFrom(bundlePath),
-#         False,
-#         sys.argv[1:],
-#         {},
-#     )
-
-
-if __name__ == '__main__':
     runnerPath = _resolveRunnerPath()
     sys.argv = [
         'streamlit',
