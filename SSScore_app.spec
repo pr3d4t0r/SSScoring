@@ -1,5 +1,5 @@
-# See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
 # -*- mode: python ; coding: utf-8 -*-
+# See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
 
 
 from pathlib import Path
@@ -34,15 +34,17 @@ datas += collectDataFiles('plotly', includes=['validators/*.json'])
 datas += collectDataFiles('ssscoring', includes=['resources/*'])
 datas += [ ( '%s/streamlit/static' % sitePackages, 'streamlit/static' ) ]
 datas += [ ( 'ssscrunner.py', '.') ]
+datas += [ ( 'SSScore_app.py', '.') ]
 
-plotlyPath = Path(site.getusersitepackages()) / 'plotly' / 'validators' / '_validators.json'
-
+# Collect hidden imports
 streamlitModules = collectSubmodules('streamlit')
 plotlyModules = collectSubmodules('plotly.validators')
 hiddenimports = streamlitModules + plotlyModules
 
+# Analysis
 a = Analysis(
-    ['SSScore_app.py', 'ssscrunner.py'],
+    # ['SSScore_app.py', 'ssscrunner.py'],
+    [ 'launch_gui.py', ],
     pathex=[],
     binaries=[],
     datas=datas,
@@ -54,8 +56,10 @@ a = Analysis(
     noarchive=False,
     optimize=0,
 )
+# Python bytecode archive
 pyz = PYZ(a.pure)
 
+# macOS App bundle settings
 exe = EXE(
     pyz,
     a.scripts,
@@ -66,13 +70,10 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=True,
-    disable_windowed_traceback=False,
-    argv_emulation=False,
-    target_arch=None,
-    codesign_identity=None,
-    entitlements_file=None,
+    console=False,  # GUI / windowed mode (will produce a .app on macOS)
 )
+
+# Collect and create the final app bundle
 coll = COLLECT(
     exe,
     a.binaries,
