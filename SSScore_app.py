@@ -21,20 +21,6 @@ STREAMLIT_CONFIG = 'config.toml'
 
 # *** functions ***
 
-# def _resolveRunnerPathFrom(bundlePath: str) -> str:
-#     path = PurePath(bundlePath)
-#     runnerPath = Path()
-#     for dir in path.parts:
-#         # if dir == 'MacOS':
-#         if dir == 'SSScore_app':
-#             break
-#         runnerPath /= dir
-#     # runnerPath = Path(runnerPath).joinpath('_internal', 'ssscrunner.py')
-#     runnerPath = Path(runnerPath) / 'SSScore_app' / '_internal' / 'ssscrunner.py'
-#     # runnerPath = Path(runnerPath).joinpath('MacOS', 'ssscrunner.py')
-#     return runnerPath.as_posix()
-
-
 def _resolveRunnerPath() -> str:
     if hasattr(sys, 'frozen'):
         basePath = Path(sys._MEIPASS)
@@ -76,7 +62,6 @@ if __name__ == '__main__':
     print('bundlePath = %s' % bundlePath)
     print('current directory = %s' % os.getcwd())
     print('expected runner path = %s' % _resolveRunnerPath())
-    _assertStreamlitDir()
     _assertMinimalConfig()
     print('Python %s' % platform.python_version())
 
