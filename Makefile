@@ -4,7 +4,7 @@
 SHELL=/bin/bash
 
 API_DOC_DIR="./docs"
-APP_CONFIG_FILE="config.toml"
+APP_CONFIG_FILE="ssscoring/resources/config.toml"
 BUILD=./build
 BUILD_OS=$(shell uname)
 DEVPI_HOST=$(shell cat devpi-hostname.txt)
@@ -28,6 +28,8 @@ all: ALWAYS
 	make package
 	make umountFlySight
 	make DumbDriver
+	make local # Prepare to make the app
+	make app
 
 
 	# pyinstaller SSScore_app.spec --clean
@@ -145,13 +147,13 @@ targets:
 	@cat Makefile| awk '/:/ && !/^#/ && !/targets/ && !/Makefile/ { gsub("ALWAYS", ""); gsub(":", ""); print; } /^ALWAYS/ { next; }'
 
 
+#	rm ~/.streamlit/$(APP_CONFIG_FILE)
 test: ALWAYS
 	@echo "Version = $(VERSION)"
 	cp $(APP_CONFIG_FILE) ~/.streamlit
 	pytest
 	rm -Rfv $$(find $(PACKAGE)/ | awk '/__pycache__$$/')
 	rm -Rfv $$(find tests | awk '/__pycache__$$/')
-	rm ~/.streamlit/$(APP_CONFIG_FILE)
 
 
 tools:
