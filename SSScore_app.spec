@@ -1,23 +1,38 @@
+# See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
 # -*- mode: python ; coding: utf-8 -*-
+
+
+from pathlib import Path
 
 from PyInstaller.utils.hooks import collect_data_files as collectDataFiles
 from PyInstaller.utils.hooks import collect_submodules as collectSubmodules
 from PyInstaller.utils.hooks import copy_metadata as copyMetadata
 
-from pathlib import Path
-
-
+import importlib.util
+import os
 import site
-import sys
+
+import plotly.validators
 
 
-site_packages = site.getsitepackages()[0]
+sitePackages = site.getsitepackages()[0]
 
-datas = [('/Users/ciurana/Python-3_13_4/lib/Python3.13/site-packages/plotly/validators', '_internal/plotly/validators')]
+
+def getValidatorsPath():
+    spec = importlib.util.find_spec('plotly.validators')
+    if spec and spec.origin:
+        return os.path.dirname(spec.origin)
+    elif spec and spec.submodule_search_locations:
+        return list(spec.submodule_search_locations)[0]
+    else:
+        raise ImportError("Can't resolve the plotly.validators path")
+
+
+datas = [(getValidatorsPath(), '_internal/plotly/validators')]
 datas += copyMetadata('streamlit')
 datas += collectDataFiles('plotly', includes=['validators/*.json'])
 datas += collectDataFiles('ssscoring', includes=['resources/*'])
-datas += [ ( '%s/streamlit/static' % site_packages, 'streamlit/static' ) ]
+datas += [ ( '%s/streamlit/static' % sitePackages, 'streamlit/static' ) ]
 datas += [ ( 'ssscrunner.py', '.') ]
 
 plotlyPath = Path(site.getusersitepackages()) / 'plotly' / 'validators' / '_validators.json'
