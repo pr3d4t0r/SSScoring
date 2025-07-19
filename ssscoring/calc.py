@@ -604,13 +604,18 @@ def getFlySightDataFromCSVBuffer(buffer:bytes, bufferName:str) -> tuple:
         stringIO = StringIO(buffer.decode(FLYSIGHT_FILE_ENCODING))
     except Exception as e:
         raise SSScoringError('invalid buffer endcoding - %s' % str(e))
-    version = detectFlySightFileVersionOf(buffer)
-    if version == FlySightVersion.V1:
-        rawData = _readVersion1CSV(stringIO)
-        tag = _tagVersion1From(bufferName)
-    elif version == FlySightVersion.V2:
-        rawData = _readVersion2CSV(stringIO)
-        tag = _tagVersion2From(bufferName)
+    try:
+        version = detectFlySightFileVersionOf(buffer)
+    except Exception:
+        tag = '%s:INVALID' % bufferName
+        rawData = None
+    else:
+        if version == FlySightVersion.V1:
+            rawData = _readVersion1CSV(stringIO)
+            tag = _tagVersion1From(bufferName)
+        elif version == FlySightVersion.V2:
+            rawData = _readVersion2CSV(stringIO)
+            tag = _tagVersion2From(bufferName)
     return (rawData, tag)
 
 
@@ -647,13 +652,18 @@ def getFlySightDataFromCSVFileName(jumpFile) -> tuple:
         raise SSScoringError('jumpFile must be a string or a Path object')
     if not validFlySightHeaderIn(jumpFile):
         raise SSScoringError('%s is an invalid speed skydiving file')
-    version = detectFlySightFileVersionOf(jumpFile)
-    if version == FlySightVersion.V1:
-        rawData = _readVersion1CSV(jumpFile)
-        tag = _tagVersion1From(jumpFile)
-    elif version == FlySightVersion.V2:
-        rawData = _readVersion2CSV(jumpFile)
-        tag = _tagVersion2From(jumpFile)
+    try:
+        version = detectFlySightFileVersionOf(jumpFile)
+    except Exception:
+        tag = 'NA'
+        rawData = None
+    else:
+        if version == FlySightVersion.V1:
+            rawData = _readVersion1CSV(jumpFile)
+            tag = _tagVersion1From(jumpFile)
+        elif version == FlySightVersion.V2:
+            rawData = _readVersion2CSV(jumpFile)
+            tag = _tagVersion2From(jumpFile)
     return (rawData, tag)
 
 
@@ -708,7 +718,10 @@ def processAllJumpFiles(jumpFiles: list, altitudeDZMeters = 0.0) -> dict:
             rawData, tag = getFlySightDataFromCSVBuffer(jumpFile.getvalue(), jumpFile.name)
         else:
             rawData, tag = getFlySightDataFromCSVFileName(jumpFile)
-        jumpResult = processJump(convertFlySight2SSScoring(rawData, altitudeDZMeters = altitudeDZMeters))
+        try:
+            jumpResult = processJump(convertFlySight2SSScoring(rawData, altitudeDZMeters = altitudeDZMeters))
+        except Exception:
+            jumpResult = JumpResults(None, 0.0, 0.0, None, None, None, JumpStatus.INVALID_SPEED_FILE)
         jumpResults[tag] = jumpResult
     return jumpResults
 
