@@ -240,10 +240,12 @@ def test_getFlySightDataFromBuffer():
     rawData, tag = getFlySightDataFromCSVBuffer(buffer, TEST_FLYSIGHT_DATA.as_posix())
     assert isinstance(rawData, pd.DataFrame)
     assert 'v1' in tag
-    with pytest.raises(SSScoringError):
-        with open(TEST_FLYSIGHT_DATA_BAD_HEADERS, 'rb') as inputFile:
-            buffer = inputFile.read()
-        rawData, tag = getFlySightDataFromCSVBuffer(buffer, TEST_FLYSIGHT_DATA_BAD_HEADERS.as_posix())
+
+    with open(TEST_FLYSIGHT_DATA_BAD_HEADERS, 'rb') as inputFile:
+        buffer = inputFile.read()
+    rawData, tag = getFlySightDataFromCSVBuffer(buffer, TEST_FLYSIGHT_DATA_BAD_HEADERS.as_posix())
+    assert not rawData
+    assert 'INVALID' in tag
 
 
 def test_getFlySightDataFromCSVFileName():

@@ -202,10 +202,13 @@ def interpretJumpResult(tag: str,
     elif jumpResult.status == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT:
         badJumpLegend = '<span style="color: red">%s - RE-JUMP: speed accuracy exceeds ISC threshold<br>' % tag
         scoringInfo = ''
+    elif jumpResult.status == JumpStatus.INVALID_SPEED_FILE:
+        badJumpLegend = '<span style="color: red">Invalid or corrupted FlySight file - it\'s neither version 1 nor version 2<br>'
+        scoringInfo = ''
     else:
         scoringInfo = 'Max speed = {0:,.0f}; '.format(maxSpeed)+('exit at %d m (%d ft)<br>Validation window starts at %d m (%d ft)<br>End scoring window at %d m (%d ft)<br>' % \
                         (window.start, M_2_FT*window.start, window.validationStart, M_2_FT*window.validationStart, window.end, M_2_FT*window.end))
-    if (processBadJump and jumpStatus != JumpStatus.OK and jumpStatus != JumpStatus.WARM_UP_FILE and jumpStatus != JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT) or jumpStatus == JumpStatus.OK:
+    if (processBadJump and jumpStatus != JumpStatus.OK and jumpStatus != JumpStatus.WARM_UP_FILE and jumpStatus != JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT and jumpStatus != JumpStatus.INVALID_SPEED_FILE) or jumpStatus == JumpStatus.OK:
         jumpStatusInfo = '<span style="color: %s">%s jump - %s - %.02f km/h</span><br>' % ('green', tag, 'VALID', jumpResult.score)
         belowMaxAltitude = isValidMaximumAltitude(jumpResult.data.altitudeAGL.max())
         badJumpLegend = None
@@ -406,7 +409,7 @@ def setSideBarDeprecated(icon: str):
         st.session_state.elevation = None
         st.session_state.trackFiles = None
     st.sidebar.metric('Elevation', value='%.1f m' % (0.0 if st.session_state.elevation == None else st.session_state.elevation))
-    trackFile = st.sidebar.file_uploader('Track file', type=[ 'csv', ], disabled=True)
+    st.sidebar.file_uploader('Track file', type=[ 'csv', ], disabled=True)
     st.sidebar.button('Clear', disabled=True)
     st.sidebar.button('Display DZ coordinates', disabled=True)
 
