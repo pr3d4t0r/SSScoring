@@ -8,6 +8,3 @@ developmentMode = false
 # headless = true
 port = 8509
 
-[browser]
-serverPost = 8509
-
