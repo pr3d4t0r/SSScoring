@@ -187,10 +187,12 @@ def initializeExtraYRanges(plot,
     plot.extra_y_ranges = {
         'altitudeFt': bm.Range1d(start = startY, end = endY),
         'angle': bm.Range1d(start = 0.0, end = 90.0),
+        'vAccelMS2': bm.Range1d(start = 0.0, end = 15.0),
         'speedAccuracy': bm.Range1d(start = 0.0, end = speedAccuracyEnd),
     }
     plot.add_layout(_initLinearAxis('Alt (ft)', 'altitudeFt', colorName=DEFAULT_AXIS_COLOR_BOKEH), 'left')
     plot.add_layout(_initLinearAxis('angle', 'angle', colorName=DEFAULT_AXIS_COLOR_BOKEH), 'left')
+    plot.add_layout(_initLinearAxis('Vertical acceleration m/s²', 'vAccelMS2', colorName=DEFAULT_AXIS_COLOR_BOKEH), 'left')
     plot.add_layout(_initLinearAxis('Speed accuracy ISC', 'speedAccuracy', colorName=DEFAULT_AXIS_COLOR_BOKEH), 'left')
     return plot
 
@@ -369,6 +371,42 @@ def graphAngle(plot,
     """
     data = jumpResult.data
     plot.line(data.plotTime, data.speedAngle, legend_label = label, line_width = 2, line_color = lineColor, y_range_name = rangeName)
+
+
+def graphAcceleration(plot,
+                      jumpResult,
+                      label = 'V-accel m/s²',
+                      lineColor = 'magenta',
+                      rangeName = 'vAccelMS2'):
+    """
+    Graph the flight acceleration curve.
+
+    Arguments
+    ---------
+        plot: pb.figure
+    A Bokeh figure where to render the plot.
+
+        jumpResult: ssscoring.JumpResults
+    A jump results named tuple with score, max speed, scores, data, etc.
+
+        label: str
+    The legend label for the new Y axis.
+
+        lineColor: str
+    A color name from the Bokeh palette.
+
+        rangeName: str
+    The range name to associate the `LinearAxis` layout with the data for
+    plotting.
+
+    Returns
+    -------
+    `None`.
+    """
+    data = jumpResult.data
+    plot.line(data.plotTime, data.vAccelMS2, legend_label = label, line_width = 2, line_color = lineColor, y_range_name = rangeName)
+
+
 
 
 def convertHexColorToRGB(color: str) -> list:
