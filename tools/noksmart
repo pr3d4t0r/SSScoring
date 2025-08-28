@@ -1,0 +1,48 @@
+#!/usr/bin/env zsh
+# https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE
+
+
+set -e
+
+
+# *** functions ***
+
+checkSMART() {
+    local state=$(kmutil showloaded 2>&1 | awk '/variant/ { next; } /SATSMARTDriver/')
+    echo "$state"
+} # checkSMART
+
+
+userWarning() {
+    cat << EOF
+
+Unloading the SATSMARTDriver when other external devices are mounted may force
+umounting them without recourse.  This could lead to data loss in VeraCrypt volumes.
+
+Always unmount all external devices before unloading the SATSMARTDriver.
+
+EOF
+} # userWarning
+
+
+# *** main ***
+
+state=$(checkSMART)
+
+if [[ -n "$state" ]]
+then
+    echo "The SATSMARTDriver kernel extension is loaded."
+    userWarning
+    read -r "confirm?Do you wish to continue y/N? "
+    confirm=${confirm:l}
+    if [[ "y" = "$confirm" ]] || [[ "yes" = "$confirm" ]]
+    then
+        echo "About to unload the SATSMARTDriver.  Prepare to enter your computer administrator"
+        echo "password."
+        echo ""
+        sudo kmutil unload --bundle-identifier com.binaryfruit.driver.SATSMARTDriver
+    fi
+else
+    echo "SATSMARTDriver not loaded"
+fi
+
