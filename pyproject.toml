@@ -35,7 +35,7 @@ license = 'BSD-3-Clause'
 name = 'ssscoring'  # $(PACKAGE) and package.txt
 readme = 'README.md'
 requires-python = '>=3.9.9'
-version = '2.10.0'
+version = '2.10.1'
 
 
 [project.scripts]
