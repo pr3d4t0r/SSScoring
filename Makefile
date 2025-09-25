@@ -23,9 +23,9 @@ VERSION=$(shell echo "from $(PACKAGE) import __VERSION__; print(__VERSION__)" | 
 
 all: ALWAYS
 	make test
+	make package
 	make manpage
 	make docs
-	make package
 	make umountFlySight
 	make DumbDriver
 
