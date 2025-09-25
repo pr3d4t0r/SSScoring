@@ -130,7 +130,7 @@ def _displaySpeedAngles(jumpResults: dict):
 
 
 def _displayAllTracksOnMap(jumpResults: dict):
-    with st.expander('**All jumps trajectories**'):
+    with st.expander('**All jumps trajectories**', expanded=True):
         displayTrackOnMap(multipleSpeedJumpsTrajectories(jumpResults))
 
 
