@@ -16,6 +16,7 @@ MANPAGES=./manpages
 PACKAGE=$(shell cat package.txt)
 PACKAGES_UPDATE=/tmp/packages-update.txt
 REQUIREMENTS=requirements.txt
+REQUIREMENTS_DEV=requirements-dev.txt
 VERSION=$(shell echo "from $(PACKAGE) import __VERSION__; print(__VERSION__)" | python)
 
 
@@ -41,6 +42,10 @@ clean:
 	rm -Rf $(API_DOC_DIR)/*
 	mkdir -p ./dist
 	pushd ./dist ; pip uninstall -y $(PACKAGE)==$(VERSION) || true ; popd
+
+
+devrequirements:
+	pip install -r $(REQUIREMENTS_DEV)
 
 
 devpi:
