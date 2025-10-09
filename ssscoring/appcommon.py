@@ -314,10 +314,11 @@ def displayDZCoordinates():
     otherwise the button is disabled.
     """
     dropZones = initDropZonesFromResource()
-    lat = float(dropZones[dropZones.dropZone == st.session_state.currentDropZone ].iloc[0].lat)
-    lon = float(dropZones[dropZones.dropZone == st.session_state.currentDropZone ].iloc[0].lon)
+    currentDZ = dropZones[dropZones.dropZone == st.session_state.currentDropZone ].iloc[0]
+    lat = float(currentDZ.lat)
+    lon = float(currentDZ.lon)
     st.write(st.session_state.currentDropZone)
-    st.write('lat, lon: %.4f, %.4f' % (lat, lon))
+    st.write('%.4f, %.4f - elevation: %.2f m, %.2f ft MSL' % (lat, lon, currentDZ.elevation, currentDZ.elevation*M_2_FT))
     if st.button('OK'):
         st.rerun()
 
