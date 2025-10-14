@@ -81,7 +81,7 @@ docs: ALWAYS
 
 DumbDriver: ALWAYS
 	if [ "$(BUILD_OS)" = "Darwin" ]; then \
-		osacompile -o $(DIST)/DumbDriver.app DumbDriver.applescript; \
+		osacompile -o $(DIST)/DumbDriver.app ./mac/DumbDriver.applescript; \
 		cp resources/DumbDriver.icns $(DIST)/DumbDriver.app/Contents/Resources/applet.icns; \
 		ls -Al $(DIST) | grep "\.app" ; \
 	fi
@@ -167,7 +167,7 @@ tools:
 
 umountFlySight: ALWAYS
 	if [ "$(BUILD_OS)" = "Darwin" ]; then \
-		osacompile -o $(DIST)/umountFlySight.app umountFlySight.applescript; \
+		osacompile -o $(DIST)/umountFlySight.app ./mac/umountFlySight.applescript; \
 		cp resources/FreeAgent.icns $(DIST)/umountFlySight.app/Contents/Resources/applet.icns; \
 		ls -Al $(DIST) | grep "\.app" ; \
 	fi
