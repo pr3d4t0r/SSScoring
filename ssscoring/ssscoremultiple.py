@@ -175,7 +175,7 @@ def main():
                 st.html("<br>If this was NOT a warm-up file, it's probably an ISC altitude violation; please report to Eugene/pr3d4t0r and attach the TRACK.CSV file</h3>" if jumpStatus in [ JumpStatus.WARM_UP_FILE, ] else '</h3>')
                 if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                     displayJumpDataIn(jumpResult.table)
-                    st.write('Max score = crosshairs.  Max speed = diamond.')
+                    st.write('Max score = crosshairs.  Max speed = diamond. V-accel = exponential mean average over 4 seconds.')
                     plotJumpResult(tag, jumpResult)
                     graphJumpResult(
                         allJumpsPlot,

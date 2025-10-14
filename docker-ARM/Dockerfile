@@ -1,7 +1,7 @@
 # See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
 
 ARG                 PLATFORM="linux/arm64"
-FROM                --platform=$PLATFORM python:latest
+FROM                --platform=$PLATFORM python:3.13.8
 LABEL               maintainer="ssscoring AT cime.net"
 ARG                 SERVICE_ACCOUNT="ssscore"
 ARG                 VERSION="0.0.0"
@@ -16,14 +16,17 @@ RUN             DEBIAN_FRONTEND=noninteractive && \
                 apt-get -y --no-install-recommends install \
                     bsdmainutils \
                     ca-certificates \
+                    cmake \
                     curl \
                     git \
                     tree \
                     vim \
                     && apt-get autoremove && apt-get clean && rm -Rf /var/lib/apt/lists/*
 RUN                 useradd -b /home/$SERVICE_ACCOUNT -m -d /home/$SERVICE_ACCOUNT -s /bin/bash $SERVICE_ACCOUNT
-RUN                 pip install -U pip \
-                        ssscoring==$VERSION
+RUN                 pip install -U pip setuptools wheel 
+# RUN                 pip install -U --only-binary=:all: pyarrow==21.0.0
+RUN                 pip install -U pyarrow==21.0.0
+RUN                 pip install -U ssscoring==$VERSION
 
 WORKDIR         /home/$SERVICE_ACCOUNT
 RUN             mkdir $APP_CONFIG_DIR
