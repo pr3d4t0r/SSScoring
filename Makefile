@@ -57,11 +57,11 @@ devpi:
 
 
 dockerize.arm64: ALWAYS
-	echo "$(VERSION)" > ./docker-ARM/dockerimageversion.txt
-	cat ./docker-ARM/dockerimageversion.txt
-	echo "pr3d4t0r/ssscore-p" > ./docker-ARM/dockerimagename.txt
-	cp $(APP_CONFIG_FILE) ./docker-ARM
-	$(MAKE) -C ./docker-ARM all
+	echo "$(VERSION)" > ./docker/ARM/dockerimageversion.txt
+	cat ./docker/ARM/dockerimageversion.txt
+	echo "pr3d4t0r/ssscore-p" > ./docker/ARM/dockerimagename.txt
+	cp $(APP_CONFIG_FILE) ./docker/ARM
+	$(MAKE) -C ./docker/ARM all
 
 
 dockerize: ALWAYS
@@ -81,7 +81,7 @@ docs: ALWAYS
 
 DumbDriver: ALWAYS
 	if [ "$(BUILD_OS)" = "Darwin" ]; then \
-		osacompile -o $(DIST)/DumbDriver.app DumbDriver.applescript; \
+		osacompile -o $(DIST)/DumbDriver.app ./mac/DumbDriver.applescript; \
 		cp resources/DumbDriver.icns $(DIST)/DumbDriver.app/Contents/Resources/applet.icns; \
 		ls -Al $(DIST) | grep "\.app" ; \
 	fi
@@ -167,7 +167,7 @@ tools:
 
 umountFlySight: ALWAYS
 	if [ "$(BUILD_OS)" = "Darwin" ]; then \
-		osacompile -o $(DIST)/umountFlySight.app umountFlySight.applescript; \
+		osacompile -o $(DIST)/umountFlySight.app ./mac/umountFlySight.applescript; \
 		cp resources/FreeAgent.icns $(DIST)/umountFlySight.app/Contents/Resources/applet.icns; \
 		ls -Al $(DIST) | grep "\.app" ; \
 	fi

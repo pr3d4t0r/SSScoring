@@ -1,4 +1,4 @@
-% ssscoring(3) Version 2.10.4 | Speed Skydiving Scoring API documentation
+% ssscoring(3) Version 2.10.5 | Speed Skydiving Scoring API documentation
 
 Name
 ====
@@ -236,6 +236,9 @@ representing all the training files for a competitive skydiver over 10 months.
   systems
 - `umountFlySight` Mac app and shell script for safe unmounting of a FlySight
   device from a Macintosh computer
+- `DumbDriver` Mac app to disable the SMART SSD / SSHD / HDD kernel driver, used
+  when the FlySight 2 isn't detected in Mac systems that have SMART drivers 
+  installed.
 
 
 Contributors
