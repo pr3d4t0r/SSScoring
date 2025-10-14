@@ -58,6 +58,7 @@ devpi:
 
 dockerize.arm64: ALWAYS
 	echo "$(VERSION)" > ./docker-ARM/dockerimageversion.txt
+	cat ./docker-ARM/dockerimageversion.txt
 	echo "pr3d4t0r/ssscore-p" > ./docker-ARM/dockerimagename.txt
 	cp $(APP_CONFIG_FILE) ./docker-ARM
 	$(MAKE) -C ./docker-ARM all
