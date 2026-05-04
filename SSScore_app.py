@@ -10,7 +10,7 @@ import os
 import platform
 import sys
 
-import streamlit.runtime.scriptrunner.magic_funcs # For PyInstaller
+# import streamlit.runtime.scriptrunner.magic_funcs # For PyInstaller
 import streamlit.web.bootstrap
 
 
@@ -50,7 +50,7 @@ def _assertMinimalConfig():
             output.write(buffer)
         msg += 'created'
     else:
-        'OK'
+        'OK!'
     print(msg)
     return configPath
 
@@ -69,7 +69,8 @@ if __name__ == '__main__':
     sys.argv = [
         'streamlit',
         'run',
-        'ssscrunner.py',
+        # 'ssscrunner.py',
+        _resolveRunnerPath(),
     ]
     streamlit.web.bootstrap.run(
         runnerPath,

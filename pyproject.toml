@@ -35,7 +35,7 @@ license = 'BSD-3-Clause'
 name = 'ssscoring'  # $(PACKAGE) and package.txt
 readme = 'README.md'
 requires-python = '>=3.9.9'
-version = '3.0.0'
+version = '2.99.0'
 
 
 [project.scripts]
@@ -62,41 +62,12 @@ packages = [
 
 [tool.setuptools.dynamic]
 dependencies = { file = 'requirements.txt' }
-# TODO:  Figure out later how to do this.
-# optional_dependencies = { file = 'dev-requirements.txt' }
 
 
 [tool.setuptools.package-data]
 ssscoring = [
-    'resources/config.toml',
     'resources/drop-zones-loc-elev.csv',
     'resources/instructions.md',
     'resources/moved-2-new-domain.md',
-]
-
-
-# https://cx-freeze.readthedocs.io/en/stable/index.html
-# cxfreeze --script SSScore_app.py --target-dir ./dist/SSScore.app
-# cxfreeze  bdist_mac
-[tool.cxfreeze]
-executables = [
-    { script = 'SSScore_app.py', base = 'console' }
-]
-
-
-[tool.cxfreeze.bdist_mac]
-bundle_name = 'SSScore'
-
-
-[tool.cxfreeze.build_exe]
-build_exe = 'dist'
-include_files = [
-    # 'config.toml',
-    'ssscrunner.py',
-]
-packages = [
-    'pydeck',
-    'streamlit',
-    'ssscoring'
 ]
 

@@ -404,9 +404,9 @@ def graphAcceleration(plot,
     `None`.
     """
     data = jumpResult.data
-    plot.line(data.plotTime, data.vAccelMS2, legend_label = label, line_width = 2, line_color = lineColor, y_range_name = rangeName)
-
-
+    data['vAccelEMA'] = data.vAccelMS2.ewm(span=20, adjust=False).mean()
+    plot.line(data.plotTime, data.vAccelMS2, legend_label = label, line_width = 2, line_color = 'dimgrey', y_range_name = rangeName)
+    plot.line(data.plotTime, data.vAccelEMA, legend_label = label, line_width = 2, line_color = lineColor, y_range_name = rangeName)
 
 
 def convertHexColorToRGB(color: str) -> list:

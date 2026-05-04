@@ -9,6 +9,7 @@ include ./build.mk
 
 
 all:
+	echo "DOCKER_VERSION=$(DOCKER_VERSION)"
 	make image && make push
 
 

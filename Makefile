@@ -16,6 +16,7 @@ MANPAGES=./manpages
 PACKAGE=$(shell cat package.txt)
 PACKAGES_UPDATE=/tmp/packages-update.txt
 REQUIREMENTS=requirements.txt
+REQUIREMENTS_DEV=requirements-dev.txt
 VERSION=$(shell echo "from $(PACKAGE) import __VERSION__; print(__VERSION__)" | python)
 
 
@@ -23,9 +24,9 @@ VERSION=$(shell echo "from $(PACKAGE) import __VERSION__; print(__VERSION__)" | 
 
 all: ALWAYS
 	make test
+	make package
 	make manpage
 	make docs
-	make package
 	make umountFlySight
 	make DumbDriver
 	make local # Prepare to make the app
@@ -35,7 +36,7 @@ all: ALWAYS
 	# pyinstaller SSScore_app.spec --clean
 	# pyinstaller --copy-metadata streamlit --add-data "/Users/ciurana/Python-3_13_4/lib/Python3.13/site-packages/plotly/validators:_internal/plotly/validators" SSScore_app.py ssscrunner.py --clean
 app: ALWAYS
-	pyinstaller SSScore_app.spec --clean
+	pyinstaller --noconfirm --clean SSScore_app.spec
 
 
 clean:
@@ -51,6 +52,10 @@ clean:
 	pushd ./dist ; pip uninstall -y $(PACKAGE)==$(VERSION) || true ; popd
 
 
+devrequirements:
+	pip install -r $(REQUIREMENTS_DEV)
+
+
 devpi:
 	devpi use $(DEVPI_HOST)
 	@devpi login $(DEVPI_USER) --password="$(DEVPI_PASSWORD)"
@@ -60,17 +65,18 @@ devpi:
 
 
 dockerize.arm64: ALWAYS
-	echo "$(VERSION)" > ./docker-ARM/dockerimageversion.txt
-	echo "pr3d4t0r/ssscore-p" > ./docker-ARM/dockerimagename.txt
-	cp $(APP_CONFIG_FILE) ./docker-ARM
-	$(MAKE) -C ./docker-ARM all
+	echo "$(VERSION)" > ./docker/ARM/dockerimageversion.txt
+	cat ./docker/ARM/dockerimageversion.txt
+	echo "pr3d4t0r/ssscore-p" > ./docker/ARM/dockerimagename.txt
+	cp $(APP_CONFIG_FILE) ./docker/ARM
+	$(MAKE) -C ./docker/ARM all
 
 
 dockerize: ALWAYS
 	echo "$(VERSION)" > ./docker/dockerimageversion.txt
 	echo "pr3d4t0r/ssscore" > ./docker/dockerimagename.txt
 	cp $(APP_CONFIG_FILE) ./docker
-	$(MAKE) -C ./docker all
+	$(MAKE) -C ./docker all VERSION=$(VERSION)
 
 
 # [[ -e ".env" ]] && mv ".env" "_env"
@@ -83,7 +89,7 @@ docs: ALWAYS
 
 DumbDriver: ALWAYS
 	if [ "$(BUILD_OS)" = "Darwin" ]; then \
-		osacompile -o $(DIST)/DumbDriver.app DumbDriver.applescript; \
+		osacompile -o $(DIST)/DumbDriver.app ./mac/DumbDriver.applescript; \
 		cp resources/DumbDriver.icns $(DIST)/DumbDriver.app/Contents/Resources/applet.icns; \
 		ls -Al $(DIST) | grep "\.app" ; \
 	fi
@@ -169,7 +175,7 @@ tools:
 
 umountFlySight: ALWAYS
 	if [ "$(BUILD_OS)" = "Darwin" ]; then \
-		osacompile -o $(DIST)/umountFlySight.app umountFlySight.applescript; \
+		osacompile -o $(DIST)/umountFlySight.app ./mac/umountFlySight.applescript; \
 		cp resources/FreeAgent.icns $(DIST)/umountFlySight.app/Contents/Resources/applet.icns; \
 		ls -Al $(DIST) | grep "\.app" ; \
 	fi

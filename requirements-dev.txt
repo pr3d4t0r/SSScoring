@@ -1,0 +1,8 @@
+build
+devpi
+pdoc
+ptpython
+pyflakes
+pytest
+pytest-cov
+watchdog

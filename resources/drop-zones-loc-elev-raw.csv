@@ -2,7 +2,7 @@ elevation,lat,lon,name,country,DZ
 2,36.649092,174.934864,Parakai Auckland,NZL,Skydive Auckland
 238,41.8926,-89.0796,Rochelle,USA,Chicagoland Skydiving Center
 24,29.067,-81.2837,DeLand,USA,Skydive Deland
-382,33.63,-117.3017,Elsinore,USA,Skydive Elsinore
+386,33.63,-117.3017,Elsinore,USA,Skydive Elsinore
 461,32.8067,-111.5866,Eloy,USA,Skydive Arizona
 416,36.5681,-114.4433,Overton,USA,Skydive Fyrosity
 83,47.2335,-123.1475,Shelton,USA,Skydive Kapowsin
@@ -152,7 +152,7 @@ elevation,lat,lon,name,country,DZ
 6,45.68732,12.70402,San Stino di Livenza,ITA,Skydive Venice
 87,45.473056,10.926944,Verona,ITA,Skydive Verona
 102,45.6755,11.496333,Thiene,ITA,Skydive Thiene
-256,50.86,-3.234667,Dunkeswell,GBR,Skydive Buzz
+244,50.8621683,-3.2355471,Honiton Devon,GBR,Skydive South West
 1541,40.1643889,-105.1636389,Longmont,USA,Mile-Hi Skydiving Center
 132,39.400471,9.139151,Serdiana,ITA,Skydive Sardegna
 262,33.976348,-85.168797,Rockmart,USA,Skydive Spaceland Atlanta
@@ -255,3 +255,4 @@ elevation,lat,lon,name,country,DZ
 3,34.7337586,-76.6603547,Beauford NC,USA,Crystal Coast Skydiving
 24,52.43500736999359,1.6178792409503804,Suffolk,GBR,UK Parachuting Beccles
 368,40.89781123032923,-82.25702384492351,Ashland OH,USA,AerOhio
+305,41.35216465499883,(-81.09909843384227,Cleveland OH,USA,Cleveland Skydiving Center
