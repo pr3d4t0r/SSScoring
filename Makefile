@@ -68,7 +68,7 @@ dockerize: ALWAYS
 	echo "$(VERSION)" > ./docker/dockerimageversion.txt
 	echo "pr3d4t0r/ssscore" > ./docker/dockerimagename.txt
 	cp $(APP_CONFIG_FILE) ./docker
-	$(MAKE) -C ./docker all
+	$(MAKE) -C ./docker all VERSION=$(VERSION)
 
 
 # [[ -e ".env" ]] && mv ".env" "_env"
