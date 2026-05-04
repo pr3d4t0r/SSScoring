@@ -36,7 +36,7 @@ all: ALWAYS
 	# pyinstaller SSScore_app.spec --clean
 	# pyinstaller --copy-metadata streamlit --add-data "/Users/ciurana/Python-3_13_4/lib/Python3.13/site-packages/plotly/validators:_internal/plotly/validators" SSScore_app.py ssscrunner.py --clean
 app: ALWAYS
-	pyinstaller --clean SSScore_app.spec
+	pyinstaller --noconfirm --clean SSScore_app.spec
 
 
 clean:

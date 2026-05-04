@@ -1,85 +1,170 @@
+# SSScore_app.spec  -- PyInstaller spec, onedir mode.
+# Build:
+#   pyinstaller --noconfirm --clean SSScore_app.spec
+#
+# Targets: macOS arm64 (.app), Windows x64 (.exe + _internal/).
+# The same spec works on both; platform-specific bits are guarded below.
+#
+# Naming note: PyInstaller's spec API (Analysis, EXE, PYZ, COLLECT, BUNDLE
+# and their keyword arguments — datas=, hiddenimports=, info_plist=, etc.)
+# is framework-imposed and cannot be renamed. Local variables follow the
+# project's camelCase / ALL_CAPS_WITH_UNDERSCORES convention.
+
 # -*- mode: python ; coding: utf-8 -*-
-# See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
 
-
+import platform
+import sys
 from pathlib import Path
+from PyInstaller.utils.hooks import collect_all, collect_submodules, copy_metadata
 
-from PyInstaller.utils.hooks import collect_data_files as collectDataFiles
-from PyInstaller.utils.hooks import collect_submodules as collectSubmodules
-from PyInstaller.utils.hooks import copy_metadata as copyMetadata
+IS_MAC = sys.platform == "darwin"
+IS_WIN = sys.platform == "win32"
 
-import importlib.util
-import os
-import site
+# Auto-match the architecture of the Python interpreter doing the build.
+# Returns 'arm64' or 'x86_64' on macOS — switches automatically if you change
+# Python installs (e.g. Homebrew x86_64 -> python.org arm64).
+MAC_TARGET_ARCH = platform.machine() if IS_MAC else None
 
-import plotly.validators
+APP_NAME = "SSScore"
+APP_VERSION = "3.0.0"
+BUNDLE_ID = "net.cime.ssscoring"
+ENTRY_SCRIPT = "launch_gui.py"
+STREAMLIT_SCRIPT = "ssscrunner.py"
 
+# Pick an icon per platform. Replace with whichever .icns/.ico you prefer.
+MAC_ICON = "resources/Reventlou.icns"
+WIN_ICON = None  # TODO: drop a .ico into resources/ and point here.
 
-sitePackages = site.getsitepackages()[0]
+ASSET_PACKAGES = ("streamlit", "pydeck", "plotly", "bokeh")
 
+bundleData: list = []
+bundleBinaries: list = []
+hiddenImports: list = []
 
-def getValidatorsPath():
-    spec = importlib.util.find_spec('plotly.validators')
-    if spec and spec.origin:
-        return os.path.dirname(spec.origin)
-    elif spec and spec.submodule_search_locations:
-        return list(spec.submodule_search_locations)[0]
-    else:
-        raise ImportError("Can't resolve the plotly.validators path")
+# -- Heavy-asset packages ----------------------------------------------------
+# Each of these ships a JS/CSS frontend bundle that MUST be on disk at runtime
+# or the rendered components silently 404 in the browser.
+for assetPackage in ASSET_PACKAGES:
+    pkgDatas, pkgBinaries, pkgHidden = collect_all(assetPackage)
+    bundleData     += pkgDatas
+    bundleBinaries += pkgBinaries
+    hiddenImports  += pkgHidden
 
+# Streamlit reads its own dist-info at runtime (version, entry points).
+bundleData += copy_metadata("streamlit")
 
-datas = [(getValidatorsPath(), '_internal/plotly/validators')]
-datas += copyMetadata('streamlit')
-datas += collectDataFiles('plotly', includes=['validators/*.json'])
-datas += collectDataFiles('ssscoring', includes=['resources/*'])
-datas += [ ( '%s/streamlit/static' % sitePackages, 'streamlit/static' ) ]
-datas += [ ( 'ssscrunner.py', '.') ]
-datas += [ ( 'SSScore_app.py', '.') ]
+# -- Project package ---------------------------------------------------------
+# collect_submodules picks up dynamically-imported modules (e.g. anything
+# referenced via importlib, or only imported under a code branch the static
+# analyzer can't see).
+hiddenImports += collect_submodules("ssscoring")
 
-# Collect hidden imports
-streamlitModules = collectSubmodules('streamlit')
-plotlyModules = collectSubmodules('plotly.validators')
-hiddenimports = streamlitModules + plotlyModules
+# Bundle the entire ssscoring package as SOURCE FILES (not just the
+# resources subdirectory). Streamlit's bootstrap exec()s SSScore_app.py
+# in a context where PyInstaller's frozen importer doesn't always resolve
+# user packages cleanly — having the .py files on disk lets Python's
+# normal PathFinder locate them. The collect_submodules() call above
+# also keeps a frozen copy in the PYZ as a fallback.
+bundleData += [
+    ("ssscoring", "ssscoring"),
+    (STREAMLIT_SCRIPT, "."),  # bundled as data; Streamlit reads it as a script
+]
 
-# Analysis
-a = Analysis(
-    # ['SSScore_app.py', 'ssscrunner.py'],
-    [ 'launch_gui.py', ],
-    pathex=[],
-    binaries=[],
-    datas=datas,
-    hiddenimports=hiddenimports,
-    hookspath=['.', ],
+# -- Hidden imports Streamlit/pydeck need but PyInstaller misses -------------
+hiddenImports += [
+    "streamlit.web.cli",
+    "streamlit.runtime.scriptrunner.magic_funcs",
+    "streamlit.runtime.caching.cache_resource_api",
+    "streamlit.runtime.caching.cache_data_api",
+    "pkg_resources.py2_warn",  # legacy shim some deps still touch
+]
+
+# -- Runtime deps imported from inside ssscoring's source files --------------
+# Because ssscoring/ is bundled as data (see bundleData below), PyInstaller's
+# analyzer never reads those .py files and never sees their imports. Anything
+# ssscoring depends on at runtime — but that isn't already pulled in by the
+# asset-package collect_all() above — must be declared here explicitly.
+RUNTIME_DEPS = (
+    "haversine",
+    "geopy",
+    "click",
+    "psutil",
+    "importlib_resources",
+)
+for runtimeDep in RUNTIME_DEPS:
+    hiddenImports += collect_submodules(runtimeDep)
+
+# -- Modules we deliberately exclude to shrink the bundle --------------------
+moduleExcludes = [
+    "tkinter", "tcl", "tk",
+    "IPython", "ipykernel", "ipywidgets",
+    "jupyter", "jupyter_client", "jupyter_core", "notebook", "nbconvert",
+    "pytest", "pytest_cov",
+    "PyQt5", "PyQt6", "PySide2", "PySide6",
+    "matplotlib.tests", "numpy.tests", "pandas.tests",
+]
+
+# ----------------------------------------------------------------------------
+
+analysis = Analysis(
+    [ENTRY_SCRIPT],
+    pathex=[str(Path(".").resolve())],
+    binaries=bundleBinaries,
+    datas=bundleData,
+    hiddenimports=hiddenImports,
+    hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[ ],
+    excludes=moduleExcludes,
     noarchive=False,
-    optimize=0,
 )
-# Python bytecode archive
-pyz = PYZ(a.pure)
 
-# macOS App bundle settings
-exe = EXE(
-    pyz,
-    a.scripts,
+pyzArchive = PYZ(analysis.pure, analysis.zipped_data)
+
+executable = EXE(
+    pyzArchive,
+    analysis.scripts,
     [],
-    exclude_binaries=True,
-    name='SSScore_app',
+    exclude_binaries=True,            # onedir, NOT onefile
+    name=APP_NAME,
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
-    console=False,  # GUI / windowed mode (will produce a .app on macOS)
+    upx=False,                         # UPX trips Defender + breaks codesigning
+    console=True,                     # set True for first-run debugging
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=MAC_TARGET_ARCH,
+    codesign_identity=None,            # signing handled post-build
+    entitlements_file=None,
+    icon=(MAC_ICON if IS_MAC else WIN_ICON),
 )
 
-# Collect and create the final app bundle
-coll = COLLECT(
-    exe,
-    a.binaries,
-    a.datas,
+collection = COLLECT(
+    executable,
+    analysis.binaries,
+    analysis.zipfiles,
+    analysis.datas,
     strip=False,
-    upx=True,
+    upx=False,
     upx_exclude=[],
-    name='SSScore_app',
+    name=APP_NAME,
 )
+
+# macOS .app bundle wrapper. No-op on Windows.
+if IS_MAC:
+    macAppBundle = BUNDLE(
+        collection,
+        name=f"{APP_NAME}.app",
+        icon=MAC_ICON,
+        bundle_identifier=BUNDLE_ID,
+        info_plist={
+            "CFBundleShortVersionString": APP_VERSION,
+            "CFBundleVersion": APP_VERSION,
+            "NSHighResolutionCapable": True,
+            "NSRequiresAquaSystemAppearance": False,
+            "LSBackgroundOnly": False,
+            "LSUIElement": False,
+            "LSMinimumSystemVersion": "11.0",
+        },
+    )
