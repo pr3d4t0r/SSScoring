@@ -23,7 +23,7 @@ RUN             DEBIAN_FRONTEND=noninteractive && \
                     vim \
                     && apt-get autoremove && apt-get clean && rm -Rf /var/lib/apt/lists/*
 RUN                 useradd -b /home/$SERVICE_ACCOUNT -m -d /home/$SERVICE_ACCOUNT -s /bin/bash $SERVICE_ACCOUNT
-RUN                 pip install -U pip setuptools wheel 
+RUN                 pip install -U pip setuptools wheel
 # RUN                 pip install -U --only-binary=:all: pyarrow==21.0.0
 RUN                 pip install -U pyarrow==21.0.0
 RUN                 pip install -U ssscoring==$VERSION
