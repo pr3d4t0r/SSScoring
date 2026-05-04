@@ -1,4 +1,4 @@
-% ssscoring(3) Version 2.10.6 | Speed Skydiving Scoring API documentation
+% ssscoring(3) Version 2.10.7 | Speed Skydiving Scoring API documentation
 
 Name
 ====
