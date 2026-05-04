@@ -204,14 +204,12 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
     - altitudeAGL
     - altitudeMSLFt
     - altitudeAGLFt
-    - hMetersPerSecond
-    - hKMh (km/h)
     - vMetersPerSecond
     - vKMh (km/h)
-    - angle
+    - vAccelMS2 (m/s²)
     - speedAccuracy (ignore; see ISC documentation)
     - hMetersPerSecond
-    - hKMh
+    - hKMh (km/h)
     - latitude
     - longitude
     - verticalAccuracy
@@ -253,6 +251,7 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
         'vKMh': 3.6*data.velD,
         'speedAngle': speedAngle,
         'speedAccuracy': data.sAcc,
+        'vAccelMS2': data.velD.diff()/data.timeUnix.diff(),
         'hMetersPerSecond': data.hMetersPerSecond,
         'hKMh': 3.6*data.hMetersPerSecond,
         'latitude': data.lat,

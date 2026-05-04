@@ -1,0 +1,24 @@
+$TTL 3600
+speedskydiving.app. IN     SOA    a.root-servers.net. dnsmaster@speedskydiving.app. (
+                1428945290         ; Serial
+                3H          ; refresh after 3 hours
+                1H          ; retry after 1 hour
+                1W          ; expire after 1 week
+                1D)         ; minimum TTL of 1 day
+
+    ; Name Server
+    IN  NS  varenka.speedskydiving.app.
+    IN  NS  betty.speedskydiving.app.
+
+    ; Mail Exchanger
+    IN  MX  10 varenka.speedskydiving.app.  ; primary mail server
+    IN  MX  20 betty.speedskydiving.app.    ; secondary mail server
+
+speedskydiving.app.           IN A        50.211.203.180
+www         IN CNAME        varenka.speedskydiving.app.
+varenka     IN A            50.211.203.180
+betty       IN A            50.211.203.178
+
+; Resource Record - veryfy the IP where your mails come from(disable if not needed)
+
+@           IN TXT          "v=spf1 mx a ip4:50.211.203.180 ip4:50.211.203.178 ~all"

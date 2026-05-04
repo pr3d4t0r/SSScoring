@@ -1,0 +1,15 @@
+# See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
+
+# Use:  streamlit config show to view all options.
+
+[client]
+showErrorDetails = 'type'
+toolbarMode = 'viewer'
+
+[logger]
+level = 'critical'
+
+[theme]
+base = 'dark'
+
+

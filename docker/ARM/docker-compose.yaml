@@ -1,0 +1,23 @@
+# See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
+
+
+services:
+    ssscore_service:
+        container_name: 'ssscore'
+        deploy:
+            resources:
+                limits:
+                    cpus: '4'
+                    memory: '4G'
+                reservations:
+                    cpus: '4'
+                    memory: '4G'
+        environment:
+            GRANT_SUDO: 'yes'
+        image: 'pr3d4t0r/ssscore:latest'
+        mem_reservation: '4G'
+        ports:
+            - 8501:8501
+        privileged: true
+        user: 'ssscore:ssscore'
+

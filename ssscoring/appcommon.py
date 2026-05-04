@@ -21,6 +21,7 @@ from ssscoring.datatypes import JumpResults
 from ssscoring.datatypes import JumpStatus
 from ssscoring.errors import SSScoringError
 from ssscoring.notebook import SPEED_COLORS
+from ssscoring.notebook import graphAcceleration
 from ssscoring.notebook import graphAltitude
 from ssscoring.notebook import graphAngle
 from ssscoring.notebook import graphJumpResult
@@ -247,6 +248,7 @@ def plotJumpResult(tag: str,
         plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
         graphAltitude(plot, jumpResult)
         graphAngle(plot, jumpResult)
+        graphAcceleration(plot, jumpResult)
         hoverValue = bm.HoverTool(tooltips=[('time', '@x{0.0}s'), ('y-val', '@y{0.00}')])
         plot.add_tools(hoverValue)
         graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
@@ -312,10 +314,11 @@ def displayDZCoordinates():
     otherwise the button is disabled.
     """
     dropZones = initDropZonesFromResource()
-    lat = float(dropZones[dropZones.dropZone == st.session_state.currentDropZone ].iloc[0].lat)
-    lon = float(dropZones[dropZones.dropZone == st.session_state.currentDropZone ].iloc[0].lon)
+    currentDZ = dropZones[dropZones.dropZone == st.session_state.currentDropZone ].iloc[0]
+    lat = float(currentDZ.lat)
+    lon = float(currentDZ.lon)
     st.write(st.session_state.currentDropZone)
-    st.write('lat, lon: %.4f, %.4f' % (lat, lon))
+    st.write('%.4f, %.4f - elevation: %.2f m, %.2f ft MSL' % (lat, lon, currentDZ.elevation, currentDZ.elevation*M_2_FT))
     if st.button('OK'):
         st.rerun()
 

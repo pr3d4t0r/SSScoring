@@ -28,6 +28,7 @@
 88,Cerfontaine,50.15131071,4.38751459,290.0,Cerfontaine,BEL
 118,Chaspuzac,45.07689403,3.76042753,832.0,Chaspuzac,FRA
 1,Chicagoland Skydiving Center,41.8926,-89.0796,238.0,Rochelle,USA
+256,Cleveland Skydiving Center,41.35216465499883,(-81.09909843384227,305.0,Cleveland OH,USA
 78,Cremona,45.16766289,10.0071609,49.0,Cremona,ITA
 253,Crystal Coast Skydiving,34.7337586,-76.6603547,3.0,Beauford NC,USA
 22,DZ Borki,56.798392,37.3312258,127.0,Borki,RUS
@@ -149,7 +150,6 @@
 178,Skydive Black Forest Lahr,48.369301,7.82772,156.0,Lahr,GER
 246,Skydive Buckeye,33.4204167,-112.6861808,315.0,Buckeye,USA
 199,Skydive Burnaby,42.877499,-79.352798,183.0,Wainfleet,CAN
-153,Skydive Buzz,50.86,-3.234667,256.0,Dunkeswell,GBR
 247,Skydive Byron Bay,-28.594696,153.551102,3.0,Tyagarah,AUS
 171,Skydive California,37.7313264,-121.3355889,11.0,Tracy,USA
 148,Skydive Carolina,34.790534,-81.195579,195.0,Chester,USA
@@ -160,7 +160,7 @@
 50,Skydive Dubai Desert,24.88522721,55.54800689,157.0,Dubai Desert,UAE
 51,Skydive Dubai Palm,25.09082159,55.13685107,0.0,Dubai Palm,UAE
 169,Skydive Elderslie - Newcastle Sport Parachute Club,-32.599701,151.339996,34.0,Elderslie,AUS
-3,Skydive Elsinore,33.63,-117.3017,382.0,Elsinore,USA
+3,Skydive Elsinore,33.63,-117.3017,386.0,Elsinore,USA
 31,Skydive Empuriabrava,42.25945116,3.10997844,2.0,Empuriabrava,ESP
 33,Skydive Estonia,58.98742257,24.72462416,60.0,Kuusiku,EST
 71,Skydive Fano,43.82527776,13.03186655,16.0,Fano,ITA
@@ -208,6 +208,7 @@
 250,Skydive Saulgau,48.02909,9.504839,581.0,Bad Saulgau,DEU
 13,Skydive Sebastian,27.8132,-80.4955,7.0,Sebastian,USA
 64,Skydive Soest,51.58022318,8.21502686,120.0,Soest,GER
+153,Skydive South West,50.8621683,-3.2355471,244.0,Honiton Devon,GBR
 89,Skydive Spa,50.47993695,5.91242552,470.0,Spa,BEL
 156,Skydive Spaceland Atlanta,33.976348,-85.168797,262.0,Rockmart,USA
 215,Skydive Spaceland Atlanta_duplicate,33.976176,-85.168775,262.0,Rockmart_duplicate,USA
@@ -222,8 +223,8 @@
 152,Skydive Thiene,45.6755,11.496333,102.0,Thiene,ITA
 190,Skydive Tullahoma,35.3800295,-86.2463536,330.0,Tullahoma,USA
 121,Skydive Twin Cities,44.96450472,-92.39083797,336.0,Baldwin,USA
-244,Skydive Utah,40.612395,-112.350855,1317.0,Erda,USA
 57,Skydive Utah,40.61318686,-112.3481226,1317.0,Tooele,USA
+244,Skydive Utah,40.612395,-112.350855,1317.0,Erda,USA
 150,Skydive Venice,45.68732,12.70402,6.0,San Stino di Livenza,ITA
 151,Skydive Verona,45.473056,10.926944,87.0,Verona,ITA
 70,Skydive Voss,60.63985851,6.50203407,91.0,Voss,NOR
