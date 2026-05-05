@@ -23,13 +23,14 @@ VERSION=$(shell echo "from $(PACKAGE) import __VERSION__; print(__VERSION__)" | 
 # Targets:
 
 all: ALWAYS
+	make devrequirements
+	make local # Prepare to make the app
 	make test
 	make package
 	make manpage
 	make docs
 	make umountFlySight
 	make DumbDriver
-	make local # Prepare to make the app
 	make app
 
 
@@ -53,7 +54,9 @@ clean:
 
 
 devrequirements:
-	pip install -r $(REQUIREMENTS_DEV)
+	pip cache purge
+	pip install -U pip
+	pip install --only-binary=:all: -r $(REQUIREMENTS_DEV)
 
 
 devpi:
@@ -107,9 +110,10 @@ libupdate:
 
 
 local:
+	pip cache purge
+	pip install -U pip
+	pip install --only-binary=:all: -r $(REQUIREMENTS) -e .
 	./tools/dzresource
-	pip install -r $(REQUIREMENTS) -e .
-	pip install -e .
 
 
 manpage:
@@ -126,7 +130,7 @@ nuke: ALWAYS
 
 # Reference:  https://setuptools.pypa.io/en/latest/userguide/index.html
 package:
-	pip install -r $(REQUIREMENTS)
+	pip install --only-binary=:all: -r $(REQUIREMENTS)
 	./tools/dzresource
 	python -m build --wheel
 
@@ -146,7 +150,7 @@ publish:
 
 
 refresh: ALWAYS
-	pip install -U -r requirements.txt
+	pip install --only-binary=:all: -U -r requirements.txt
 
 
 # Delete the Python virtual environment - necessary when updating the
