@@ -27,6 +27,7 @@ from ssscoring.notebook import graphAngle
 from ssscoring.notebook import graphJumpResult
 from ssscoring.notebook import initializeExtraYRanges
 from ssscoring.notebook import initializePlot
+from streamlit_bokeh import streamlit_bokeh
 
 import os
 
@@ -252,7 +253,7 @@ def plotJumpResult(tag: str,
         hoverValue = bm.HoverTool(tooltips=[('time', '@x{0.0}s'), ('y-val', '@y{0.00}')])
         plot.add_tools(hoverValue)
         graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
-        st.bokeh_chart(plot, use_container_width=True)
+        streamlit_bokeh(plot, use_container_width=True)
 
 
 def initFileUploaderState(filesObject:str, uploaderKey:str ='uploaderKey'):

@@ -31,8 +31,8 @@ from ssscoring.mapview import speedJumpTrajectory
 from ssscoring.notebook import SPEED_COLORS
 from ssscoring.notebook import graphJumpResult
 from ssscoring.notebook import initializePlot
+from streamlit_bokeh import streamlit_bokeh
 
-import bokeh.plotting as bp
 import pandas as pd
 import streamlit as st
 
@@ -120,7 +120,7 @@ def _displaySpeedSummary(aggregate: pd.DataFrame,
                          allJumpsPlot):
     st.html('<h2>Speed summary</h2>')
     st.dataframe(totalResultsFrom(aggregate), hide_index = True)
-    st.bokeh_chart(allJumpsPlot, use_container_width=True)
+    streamlit_bokeh(allJumpsPlot, use_container_width=True)
 
 
 def _displaySpeedAngles(jumpResults: dict):
