@@ -9,4 +9,5 @@ plotly
 psutil
 pydeck
 streamlit
-streamlit-bokeh
+streamlit-bokeh==3.8.3
+

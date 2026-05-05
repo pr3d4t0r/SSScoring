@@ -31,7 +31,8 @@ from ssscoring.mapview import speedJumpTrajectory
 from ssscoring.notebook import SPEED_COLORS
 from ssscoring.notebook import graphJumpResult
 from ssscoring.notebook import initializePlot
-from streamlit_bokeh import streamlit_bokeh
+# TODO: Remove this if present after 20260531
+# from streamlit_bokeh import streamlit_bokeh
 
 import pandas as pd
 import streamlit as st
@@ -116,11 +117,18 @@ def _displayJumpsInSet(aggregate: pd.DataFrame):
         st.dataframe(displayAggregate)
 
 
+# TODO: Remove this if present after 20260531
+# def _displaySpeedSummary(aggregate: pd.DataFrame,
+#                          allJumpsPlot):
+#     st.html('<h2>Speed summary</h2>')
+#     st.dataframe(totalResultsFrom(aggregate), hide_index = True)
+#     streamlit_bokeh(allJumpsPlot, use_container_width=True)
+
 def _displaySpeedSummary(aggregate: pd.DataFrame,
                          allJumpsPlot):
     st.html('<h2>Speed summary</h2>')
     st.dataframe(totalResultsFrom(aggregate), hide_index = True)
-    streamlit_bokeh(allJumpsPlot, use_container_width=True)
+    st.plotly_chart(allJumpsPlot, width='stretch')   # ← was streamlit_bokeh(...)
 
 
 def _displaySpeedAngles(jumpResults: dict):
