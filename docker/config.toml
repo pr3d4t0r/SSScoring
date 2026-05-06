@@ -1,15 +1,10 @@
-# See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
+# See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
 
-# Use:  streamlit config show to view all options.
+[global]
+developmentMode = false
 
-[client]
-showErrorDetails = 'type'
-toolbarMode = 'viewer'
-
-[logger]
-level = 'critical'
-
-[theme]
-base = 'dark'
-
+[server]
+# address = 'localhost'
+# headless = true
+port = 8501
 
