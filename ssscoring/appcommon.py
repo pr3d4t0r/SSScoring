@@ -27,10 +27,13 @@ from ssscoring.notebook import graphAngle
 from ssscoring.notebook import graphJumpResult
 from ssscoring.notebook import initializeExtraYRanges
 from ssscoring.notebook import initializePlot
+# TODO: Remove this if present after 20260531
+# from streamlit_bokeh import streamlit_bokeh
 
 import os
 
-import bokeh.models as bm
+# TODO: Remove this if present after 20260531
+# import bokeh.models as bm
 import pandas as pd
 import pydeck as pdk
 import streamlit as st
@@ -223,36 +226,57 @@ def interpretJumpResult(tag: str,
     return jumpStatusInfo, scoringInfo, badJumpLegend, jumpStatus
 
 
-def plotJumpResult(tag: str,
-                   jumpResult: JumpResults):
-    """
-    Plot the jump results including altitude, horizontal speed, time, etc. for
-    evaluation and interpretation.
+# TODO: Remove this if present after 20260531
+# def plotJumpResult(tag: str,
+#                    jumpResult: JumpResults):
+#     """
+#     Plot the jump results including altitude, horizontal speed, time, etc. for
+#     evaluation and interpretation.
+#
+#     Arguments
+#     ---------
+#         tag
+#     A string that identifies a specific jump and the FlySight version that
+#     generated the corresponding track file.  Often in the form: `HH-mm-ss:vX`
+#     where `X` is the FlySight hardware version.
+#
+#         jumpResult
+#     An instance of `ssscoring.datatypes.JumpResults` with jump data.
+#     """
+#     if jumpResult.data is not None:
+#         try:
+#             yMax = DEFAULT_PLOT_MAX_V_SCALE if jumpResult.score <= DEFAULT_PLOT_MAX_V_SCALE else jumpResult.score + DEFAULT_PLOT_INCREMENT
+#         except TypeError:
+#             yMax = DEFAULT_PLOT_MAX_V_SCALE
+#         plot = initializePlot(tag, backgroundColorName='#2c2c2c', yMax=yMax)
+#         plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
+#         graphAltitude(plot, jumpResult)
+#         graphAngle(plot, jumpResult)
+#         graphAcceleration(plot, jumpResult)
+#         hoverValue = bm.HoverTool(tooltips=[('time', '@x{0.0}s'), ('y-val', '@y{0.00}')])
+#         plot.add_tools(hoverValue)
+#         graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
+#         streamlit_bokeh(plot, use_container_width=True)
 
-    Arguments
-    ---------
-        tag
-    A string that identifies a specific jump and the FlySight version that
-    generated the corresponding track file.  Often in the form: `HH-mm-ss:vX`
-    where `X` is the FlySight hardware version.
 
-        jumpResult
-    An instance of `ssscoring.datatypes.JumpResults` with jump data.
-    """
+# imports section — drop streamlit_bokeh and bokeh.models
+# from streamlit_bokeh import streamlit_bokeh           # ← delete
+# import bokeh.models as bm                             # ← delete
+
+# plotJumpResult() — at the end
+def plotJumpResult(tag: str, jumpResult: JumpResults):
     if jumpResult.data is not None:
         try:
             yMax = DEFAULT_PLOT_MAX_V_SCALE if jumpResult.score <= DEFAULT_PLOT_MAX_V_SCALE else jumpResult.score + DEFAULT_PLOT_INCREMENT
         except TypeError:
             yMax = DEFAULT_PLOT_MAX_V_SCALE
-        plot = initializePlot(tag, backgroundColorName='#2c2c2c', yMax=yMax)
-        plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
-        graphAltitude(plot, jumpResult)
-        graphAngle(plot, jumpResult)
-        graphAcceleration(plot, jumpResult)
-        hoverValue = bm.HoverTool(tooltips=[('time', '@x{0.0}s'), ('y-val', '@y{0.00}')])
-        plot.add_tools(hoverValue)
-        graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
-        st.bokeh_chart(plot, use_container_width=True)
+        fig = initializePlot(tag, backgroundColorName='#2c2c2c', yMax=yMax)
+        fig = initializeExtraYRanges(fig, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
+        graphAltitude(fig, jumpResult)
+        graphAngle(fig, jumpResult)
+        graphAcceleration(fig, jumpResult)
+        graphJumpResult(fig, jumpResult, lineColor=SPEED_COLORS[0])
+        st.plotly_chart(fig, width='stretch')
 
 
 def initFileUploaderState(filesObject:str, uploaderKey:str ='uploaderKey'):

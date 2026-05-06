@@ -1,8 +1,7 @@
 build
-devpi
 pdoc
 ptpython
 pyflakes
+pyinstaller
 pytest
 pytest-cov
-watchdog

@@ -1,3 +1,5 @@
+# See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
+
 # SSScore_app.spec  -- PyInstaller spec, onedir mode.
 # Build:
 #   pyinstaller --noconfirm --clean SSScore_app.spec
@@ -17,25 +19,22 @@ import sys
 from pathlib import Path
 from PyInstaller.utils.hooks import collect_all, collect_submodules, copy_metadata
 
-IS_MAC = sys.platform == "darwin"
-IS_WIN = sys.platform == "win32"
+IS_MAC = sys.platform == 'darwin'
+IS_WIN = sys.platform == 'win32'
 
-# Auto-match the architecture of the Python interpreter doing the build.
-# Returns 'arm64' or 'x86_64' on macOS — switches automatically if you change
-# Python installs (e.g. Homebrew x86_64 -> python.org arm64).
 MAC_TARGET_ARCH = platform.machine() if IS_MAC else None
 
-APP_NAME = "SSScore"
-APP_VERSION = "3.0.0"
-BUNDLE_ID = "net.cime.ssscoring"
-ENTRY_SCRIPT = "launch_gui.py"
-STREAMLIT_SCRIPT = "ssscrunner.py"
+APP_NAME = 'SSScore'
+APP_VERSION = '3.0.0'
+BUNDLE_ID = 'eu.ciurana.ssscoring'
+BUNDLE_DIR_NAME = 'SSScore'
+ENTRY_SCRIPT = 'launch_gui.py'
+STREAMLIT_SCRIPT = 'ssscrunner.py'
 
-# Pick an icon per platform. Replace with whichever .icns/.ico you prefer.
-MAC_ICON = "resources/Reventlou.icns"
+MAC_ICON = 'resources/Reventlou.icns'
 WIN_ICON = None  # TODO: drop a .ico into resources/ and point here.
 
-ASSET_PACKAGES = ("streamlit", "pydeck", "plotly", "bokeh")
+ASSET_PACKAGES = ('streamlit', 'pydeck', 'plotly', 'bokeh', 'webview')
 
 bundleData: list = []
 bundleBinaries: list = []
@@ -51,13 +50,13 @@ for assetPackage in ASSET_PACKAGES:
     hiddenImports  += pkgHidden
 
 # Streamlit reads its own dist-info at runtime (version, entry points).
-bundleData += copy_metadata("streamlit")
+bundleData += copy_metadata('streamlit')
 
 # -- Project package ---------------------------------------------------------
 # collect_submodules picks up dynamically-imported modules (e.g. anything
 # referenced via importlib, or only imported under a code branch the static
 # analyzer can't see).
-hiddenImports += collect_submodules("ssscoring")
+hiddenImports += collect_submodules('ssscoring')
 
 # Bundle the entire ssscoring package as SOURCE FILES (not just the
 # resources subdirectory). Streamlit's bootstrap exec()s SSScore_app.py
@@ -66,17 +65,17 @@ hiddenImports += collect_submodules("ssscoring")
 # normal PathFinder locate them. The collect_submodules() call above
 # also keeps a frozen copy in the PYZ as a fallback.
 bundleData += [
-    ("ssscoring", "ssscoring"),
-    (STREAMLIT_SCRIPT, "."),  # bundled as data; Streamlit reads it as a script
+    ('ssscoring', 'ssscoring'),
+    (STREAMLIT_SCRIPT, '.'),  # bundled as data; Streamlit reads it as a script
 ]
 
 # -- Hidden imports Streamlit/pydeck need but PyInstaller misses -------------
 hiddenImports += [
-    "streamlit.web.cli",
-    "streamlit.runtime.scriptrunner.magic_funcs",
-    "streamlit.runtime.caching.cache_resource_api",
-    "streamlit.runtime.caching.cache_data_api",
-    "pkg_resources.py2_warn",  # legacy shim some deps still touch
+    'streamlit.web.cli',
+    'streamlit.runtime.scriptrunner.magic_funcs',
+    'streamlit.runtime.caching.cache_resource_api',
+    'streamlit.runtime.caching.cache_data_api',
+    'pkg_resources.py2_warn',  # legacy shim some deps still touch
 ]
 
 # -- Runtime deps imported from inside ssscoring's source files --------------
@@ -85,30 +84,32 @@ hiddenImports += [
 # ssscoring depends on at runtime — but that isn't already pulled in by the
 # asset-package collect_all() above — must be declared here explicitly.
 RUNTIME_DEPS = (
-    "haversine",
-    "geopy",
-    "click",
-    "psutil",
-    "importlib_resources",
+    'haversine',
+    'geopy',
+    'click',
+    'psutil',
+    'importlib_resources',
+    'webview',
+    'objc',
 )
 for runtimeDep in RUNTIME_DEPS:
     hiddenImports += collect_submodules(runtimeDep)
 
 # -- Modules we deliberately exclude to shrink the bundle --------------------
 moduleExcludes = [
-    "tkinter", "tcl", "tk",
-    "IPython", "ipykernel", "ipywidgets",
-    "jupyter", "jupyter_client", "jupyter_core", "notebook", "nbconvert",
-    "pytest", "pytest_cov",
-    "PyQt5", "PyQt6", "PySide2", "PySide6",
-    "matplotlib.tests", "numpy.tests", "pandas.tests",
+    'tkinter', 'tcl', 'tk',
+    'IPython', 'ipykernel', 'ipywidgets',
+    'jupyter', 'jupyter_client', 'jupyter_core', 'notebook', 'nbconvert',
+    'pytest', 'pytest_cov',
+    'PyQt5', 'PyQt6', 'PySide2', 'PySide6',
+    'matplotlib.tests', 'numpy.tests', 'pandas.tests',
 ]
 
 # ----------------------------------------------------------------------------
 
 analysis = Analysis(
     [ENTRY_SCRIPT],
-    pathex=[str(Path(".").resolve())],
+    pathex=[str(Path('.').resolve())],
     binaries=bundleBinaries,
     datas=bundleData,
     hiddenimports=hiddenImports,
@@ -126,7 +127,7 @@ executable = EXE(
     analysis.scripts,
     [],
     exclude_binaries=True,            # onedir, NOT onefile
-    name=APP_NAME,
+    name=BUNDLE_DIR_NAME,
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -148,23 +149,26 @@ collection = COLLECT(
     strip=False,
     upx=False,
     upx_exclude=[],
-    name=APP_NAME,
+    name=BUNDLE_DIR_NAME,
 )
 
 # macOS .app bundle wrapper. No-op on Windows.
 if IS_MAC:
     macAppBundle = BUNDLE(
         collection,
-        name=f"{APP_NAME}.app",
+        name=f'{BUNDLE_DIR_NAME}.app',
         icon=MAC_ICON,
         bundle_identifier=BUNDLE_ID,
         info_plist={
-            "CFBundleShortVersionString": APP_VERSION,
-            "CFBundleVersion": APP_VERSION,
-            "NSHighResolutionCapable": True,
-            "NSRequiresAquaSystemAppearance": False,
-            "LSBackgroundOnly": False,
-            "LSUIElement": False,
-            "LSMinimumSystemVersion": "11.0",
+            'CFBundleShortVersionString': APP_VERSION,
+            'CFBundleVersion': APP_VERSION,
+            'NSHighResolutionCapable': True,
+            'NSRequiresAquaSystemAppearance': False,
+            'LSBackgroundOnly': False,
+            'LSUIElement': False,
+            'LSMinimumSystemVersion': '11.0',
+            'CFBundleName': APP_NAME,
+            'CFBundleDisplayName': APP_NAME,
         },
     )
+

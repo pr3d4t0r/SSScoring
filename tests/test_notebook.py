@@ -12,7 +12,7 @@ from ssscoring.notebook import validationWindowDataFrom
 
 import pathlib
 
-import bokeh.models as bm
+import pandas as pd
 import pytest
 
 
@@ -41,6 +41,17 @@ def test_graphJumpResult():
     pass
 
 
+# TODO: Fix this in the documentation ⬆️
+# def test_validationWindowDataFrom():
+#     global _data
+# 
+#     rawData, tag = getFlySightDataFromCSVFileName(TEST_FLYSIGHT_DATA)
+#     _data = convertFlySight2SSScoring(rawData, altitudeDZMeters=19.0)
+#     jumpResult = processJump(_data)
+#     windowData = validationWindowDataFrom(jumpResult.data, jumpResult.window)
+#     assert isinstance(windowData, bm.ColumnDataSource)
+#     assert len(windowData.data['x'])
+
 def test_validationWindowDataFrom():
     global _data
 
@@ -48,8 +59,9 @@ def test_validationWindowDataFrom():
     _data = convertFlySight2SSScoring(rawData, altitudeDZMeters=19.0)
     jumpResult = processJump(_data)
     windowData = validationWindowDataFrom(jumpResult.data, jumpResult.window)
-    assert isinstance(windowData, bm.ColumnDataSource)
-    assert len(windowData.data['x'])
+    assert isinstance(windowData, pd.DataFrame)
+    assert list(windowData.columns) == ['x', 'y']
+    assert len(windowData) > 0
 
 
 def test_convertHexColorToRGB():
