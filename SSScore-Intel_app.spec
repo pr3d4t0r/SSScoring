@@ -30,7 +30,7 @@ BUNDLE_DIR_NAME = "SSScore-Intel"
 ENTRY_SCRIPT = "launch_gui.py"
 STREAMLIT_SCRIPT = "ssscrunner.py"
 
-MAC_ICON = "resources/Reventlou.icns"
+MAC_ICON = 'resources/SSScore.icns'
 WIN_ICON = None
 
 ASSET_PACKAGES = ('streamlit', 'pydeck', 'plotly', 'bokeh', 'webview')

@@ -7,12 +7,12 @@
 # Closing the window exits the process (taking the daemon thread with it).
 
 from __future__ import annotations
+from pathlib import Path
 
 import socket
 import sys
 import threading
 import time
-from pathlib import Path
 
 import webview
 
@@ -28,8 +28,8 @@ PORT_POLL_INTERVAL_SEC = 0.2
 SOCKET_CONNECT_TIMEOUT_SEC = 0.5
 
 WINDOW_TITLE = 'SSScore'
-WINDOW_WIDTH = 1400
-WINDOW_HEIGHT = 900
+WINDOW_SCREEN_H_FRACTION = 0.8
+WINDOW_SCREEN_V_FRACTION = 0.9
 WINDOW_MIN_WIDTH = 1100
 WINDOW_MIN_HEIGHT = 700
 
@@ -86,6 +86,19 @@ def _runStreamlit(scriptPath: str) -> None:
     bootstrap.run(scriptPath, is_hello=False, args=[], flag_options={})
 
 
+def _screenLogicalSizeMac() -> tuple[int, int]:
+    '''Primary screen size in logical points (what PyWebView wants for window
+    dimensions). Retina/HiDPI is handled correctly: NSScreen.frame() returns
+    points, not physical pixels, which matches PyWebView's coordinate space.
+    '''
+    try:
+        from AppKit import NSScreen
+        frame = NSScreen.mainScreen().frame()
+        return int(frame.size.width), int(frame.size.height)
+    except Exception:
+        return 1920, 1080 # fallback
+
+
 def main() -> None:
     from streamlit import config as streamlitConfig
 
@@ -121,11 +134,19 @@ def main() -> None:
         )
         sys.exit(1)
 
+    screenW, screenH = _screenLogicalSizeMac()
+    windowW = max(WINDOW_MIN_WIDTH,  int(screenW * WINDOW_SCREEN_H_FRACTION))
+    windowH = max(WINDOW_MIN_HEIGHT, int(screenH * WINDOW_SCREEN_V_FRACTION))
+    windowX = (screenW - windowW) // 2
+    windowY = (screenH - windowH) // 2
+
     webview.create_window(
         title=WINDOW_TITLE,
         url=f'http://{SERVER_HOST}:{port}',
-        width=WINDOW_WIDTH,
-        height=WINDOW_HEIGHT,
+        width=windowW,
+        height=windowH,
+        x=windowX,
+        y=windowY,
         min_size=(WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT),
         resizable=True,
     )

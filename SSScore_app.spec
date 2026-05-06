@@ -31,7 +31,7 @@ BUNDLE_DIR_NAME = 'SSScore'
 ENTRY_SCRIPT = 'launch_gui.py'
 STREAMLIT_SCRIPT = 'ssscrunner.py'
 
-MAC_ICON = 'resources/Reventlou.icns'
+MAC_ICON = 'resources/SSScore.icns'
 WIN_ICON = None  # TODO: drop a .ico into resources/ and point here.
 
 ASSET_PACKAGES = ('streamlit', 'pydeck', 'plotly', 'bokeh', 'webview')
