@@ -6,5 +6,5 @@ developmentMode = false
 [server]
 # address = 'localhost'
 # headless = true
-port = 8509
+port = 8501
 

@@ -146,7 +146,7 @@ def speedJumpTrajectory(jumpResult: JumpResults,
             'cursor': 'default',
         }
         deck = pdk.Deck(
-            map_style = None,
+            map_style = 'road',
             layers=layers,
             initial_view_state=pdk.data_utils.compute_view(viewBox[['longitude', 'latitude',]]),
             tooltip=tooltip,
@@ -232,7 +232,7 @@ def multipleSpeedJumpsTrajectories(jumpResults):
             mapLayers += layers
     viewBox = viewPointBox(workData)
     deck = pdk.Deck(
-        map_style = None,
+        map_style = 'road',
         initial_view_state=pdk.data_utils.compute_view(viewBox[['longitude', 'latitude',]]),
         layers=mapLayers,
     )

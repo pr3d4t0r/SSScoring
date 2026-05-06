@@ -1,0 +1,7 @@
+#!/usr/bin/env zsh
+
+
+# *** main ***
+
+sudo kmutil unload --bundle-identifier com.binaryfruit.driver.SATSMARTDriver
+

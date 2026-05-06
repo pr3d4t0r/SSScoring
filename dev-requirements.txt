@@ -1,7 +1,7 @@
-build
-pdoc
+pandas
 ptpython
-pyflakes
+pudb
 pyinstaller
 pytest
 pytest-cov
+streamlit

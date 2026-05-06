@@ -1,0 +1,32 @@
+# See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
+
+# Makefile.x86 -- Intel (x86_64) macOS .app build.
+#
+# Workflow:
+#   activate86                                    # source ~/Python-3_14_4-x86_64/bin/activate
+#   make -f Makefile.x86 <target>
+#
+# Default target: all (full build, mirrors master Makefile).
+# Recursive make calls explicitly pass -f Makefile.x86 so future-you knows
+# without doubt which Makefile is driving the build.
+
+include common.mk
+
+
+all: ALWAYS
+	make -f Makefile.x86 devrequirements
+	make -f Makefile.x86 local
+	make -f Makefile.x86 test
+	make -f Makefile.x86 package
+	make -f Makefile.x86 manpage
+	make -f Makefile.x86 docs
+	make -f Makefile.x86 umountFlySight
+	make -f Makefile.x86 DumbDriver
+	make -f Makefile.x86 app
+
+
+app: ALWAYS
+	iconutil -c icns resources/SSScore.iconset -o resources/SSScore.icns
+	pyinstaller --noconfirm --clean SSScore-Intel_app.spec
+	rm -rf $(DIST)/SSScore-Intel
+

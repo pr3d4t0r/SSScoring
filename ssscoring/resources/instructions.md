@@ -43,6 +43,6 @@ Team**, and CIME Sofware Ltd.
 
 **<a href='https://github.com/pr3d4t0r/SSScoring' target='_blank'>SSScore</a>** and all its components are released under the BSD-3 open source license.
 
-This product includes Streamlit software developed by Snowflake, Inc. used
+This product includes Streamlit software developed by Snowflake, Inc., used
 under the Apache 2.0 license.
 
