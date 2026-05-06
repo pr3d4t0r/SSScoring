@@ -99,7 +99,7 @@ libupdate:
 local:
 	pip cache purge
 	pip install -U pip
-	pip install --only-binary=:all: -r $(REQUIREMENTS) -e .
+	pip install --only-binary=:all: --no-binary=proxy-tools -r $(REQUIREMENTS) -e .
 	./tools/dzresource
 
 
@@ -116,7 +116,7 @@ nuke: ALWAYS
 
 
 package:
-	pip install --only-binary=:all: -r $(REQUIREMENTS)
+	pip install --only-binary=:all: --no-binary=proxy-tools -r $(REQUIREMENTS) -e .
 	./tools/dzresource
 	python -m build --wheel
 
@@ -132,7 +132,7 @@ publish:
 
 
 refresh: ALWAYS
-	pip install --only-binary=:all: -U -r requirements.txt
+	pip install --only-binary=:all: --no-binary=proxy-tools -r $(REQUIREMENTS) -e .
 
 
 resetpy: ALWAYS

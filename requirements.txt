@@ -7,5 +7,6 @@ numpy
 plotly
 psutil
 pydeck
+pywebview>=5.0
 streamlit
 

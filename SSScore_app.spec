@@ -22,9 +22,6 @@ from PyInstaller.utils.hooks import collect_all, collect_submodules, copy_metada
 IS_MAC = sys.platform == 'darwin'
 IS_WIN = sys.platform == 'win32'
 
-# Auto-match the architecture of the Python interpreter doing the build.
-# Returns 'arm64' or 'x86_64' on macOS — switches automatically if you change
-# Python installs (e.g. Homebrew x86_64 -> python.org arm64).
 MAC_TARGET_ARCH = platform.machine() if IS_MAC else None
 
 APP_NAME = 'SSScore'
@@ -34,11 +31,10 @@ BUNDLE_DIR_NAME = 'SSScore'
 ENTRY_SCRIPT = 'launch_gui.py'
 STREAMLIT_SCRIPT = 'ssscrunner.py'
 
-# Pick an icon per platform. Replace with whichever .icns/.ico you prefer.
 MAC_ICON = 'resources/Reventlou.icns'
 WIN_ICON = None  # TODO: drop a .ico into resources/ and point here.
 
-ASSET_PACKAGES = ('streamlit', 'pydeck', 'plotly', 'bokeh')
+ASSET_PACKAGES = ('streamlit', 'pydeck', 'plotly', 'bokeh', 'webview')
 
 bundleData: list = []
 bundleBinaries: list = []
@@ -93,6 +89,8 @@ RUNTIME_DEPS = (
     'click',
     'psutil',
     'importlib_resources',
+    'webview',
+    'objc',
 )
 for runtimeDep in RUNTIME_DEPS:
     hiddenImports += collect_submodules(runtimeDep)

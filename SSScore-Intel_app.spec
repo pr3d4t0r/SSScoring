@@ -25,15 +25,15 @@ MAC_TARGET_ARCH = platform.machine() if IS_MAC else None
 
 APP_NAME = "SSScore"
 APP_VERSION = "3.0.0"
-BUNDLE_ID = "net.cime.ssscoring.x86_64"        # ← differs from arm64 spec
-BUNDLE_DIR_NAME = "SSScore-Intel"              # ← differs from arm64 spec
+BUNDLE_ID = "net.cime.ssscoring.x86_64"
+BUNDLE_DIR_NAME = "SSScore-Intel"
 ENTRY_SCRIPT = "launch_gui.py"
 STREAMLIT_SCRIPT = "ssscrunner.py"
 
 MAC_ICON = "resources/Reventlou.icns"
 WIN_ICON = None
 
-ASSET_PACKAGES = ("streamlit", "pydeck", "plotly", "bokeh")
+ASSET_PACKAGES = ('streamlit', 'pydeck', 'plotly', 'bokeh', 'webview')
 
 bundleData: list = []
 bundleBinaries: list = []
@@ -67,6 +67,8 @@ RUNTIME_DEPS = (
     "click",
     "psutil",
     "importlib_resources",
+    'webview',
+    'objc',
 )
 for runtimeDep in RUNTIME_DEPS:
     hiddenImports += collect_submodules(runtimeDep)
