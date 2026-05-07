@@ -15,6 +15,8 @@ BUILD=./build
 BUILD_OS=$(shell uname)
 DIST=./dist
 FROZEN_PACKAGES=/tmp/requirements-frozen.txt
+ICON_SET_MAC="resources/SSScore.icns"
+ICON_SET_WINDOWS="resources/SSScore.ico"
 MANPAGES=./manpages
 PACKAGE=$(shell cat package.txt)
 PACKAGES_UPDATE=/tmp/packages-update.txt
@@ -33,6 +35,8 @@ clean:
 	rm -Rf $(BUILD)/*
 	rm -Rf $(DIST)/*
 	rm -Rf $(MANPAGES)/*
+	rm -Rf $(ICON_SET_MAC)
+	rm -Rf $(ICON_SET_WINDOWS)
 	rm -Rfv $$(find $(PACKAGE)/ | awk '/__pycache__$$/')
 	rm -Rfv $$(find tests | awk '/__pycache__$$/')
 	rm -Rfv $$(find . | awk '/.ipynb_checkpoints/')
@@ -83,6 +87,20 @@ DumbDriver: ALWAYS
 		cp resources/DumbDriver.icns $(DIST)/DumbDriver.app/Contents/Resources/applet.icns; \
 		ls -Al $(DIST) | grep "\.app" ; \
 	fi
+
+
+icons-mac: ALWAYS
+	iconutil -c icns resources/SSScore.iconset -o $(ICON_SET_MAC)
+
+
+icons-win: ALWAYS
+	magick \
+          resources/SSScore.iconset/icon_16x16.png \
+          resources/SSScore.iconset/icon_32x32.png \
+          resources/SSScore.iconset/icon_48x48.png \
+          resources/SSScore.iconset/icon_128x128.png \
+          resources/SSScore.iconset/icon_256x256.png \
+          $(ICON_SET_WINDOWS)
 
 
 install:

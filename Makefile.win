@@ -21,8 +21,6 @@ all: ALWAYS
 
 # app: win-clean
 app:
+	make icons-win
 	pyinstaller --noconfirm --clean SSScore-Windows.spec
-
-# win-clean:
-# 	rm -rf build dist SSCore.exe
 

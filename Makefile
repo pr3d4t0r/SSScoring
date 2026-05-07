@@ -23,7 +23,7 @@ all: ALWAYS
 
 
 app: ALWAYS
-	iconutil -c icns resources/SSScore.iconset -o resources/SSScore.icns
+	make icons-mac
 	pyinstaller --noconfirm --clean SSScore_app.spec
 	rm -rf $(DIST)/SSScore
 
