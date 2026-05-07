@@ -44,7 +44,7 @@ def test_graphJumpResult():
 # TODO: Fix this in the documentation ⬆️
 # def test_validationWindowDataFrom():
 #     global _data
-# 
+#
 #     rawData, tag = getFlySightDataFromCSVFileName(TEST_FLYSIGHT_DATA)
 #     _data = convertFlySight2SSScoring(rawData, altitudeDZMeters=19.0)
 #     jumpResult = processJump(_data)

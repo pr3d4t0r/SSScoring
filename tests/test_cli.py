@@ -38,12 +38,12 @@ def test_die():
     assert 42 == die('Bogus error', 42, isUnitTest = True)
 
 
-# TODO:  Windows compatibility issue MSYS2 vs native, fix it later.  Low priority.
-# def test__assertDataLake(_bogusFile, _bogusDir):
-#     assert _assertDataLake(TEST_DATA_LAKE, isUnitTest = True)
-#     assert not _assertDataLake(TEST_DATA_LAKE_BOGUS, isUnitTest = True)
-#     assert not _assertDataLake(_bogusFile, isUnitTest = True)
-#     assert not _assertDataLake(_bogusDir, isUnitTest = True)
+@pytest.mark.skip('TODO:  Windows compatibility issue MSYS2 vs native, fix it later.  Low priority.')
+def test__assertDataLake(_bogusFile, _bogusDir):
+    assert _assertDataLake(TEST_DATA_LAKE, isUnitTest = True)
+    assert not _assertDataLake(TEST_DATA_LAKE_BOGUS, isUnitTest = True)
+    assert not _assertDataLake(_bogusFile, isUnitTest = True)
+    assert not _assertDataLake(_bogusDir, isUnitTest = True)
 
 
 def test_ssscoreCommand():
