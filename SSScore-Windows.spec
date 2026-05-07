@@ -16,7 +16,8 @@ BUNDLE_DIR_NAME = 'SSScore'          # folder that will contain the .exe + _inte
 ENTRY_SCRIPT = 'launch_gui.py'
 STREAMLIT_SCRIPT = 'ssscrunner.py'
 
-WIN_ICON = 'resources/SSScore.ico'   # ← put your .ico here (convert from .icns if needed)
+# WIN_ICON = 'resources/SSScore.ico'   # ← put your .ico here (convert from .icns if needed)
+WIN_ICON = None
 
 ASSET_PACKAGES = ('streamlit', 'pydeck', 'plotly', 'bokeh', 'webview')
 
