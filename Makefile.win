@@ -20,20 +20,21 @@ all: ALWAYS
 	make -f Makefile.win app
 
 # app: win-clean
-app: win-clean
-	$(PYTHON) -m venv $(VENV) 2>/dev/null || true
-	source $(VENV)/Scripts/activate && \
-		$(PYINST) --clean --onefile --windowed \
-		--icon resources/SSScore.ico \
-		--add-data "ssscrunner.py;." \
-		--hidden-import=streamlit \
-		--hidden-import=pywebview \
-		--hidden-import=webview \
-		--hidden-import=plotly \
-		--hidden-import=pydeck \
-		--collect-all streamlit \
-		--collect-all pywebview \
-		SSCore_app.spec || echo "=== Build failed - check output above ==="
+app:
+	pyinstaller --noconfirm --clean SSScore-Windows.spec
+# 	$(PYTHON) -m venv $(VENV) 2>/dev/null || true
+# 	source $(VENV)/Scripts/activate && \
+# 		$(PYINST) --clean --onefile --windowed \
+# 		--icon resources/SSScore.ico \
+# 		--add-data "ssscrunner.py;." \
+# 		--hidden-import=streamlit \
+# 		--hidden-import=pywebview \
+# 		--hidden-import=webview \
+# 		--hidden-import=plotly \
+# 		--hidden-import=pydeck \
+# 		--collect-all streamlit \
+# 		--collect-all pywebview \
+# 		SSCore_app.spec || echo "=== Build failed - check output above ==="
 
 # win-clean:
 # 	rm -rf build dist SSCore.exe
