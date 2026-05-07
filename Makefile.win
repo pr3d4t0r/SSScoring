@@ -15,8 +15,8 @@ all: ALWAYS
 	make -f Makefile.win package
 	make -f Makefile.win manpage
 	make -f Makefile.win docs
-	make -f Makefile.win app
-
+# 	make -f Makefile.win app
+# 
 # app: win-clean
 # 	$(PYTHON) -m venv $(VENV) 2>/dev/null || true
 # 	source $(VENV)/Scripts/activate && \
