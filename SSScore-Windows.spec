@@ -3,15 +3,22 @@
 # SSScore-Windows.spec — dedicated Windows build (onedir .exe)
 # Build:  make -f Makefile.win app   (or pyinstaller --noconfirm --clean SSScore-Windows.spec)
 
-import platform
-import sys
 from pathlib import Path
 from PyInstaller.utils.hooks import collect_all, collect_submodules, copy_metadata
+
+import platform
+import sys
+
+
+#+++ constants +++
 
 IS_WIN = sys.platform == 'win32'
 
 APP_NAME = 'SSScore'
-APP_VERSION = '3.0.0'
+
+from ssscoring import __VERSION__
+APP_VERSION = __VERSION__
+
 BUNDLE_DIR_NAME = 'SSScore'          # folder that will contain the .exe + _internal
 ENTRY_SCRIPT = 'launch_gui.py'
 STREAMLIT_SCRIPT = 'ssscrunner.py'
@@ -20,6 +27,9 @@ STREAMLIT_SCRIPT = 'ssscrunner.py'
 WIN_ICON = None
 
 ASSET_PACKAGES = ('streamlit', 'pydeck', 'plotly', 'bokeh', 'webview')
+
+
+# +++ globals +++
 
 bundleData: list = []
 bundleBinaries: list = []

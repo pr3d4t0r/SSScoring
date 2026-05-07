@@ -24,7 +24,10 @@ IS_WIN = sys.platform == "win32"
 MAC_TARGET_ARCH = platform.machine() if IS_MAC else None
 
 APP_NAME = "SSScore"
-APP_VERSION = "3.0.0"
+
+from ssscoring import __VERSION__
+APP_VERSION = __VERSION__
+
 BUNDLE_ID = "net.cime.ssscoring.x86_64"
 BUNDLE_DIR_NAME = "SSScore-Intel"
 ENTRY_SCRIPT = "launch_gui.py"
