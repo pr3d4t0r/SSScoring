@@ -23,7 +23,7 @@ BUNDLE_DIR_NAME = 'SSScore'          # folder that will contain the .exe + _inte
 ENTRY_SCRIPT = 'launch_gui.py'
 STREAMLIT_SCRIPT = 'ssscrunner.py'
 
-WIN_ICON = 'resources/SSScore.ico' 
+WIN_ICON = 'resources/SSScore.ico'
 
 ASSET_PACKAGES = ('streamlit', 'pydeck', 'plotly', 'bokeh', 'webview')
 
@@ -92,7 +92,7 @@ executable = EXE(
     pyzArchive,
     analysis.scripts,
     [],
-    exclude_binaries=True,          # onedir mode (same as macOS)
+    exclude_binaries=False,
     name=APP_NAME,
     debug=False,
     bootloader_ignore_signals=False,
