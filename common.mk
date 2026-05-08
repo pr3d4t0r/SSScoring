@@ -42,6 +42,7 @@ clean:
 	rm -Rfv $$(find . | awk '/.ipynb_checkpoints/')
 	rm -Rfv ./.pytest_cache
 	rm -Rf $(API_DOC_DIR)/*
+	pip cache purge
 	mkdir -p ./dist
 	pushd ./dist ; pip uninstall -y $(PACKAGE)==$(VERSION) || true ; popd
 
@@ -115,7 +116,6 @@ libupdate:
 
 
 local:
-	pip cache purge
 	pip install -U pip
 	pip install --only-binary=:all: --no-binary=proxy-tools -r $(REQUIREMENTS) -e .
 	./tools/dzresource
