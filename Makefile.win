@@ -17,9 +17,9 @@ all: ALWAYS
 	make -f Makefile.win manpage
 	make -f Makefile.win docs
 	make -f Makefile.win app || true
-	zip -9j dist/SSScore_exe.zip dist/SSScore.exe
-	ls -Alrt dist/*
 
 app: icons-win
 	$(PYINST) --clean SSScore-Windows.spec
+	zip -9j dist/SSScore_exe.zip dist/SSScore.exe
+	ls -Alrt dist/*
 
