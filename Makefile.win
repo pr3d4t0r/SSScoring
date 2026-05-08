@@ -19,8 +19,5 @@ all: ALWAYS
 	make -f Makefile.win app
 
 app: icons-win
-	$(PYINST) --clean --onefile --windowed \
-        --icon resources/SSScore.ico \
-        --add-data "ssscrunner.py;." \
-        SSScore-Windows.spec
+	$(PYINST) --clean SSScore-Windows.spec
 
