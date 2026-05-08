@@ -1,6 +1,6 @@
 # See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
 
-# Makefile.win — Windows build (fixed VENV, committable)
+# Makefile.win — Windows build (onefile .exe, committable)
 
 include common.mk
 
@@ -8,7 +8,6 @@ VENV   := /c/Python-3_13_13-Win-x86_64
 PYTHON := python
 PYINST := $(VENV)/Scripts/pyinstaller
 
-.PHONY: win-clean win-build app
 
 all: ALWAYS
 	make -f Makefile.win devrequirements
@@ -19,8 +18,9 @@ all: ALWAYS
 	make -f Makefile.win docs
 	make -f Makefile.win app
 
-# app: win-clean
-app:
-	make icons-win
-	pyinstaller --noconfirm --clean SSScore-Windows.spec
+app: icons-win
+	$(PYINST) --clean --onefile --windowed \
+        --icon resources/SSScore.ico \
+        --add-data "ssscrunner.py;." \
+        SSScore-Windows.spec
 

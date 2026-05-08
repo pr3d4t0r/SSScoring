@@ -1,7 +1,7 @@
 # See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
 
-# SSScore-Windows.spec — dedicated Windows build (onedir .exe)
-# Build:  make -f Makefile.win app   (or pyinstaller --noconfirm --clean SSScore-Windows.spec)
+# SSScore-Windows.spec — dedicated Windows build (ONEFILE .exe)
+# Build: make -f Makefile.win app  (or pyinstaller --noconfirm --clean SSScore-Windows.spec)
 
 from pathlib import Path
 from PyInstaller.utils.hooks import collect_all, collect_submodules, copy_metadata
@@ -10,16 +10,14 @@ import platform
 import sys
 
 
-#+++ constants +++
+# +++ constants +++
 
 IS_WIN = sys.platform == 'win32'
-
 APP_NAME = 'SSScore'
 
 from ssscoring import __VERSION__
 APP_VERSION = __VERSION__
 
-BUNDLE_DIR_NAME = 'SSScore'          # folder that will contain the .exe + _internal
 ENTRY_SCRIPT = 'launch_gui.py'
 STREAMLIT_SCRIPT = 'ssscrunner.py'
 
@@ -55,6 +53,7 @@ hiddenImports += [
     'streamlit.runtime.caching.cache_resource_api',
     'streamlit.runtime.caching.cache_data_api',
     'pkg_resources.py2_warn',
+    'webview.platforms.edgechromium',   # added for Windows stability
 ]
 
 RUNTIME_DEPS = (
@@ -88,29 +87,28 @@ analysis = Analysis(
 
 pyzArchive = PYZ(analysis.pure, analysis.zipped_data)
 
+# ==================== ONEFILE CHANGES START HERE ====================
 executable = EXE(
     pyzArchive,
     analysis.scripts,
-    [],
-    exclude_binaries=False,
+    analysis.binaries,      # ← bundled into the single exe
+    analysis.zipfiles,
+    analysis.datas,         # ← all data files bundled into the exe
     name=APP_NAME,
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=False,
-    console=False,
+    # TODO
+    # console=False,          # GUI app
+    console=False,          # GUI app
     disable_windowed_traceback=False,
     argv_emulation=False,
     icon=WIN_ICON,
+    onefile=True,           # ← THIS IS THE KEY CHANGE (was onedir)
+    runtime_tmpdir=None,    # optional: use system temp folder
 )
 
-collection = COLLECT(
-    executable,
-    analysis.binaries,
-    analysis.zipfiles,
-    analysis.datas,
-    strip=False,
-    upx=False,
-    upx_exclude=[],
-    name=BUNDLE_DIR_NAME,
-)
+
+# Removed the entire COLLECT block — not needed for onefile mode
+
