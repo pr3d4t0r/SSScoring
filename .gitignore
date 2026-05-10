@@ -152,6 +152,7 @@ venv.bak/
 **/test.json
 **/test.py
 **/tmp/*
+**/.DS_Store**
 .lesshst
 .vimrc
 README-1ST.ipynb
