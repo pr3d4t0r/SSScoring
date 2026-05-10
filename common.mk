@@ -11,12 +11,13 @@ SHELL=/bin/bash
 
 API_DOC_DIR="./docs"
 APP_CONFIG_FILE="ssscoring/resources/config.toml"
+APP_NAME="SSScore"
 BUILD=./build
 BUILD_OS=$(shell uname)
 DIST=./dist
 FROZEN_PACKAGES=/tmp/requirements-frozen.txt
-ICON_SET_MAC="resources/SSScore.icns"
-ICON_SET_WINDOWS="resources/SSScore.ico"
+ICON_SET_MAC="resources/$(APP_NAME).icns"
+ICON_SET_WINDOWS="resources/$(APP_NAME).ico"
 MANPAGES=./manpages
 PACKAGE=$(shell cat package.txt)
 PACKAGES_UPDATE=/tmp/packages-update.txt
@@ -61,6 +62,10 @@ devpi:
 	@[[ -e "pip.conf-bak" ]] && rm -f "pip.conf-bak"
 
 
+dmg: ALWAYS
+	@if [[ -z "$(APP_BUNDLE)" ]] ; then echo "APP_BUNDLE target not defined in Makefile"; exit 99; fi
+
+
 dockerize.arm64: ALWAYS
 	echo "$(VERSION)" > ./docker/ARM/dockerimageversion.txt
 	cat ./docker/ARM/dockerimageversion.txt
@@ -91,16 +96,16 @@ DumbDriver: ALWAYS
 
 
 icons-mac: ALWAYS
-	iconutil -c icns resources/SSScore.iconset -o $(ICON_SET_MAC)
+	iconutil -c icns resources/$(APP_NAME).iconset -o $(ICON_SET_MAC)
 
 
 icons-win: ALWAYS
 	magick \
-          resources/SSScore.iconset/icon_16x16.png \
-          resources/SSScore.iconset/icon_32x32.png \
-          resources/SSScore.iconset/icon_48x48.png \
-          resources/SSScore.iconset/icon_128x128.png \
-          resources/SSScore.iconset/icon_256x256.png \
+          resources/$(APP_NAME).iconset/icon_16x16.png \
+          resources/$(APP_NAME).iconset/icon_32x32.png \
+          resources/$(APP_NAME).iconset/icon_48x48.png \
+          resources/$(APP_NAME).iconset/icon_128x128.png \
+          resources/$(APP_NAME).iconset/icon_256x256.png \
           $(ICON_SET_WINDOWS)
 
 

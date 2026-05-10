@@ -9,6 +9,8 @@
 
 include common.mk
 
+APP_BUNDLE="$(APP_NAME).app"
+
 
 all: ALWAYS
 	make devrequirements
@@ -24,6 +26,6 @@ all: ALWAYS
 
 app: ALWAYS
 	make icons-mac
-	pyinstaller --noconfirm --clean SSScore_app.spec
-	rm -rf $(DIST)/SSScore
+	pyinstaller --noconfirm --clean $(APP_NAME)_app.spec
+	rm -rf $(DIST)/$(APP_NAME)
 

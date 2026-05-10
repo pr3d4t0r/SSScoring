@@ -27,6 +27,6 @@ all: ALWAYS
 
 app: ALWAYS
 	make icons-mac
-	pyinstaller --noconfirm --clean SSScore-Intel_app.spec
-	rm -rf $(DIST)/SSScore-Intel
+	pyinstaller --noconfirm --clean $(APP_NAME)-Intel_app.spec
+	rm -rf $(DIST)/$(APP_NAME)-Intel
 
