@@ -32,6 +32,11 @@ DEVPI_USER=$(shell cat ./devpi-user.txt)
 
 # Arch-agnostic targets:
 
+bundle: ALWAYS
+	pushd $(DIST) && zip -9yr SSScore-Universal.zip *app && popd
+	ls -Al $(DIST)
+
+
 clean:
 	rm -Rf $(BUILD)/*
 	rm -Rf $(DIST)/*
