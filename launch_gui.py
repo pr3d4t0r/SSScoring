@@ -99,6 +99,26 @@ def _screenLogicalSizeMac() -> tuple[int, int]:
         return 1920, 1080 # fallback
 
 
+def _screenLogicalSizeWin() -> tuple[int, int]:
+    try:
+        screens = webview.screens
+        if screens:
+            s = screens[0]  # primary monitor
+            return int(s.width), int(s.height)
+    except Exception:
+        pass
+    # fallback
+    return 1920, 1080
+
+
+def _getPrimaryScreenSize() -> tuple[int, int]:
+    if sys.platform == 'darwin':
+        return _screenLogicalSizeMac()
+    else:
+        # Windows (and Linux fallback)
+        return _screenLogicalSizeWin()
+
+
 def main() -> None:
     from streamlit import config as streamlitConfig
 
@@ -134,7 +154,7 @@ def main() -> None:
         )
         sys.exit(1)
 
-    screenW, screenH = _screenLogicalSizeMac()
+    screenW, screenH = _getPrimaryScreenSize()
     windowW = max(WINDOW_MIN_WIDTH,  int(screenW * WINDOW_SCREEN_H_FRACTION))
     windowH = max(WINDOW_MIN_HEIGHT, int(screenH * WINDOW_SCREEN_V_FRACTION))
     windowX = (screenW - windowW) // 2

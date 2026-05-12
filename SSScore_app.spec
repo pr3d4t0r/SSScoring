@@ -14,10 +14,14 @@
 
 # -*- mode: python ; coding: utf-8 -*-
 
-import platform
-import sys
 from pathlib import Path
 from PyInstaller.utils.hooks import collect_all, collect_submodules, copy_metadata
+
+import platform
+import sys
+
+
+#+++ constants +++
 
 IS_MAC = sys.platform == 'darwin'
 IS_WIN = sys.platform == 'win32'
@@ -25,16 +29,21 @@ IS_WIN = sys.platform == 'win32'
 MAC_TARGET_ARCH = platform.machine() if IS_MAC else None
 
 APP_NAME = 'SSScore'
-APP_VERSION = '3.0.0'
+
+from ssscoring import __VERSION__
+APP_VERSION = __VERSION__
+
 BUNDLE_ID = 'eu.ciurana.ssscoring'
 BUNDLE_DIR_NAME = 'SSScore'
 ENTRY_SCRIPT = 'launch_gui.py'
 STREAMLIT_SCRIPT = 'ssscrunner.py'
 
 MAC_ICON = 'resources/SSScore.icns'
-WIN_ICON = None  # TODO: drop a .ico into resources/ and point here.
 
 ASSET_PACKAGES = ('streamlit', 'pydeck', 'plotly', 'bokeh', 'webview')
+
+
+# +++ globals +++
 
 bundleData: list = []
 bundleBinaries: list = []

@@ -749,28 +749,45 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
 
     Raises
     ------
-    `SSSCoringError` if the `jumpResults` object is empty.
+    `SSScoringError` if the `jumpResults` object is empty.
     """
     if not len(jumpResults):
         raise SSScoringError('jumpResults is empty - impossible to collate angles')
+
     speeds = pd.DataFrame()
     for jumpResultIndex in sorted(list(jumpResults.keys())):
         jumpResult = jumpResults[jumpResultIndex]
         if jumpResult.status == JumpStatus.OK:
-            t = jumpResult.table
+            t = jumpResult.table.copy()
             finalTime = t.iloc[-1].time
-            t.iloc[-1].time = LAST_TIME_TRANCHE
-            t = pd.pivot_table(t, columns = t.time)
-            d = pd.DataFrame([ jumpResult.score, ], index = [ jumpResultIndex, ], columns = [ 'score', ], dtype = object)
+
+            if finalTime > 20.1:
+                finalSpeed = t.iloc[-1].vKMh
+                t.iloc[-1].time = LAST_TIME_TRANCHE   # keep LAST_TIME_TRANCHE for pivoting
+            else:
+                finalSpeed = None
+
+            t = pd.pivot_table(t, columns=t.time)
+            d = pd.DataFrame([jumpResult.score], index=[jumpResultIndex], columns=['score'])
+
             for column in t.columns:
                 d[column] = t[column].vKMh
-            d['finalTime'] = [ finalTime, ]
+
+            d['finalTime'] = [finalTime]
             d['maxSpeed'] = jumpResult.maxSpeed
+
+            if finalSpeed is not None:
+                d['finalSpeed'] = [finalSpeed]
+            else:
+                d['finalSpeed'] = [d.get(25.0, [0.0])[0]]
 
             if speeds.empty:
                 speeds = d.copy()
             else:
-                speeds = pd.concat([ speeds, d, ])
+                speeds = pd.concat([speeds, d])
+
+    cols = ['score', 5.0, 10.0, 15.0, 20.0, 'finalSpeed', 'finalTime', 'maxSpeed']
+    speeds = speeds[[c for c in cols if c in speeds.columns]]
     speeds = speeds.replace(np.nan, 0.0)
     return speeds.sort_index()
 

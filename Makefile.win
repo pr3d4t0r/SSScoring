@@ -1,0 +1,25 @@
+# See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
+
+# Makefile.win — Windows build (onefile .exe, committable)
+
+include common.mk
+
+VENV   := /c/Python-3_13_13-Win-x86_64
+PYTHON := python
+PYINST := $(VENV)/Scripts/pyinstaller
+
+
+all: ALWAYS
+	make -f Makefile.win devrequirements
+	make -f Makefile.win local
+	make -f Makefile.win test
+	make -f Makefile.win package
+	make -f Makefile.win manpage
+	make -f Makefile.win docs
+	make -f Makefile.win app || true
+
+app: icons-win
+	$(PYINST) --clean SSScore-Windows.spec
+	zip -9j dist/SSScore_exe.zip dist/SSScore.exe
+	ls -Alrt dist/*
+

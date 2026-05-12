@@ -1,0 +1,18 @@
+#!/usr/bin/env zsh
+# See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
+
+[[ -e .env ]] && source .env
+
+# +++ main +++
+
+streamlit run "$1" --server.headless true &
+
+running=1
+while [[ $running -ne 0 ]]; do
+    curl -s --max-time 1 http://localhost:8501 > /dev/null
+    running=$?
+    sleep 0.3
+done
+
+open -a "$DEV_BBOWSER" "http://localhost:8501"
+

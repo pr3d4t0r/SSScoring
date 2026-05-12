@@ -11,10 +11,13 @@ SHELL=/bin/bash
 
 API_DOC_DIR="./docs"
 APP_CONFIG_FILE="ssscoring/resources/config.toml"
+APP_NAME="SSScore"
 BUILD=./build
 BUILD_OS=$(shell uname)
 DIST=./dist
 FROZEN_PACKAGES=/tmp/requirements-frozen.txt
+ICON_SET_MAC="resources/$(APP_NAME).icns"
+ICON_SET_WINDOWS="resources/$(APP_NAME).ico"
 MANPAGES=./manpages
 PACKAGE=$(shell cat package.txt)
 PACKAGES_UPDATE=/tmp/packages-update.txt
@@ -33,11 +36,14 @@ clean:
 	rm -Rf $(BUILD)/*
 	rm -Rf $(DIST)/*
 	rm -Rf $(MANPAGES)/*
+	rm -Rf $(ICON_SET_MAC)
+	rm -Rf $(ICON_SET_WINDOWS)
 	rm -Rfv $$(find $(PACKAGE)/ | awk '/__pycache__$$/')
 	rm -Rfv $$(find tests | awk '/__pycache__$$/')
 	rm -Rfv $$(find . | awk '/.ipynb_checkpoints/')
 	rm -Rfv ./.pytest_cache
 	rm -Rf $(API_DOC_DIR)/*
+	pip cache purge
 	mkdir -p ./dist
 	pushd ./dist ; pip uninstall -y $(PACKAGE)==$(VERSION) || true ; popd
 
@@ -54,6 +60,10 @@ devpi:
 	devpi use $(DEVPI_USER)/dev
 	devpi -v use --set-cfg $(DEVPI_USER)/dev
 	@[[ -e "pip.conf-bak" ]] && rm -f "pip.conf-bak"
+
+
+dmg: ALWAYS
+	@if [[ -z "$(APP_BUNDLE)" ]] ; then echo "APP_BUNDLE target not defined in Makefile"; exit 99; fi
 
 
 dockerize.arm64: ALWAYS
@@ -85,6 +95,20 @@ DumbDriver: ALWAYS
 	fi
 
 
+icons-mac: ALWAYS
+	iconutil -c icns resources/$(APP_NAME).iconset -o $(ICON_SET_MAC)
+
+
+icons-win: ALWAYS
+	magick \
+          resources/$(APP_NAME).iconset/icon_16x16.png \
+          resources/$(APP_NAME).iconset/icon_32x32.png \
+          resources/$(APP_NAME).iconset/icon_48x48.png \
+          resources/$(APP_NAME).iconset/icon_128x128.png \
+          resources/$(APP_NAME).iconset/icon_256x256.png \
+          $(ICON_SET_WINDOWS)
+
+
 install:
 	pip install -U $(PACKAGE)==$(VERSION)
 	pip list | awk 'NR < 3 { print; } /$(PACKAGE)/'
@@ -97,7 +121,6 @@ libupdate:
 
 
 local:
-	pip cache purge
 	pip install -U pip
 	pip install --only-binary=:all: --no-binary=proxy-tools -r $(REQUIREMENTS) -e .
 	./tools/dzresource
