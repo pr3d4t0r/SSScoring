@@ -27,5 +27,7 @@ all: ALWAYS
 app: ALWAYS
 	make icons-mac
 	pyinstaller --noconfirm --clean $(APP_NAME)_app.spec
-	rm -rf $(DIST)/$(APP_NAME)
+	@rm -rf $(DIST)/$(APP_NAME)
+	@lipo -info $(DIST)/$(APP_BUNDLE)/Contents/MacOS/SSScore
+
 

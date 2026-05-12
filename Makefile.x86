@@ -12,6 +12,9 @@
 
 include common.mk
 
+APP_NAME=SSScore-Intel
+APP_BUNDLE=$(APP_NAME).app
+
 
 all: ALWAYS
 	make -f Makefile.x86 devrequirements
@@ -27,6 +30,7 @@ all: ALWAYS
 
 app: ALWAYS
 	make icons-mac
-	pyinstaller --noconfirm --clean $(APP_NAME)-Intel_app.spec
-	rm -rf $(DIST)/$(APP_NAME)-Intel
+	pyinstaller --noconfirm --clean $(APP_NAME)_app.spec
+	@rm -rf $(DIST)/$(APP_NAME)
+	@lipo -info $(DIST)/$(APP_BUNDLE)/Contents/MacOS/SSScore
 
