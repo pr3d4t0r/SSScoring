@@ -9,17 +9,13 @@
 from __future__ import annotations
 from pathlib import Path
 
-from webview.menu import Menu
-from webview.menu import MenuAction
-
-
 import socket
 import sys
 import threading
 import time
 
 import webview
-import ssscoring
+import ssscoring    # Forces PyInstaller to use the package.  Keep this comment.
 
 
 SERVER_HOST = '127.0.0.1'
@@ -119,25 +115,12 @@ def _getPrimaryScreenSize() -> tuple[int, int]:
         return _screenLogicalSizeWin()
 
 
-def _showAbout(window):
-    content = f'''
-    <h2>SSScore {ssscoring.__VERSION__}</h2>
-    <p>A modern desktop application for analyzing FlySight speed skydiving data.</p>
-    <hr>
-    <p>© 2026 Eugene Ciurana / pr3d4t0r</p>
-    '''
-    window.load_html(content, title=f'About SSScore {ssscoring.__VERSION__}')
-
-
 def main() -> None:
     from streamlit import config as streamlitConfig
 
     scriptPath = str(_bundleRoot() / 'ssscrunner.py')
     port = _freePort()
 
-    # Headless server config — no auto-browser-open (PyWebView owns the window),
-    # no telemetry, no file watcher (frozen bundle's source files don't change
-    # at runtime), no developer mode (suppresses dev-only UI affordances).
     streamlitConfig.set_option('server.headless', True)
     streamlitConfig.set_option('server.port', port)
     streamlitConfig.set_option('server.address', SERVER_HOST)
@@ -148,16 +131,12 @@ def main() -> None:
     streamlitConfig.set_option('runner.magicEnabled', False)
     streamlitConfig.set_option('runner.fastReruns', True)
 
-    # Streamlit on a daemon thread; main thread is reserved for PyWebView,
-    # which on macOS must own the main thread for Cocoa event-loop reasons.
     threading.Thread(
         target=_runStreamlit,
         args=(scriptPath,),
         daemon=True,
     ).start()
 
-    # Don't open the window until the server is actually serving — avoids a
-    # brief connection-refused error inside the embedded webview.
     if not _waitForServerReady(port):
         sys.stderr.write(
             f'SSScore: Streamlit server did not become ready within {SERVER_READY_TIMEOUT_SEC:.0f}s\n'
@@ -170,7 +149,7 @@ def main() -> None:
     windowX = (screenW - windowW) // 2
     windowY = (screenH - windowH) // 2
 
-    window = webview.create_window(
+    webview.create_window(
         title=WINDOW_TITLE,
         url=f'http://{SERVER_HOST}:{port}',
         width=windowW,
@@ -180,16 +159,6 @@ def main() -> None:
         min_size=(WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT),
         resizable=True,
     )
-
-    def aboutHandler(window):
-        _showAbout(window)
-
-    helpMenu = Menu(
-            'Help',
-            [
-                MenuAction('About SSScore...', aboutHandler),
-            ],)
-    window.menu = [ helpMenu, ]
 
     webview.start()
     sys.exit(0)
