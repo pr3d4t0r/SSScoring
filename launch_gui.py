@@ -9,17 +9,17 @@
 from __future__ import annotations
 from pathlib import Path
 
+from webview.menu import Menu
+from webview.menu import MenuAction
+
+
 import socket
 import sys
 import threading
 import time
 
 import webview
-
-# Importing ssscoring here ensures PyInstaller's import-graph analyzer
-# picks up the package even though the actual Streamlit script is loaded
-# at runtime as a data file.
-import ssscoring  # noqa: F401
+import ssscoring
 
 
 SERVER_HOST = '127.0.0.1'
@@ -119,6 +119,16 @@ def _getPrimaryScreenSize() -> tuple[int, int]:
         return _screenLogicalSizeWin()
 
 
+def _showAbout(window):
+    content = f'''
+    <h2>SSScore {ssscoring.__VERSION__}</h2>
+    <p>A modern desktop application for analyzing FlySight speed skydiving data.</p>
+    <hr>
+    <p>© 2026 Eugene Ciurana / pr3d4t0r</p>
+    '''
+    window.load_html(content, title=f'About SSScore {ssscoring.__VERSION__}')
+
+
 def main() -> None:
     from streamlit import config as streamlitConfig
 
@@ -160,7 +170,7 @@ def main() -> None:
     windowX = (screenW - windowW) // 2
     windowY = (screenH - windowH) // 2
 
-    webview.create_window(
+    window = webview.create_window(
         title=WINDOW_TITLE,
         url=f'http://{SERVER_HOST}:{port}',
         width=windowW,
@@ -171,12 +181,17 @@ def main() -> None:
         resizable=True,
     )
 
-    # Blocks the main thread until all PyWebView windows are closed (red
-    # close button on macOS, Cmd-Q, or window-menu close).
-    webview.start()
+    def aboutHandler(window):
+        _showAbout(window)
 
-    # Window closed -> exit cleanly. The daemon Streamlit thread dies with
-    # the process; no graceful-shutdown dance needed.
+    helpMenu = Menu(
+            'Help',
+            [
+                MenuAction('About SSScore...', aboutHandler),
+            ],)
+    window.menu = [ helpMenu, ]
+
+    webview.start()
     sys.exit(0)
 
 
