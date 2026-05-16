@@ -855,27 +855,36 @@ def collateAnglesByTimeFromExit(jumpResults: dict) -> pd.DataFrame:
     """
     if not len(jumpResults):
         raise SSScoringError('jumpResults is empty - impossible to collate angles')
+
     angles = pd.DataFrame()
     for jumpResultIndex in sorted(list(jumpResults.keys())):
         jumpResult = jumpResults[jumpResultIndex]
         if jumpResult.status == JumpStatus.OK:
-            t = jumpResult.table
+            t = jumpResult.table.copy()                    # ← critical: avoid mutation
+
             finalTime = t.iloc[-1].time
+            finalAngle = t.iloc[-1].speedAngle
+
             t.iloc[-1].time = LAST_TIME_TRANCHE
-            t = pd.pivot_table(t, columns = t.time)
-            d = pd.DataFrame([ jumpResult.score, ], index = [ jumpResultIndex, ], columns = [ 'score', ], dtype = object)
+
+            t = pd.pivot_table(t, columns=t.time)
+            d = pd.DataFrame([jumpResult.score], index=[jumpResultIndex], columns=['score'])
+
             for column in t.columns:
                 d[column] = t[column].speedAngle
-            d['finalTime'] = [ finalTime, ]
+
+            d['finalTime'] = [finalTime]
+            d['finalAngle'] = [finalAngle]                 # ← new clean column
 
             if angles.empty:
                 angles = d.copy()
             else:
-                angles = pd.concat([ angles, d, ])
-    cols = sorted([ column for column in angles.columns if isinstance(column, float) ])
-    cols = [ 'score', ]+cols+[ 'finalTime', ]
-    angles = angles[cols]
+                angles = pd.concat([angles, d])
+
+    cols = ['score', 5.0, 10.0, 15.0, 20.0, 'finalAngle', 'finalTime']
+    angles = angles[[c for c in cols if c in angles.columns]]
     angles = angles.replace(np.nan, 0.0)
+
     return angles.sort_index()
 
 
