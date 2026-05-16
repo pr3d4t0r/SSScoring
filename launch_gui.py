@@ -15,11 +15,7 @@ import threading
 import time
 
 import webview
-
-# Importing ssscoring here ensures PyInstaller's import-graph analyzer
-# picks up the package even though the actual Streamlit script is loaded
-# at runtime as a data file.
-import ssscoring  # noqa: F401
+import ssscoring    # Forces PyInstaller to use the package.  Keep this comment.
 
 
 SERVER_HOST = '127.0.0.1'
@@ -125,9 +121,6 @@ def main() -> None:
     scriptPath = str(_bundleRoot() / 'ssscrunner.py')
     port = _freePort()
 
-    # Headless server config — no auto-browser-open (PyWebView owns the window),
-    # no telemetry, no file watcher (frozen bundle's source files don't change
-    # at runtime), no developer mode (suppresses dev-only UI affordances).
     streamlitConfig.set_option('server.headless', True)
     streamlitConfig.set_option('server.port', port)
     streamlitConfig.set_option('server.address', SERVER_HOST)
@@ -138,16 +131,12 @@ def main() -> None:
     streamlitConfig.set_option('runner.magicEnabled', False)
     streamlitConfig.set_option('runner.fastReruns', True)
 
-    # Streamlit on a daemon thread; main thread is reserved for PyWebView,
-    # which on macOS must own the main thread for Cocoa event-loop reasons.
     threading.Thread(
         target=_runStreamlit,
         args=(scriptPath,),
         daemon=True,
     ).start()
 
-    # Don't open the window until the server is actually serving — avoids a
-    # brief connection-refused error inside the embedded webview.
     if not _waitForServerReady(port):
         sys.stderr.write(
             f'SSScore: Streamlit server did not become ready within {SERVER_READY_TIMEOUT_SEC:.0f}s\n'
@@ -171,12 +160,7 @@ def main() -> None:
         resizable=True,
     )
 
-    # Blocks the main thread until all PyWebView windows are closed (red
-    # close button on macOS, Cmd-Q, or window-menu close).
     webview.start()
-
-    # Window closed -> exit cleanly. The daemon Streamlit thread dies with
-    # the process; no graceful-shutdown dance needed.
     sys.exit(0)
 
 
