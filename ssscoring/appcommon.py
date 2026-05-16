@@ -147,15 +147,30 @@ def displayJumpDataIn(resultsTable: pd.DataFrame):
     ---
     `ssscoring.datatypes.JumpResults`
     """
-    if resultsTable is not None:
-        table = resultsTable.copy()
-        table.vKMh = table.vKMh.apply(lambda x: round(x, 2))
-        table.hKMh = table.hKMh.apply(lambda x: round(x, 2))
-        table.deltaV = table.deltaV.apply(lambda x: round(x, 2))
-        table.deltaAngle = table.deltaAngle.apply(lambda x: round(x, 2))
-        table['altitude (ft)'] = table['altitude (ft)'].apply(lambda x: round(x, 1))
-        table.index = ['']*len(table)
-        st.dataframe(table, hide_index=True)
+    if resultsTable is None:
+        return
+
+    table = resultsTable.copy()
+
+    for col in ['vKMh', 'deltaV', 'vAccel m/s²', 'speedAngle',
+                'angularVel º/s', 'deltaAngle', 'hKMh', 'distanceFromExit (m)']:
+        if col in table.columns:
+            table[col] = table[col].round(2)
+
+    if 'altitude (ft)' in table.columns:
+        table['altitude (ft)'] = table['altitude (ft)'].round(1)
+
+    table.index = [''] * len(table)
+
+    st.dataframe(
+        table,
+        hide_index=True,
+        column_config={
+            col: st.column_config.NumberColumn(format="%.2f")
+            for col in table.columns
+            if table[col].dtype.kind in 'fi' and col != 'altitude (ft)'
+        }
+    )
 
 
 def interpretJumpResult(tag: str,
@@ -226,44 +241,6 @@ def interpretJumpResult(tag: str,
     return jumpStatusInfo, scoringInfo, badJumpLegend, jumpStatus
 
 
-# TODO: Remove this if present after 20260531
-# def plotJumpResult(tag: str,
-#                    jumpResult: JumpResults):
-#     """
-#     Plot the jump results including altitude, horizontal speed, time, etc. for
-#     evaluation and interpretation.
-#
-#     Arguments
-#     ---------
-#         tag
-#     A string that identifies a specific jump and the FlySight version that
-#     generated the corresponding track file.  Often in the form: `HH-mm-ss:vX`
-#     where `X` is the FlySight hardware version.
-#
-#         jumpResult
-#     An instance of `ssscoring.datatypes.JumpResults` with jump data.
-#     """
-#     if jumpResult.data is not None:
-#         try:
-#             yMax = DEFAULT_PLOT_MAX_V_SCALE if jumpResult.score <= DEFAULT_PLOT_MAX_V_SCALE else jumpResult.score + DEFAULT_PLOT_INCREMENT
-#         except TypeError:
-#             yMax = DEFAULT_PLOT_MAX_V_SCALE
-#         plot = initializePlot(tag, backgroundColorName='#2c2c2c', yMax=yMax)
-#         plot = initializeExtraYRanges(plot, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
-#         graphAltitude(plot, jumpResult)
-#         graphAngle(plot, jumpResult)
-#         graphAcceleration(plot, jumpResult)
-#         hoverValue = bm.HoverTool(tooltips=[('time', '@x{0.0}s'), ('y-val', '@y{0.00}')])
-#         plot.add_tools(hoverValue)
-#         graphJumpResult(plot, jumpResult, lineColor=SPEED_COLORS[0])
-#         streamlit_bokeh(plot, use_container_width=True)
-
-
-# imports section — drop streamlit_bokeh and bokeh.models
-# from streamlit_bokeh import streamlit_bokeh           # ← delete
-# import bokeh.models as bm                             # ← delete
-
-# plotJumpResult() — at the end
 def plotJumpResult(tag: str, jumpResult: JumpResults):
     if jumpResult.data is not None:
         try:
