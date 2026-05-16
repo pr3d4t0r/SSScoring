@@ -117,18 +117,16 @@ def _displayJumpsInSet(aggregate: pd.DataFrame):
         st.dataframe(displayAggregate)
 
 
-# TODO: Remove this if present after 20260531
-# def _displaySpeedSummary(aggregate: pd.DataFrame,
-#                          allJumpsPlot):
-#     st.html('<h2>Speed summary</h2>')
-#     st.dataframe(totalResultsFrom(aggregate), hide_index = True)
-#     streamlit_bokeh(allJumpsPlot, use_container_width=True)
-
 def _displaySpeedSummary(aggregate: pd.DataFrame,
                          allJumpsPlot):
     st.html('<h2>Speed summary</h2>')
-    st.dataframe(totalResultsFrom(aggregate), hide_index = True)
-    st.plotly_chart(allJumpsPlot, width='stretch')   # ← was streamlit_bokeh(...)
+    summary = totalResultsFrom(aggregate)
+
+    st.dataframe(
+        summary.style.format("{:.2f}"),
+        hide_index=True
+    )
+    st.plotly_chart(allJumpsPlot, width='stretch')
 
 
 def _displaySpeedAngles(jumpResults: dict):
