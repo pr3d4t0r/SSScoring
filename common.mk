@@ -9,6 +9,7 @@
 
 SHELL=/bin/bash
 
+RESOURCES=./resources
 API_DOC_DIR="./docs"
 APP_CONFIG_FILE="ssscoring/resources/config.toml"
 APP_NAME="SSScore"
@@ -16,8 +17,8 @@ BUILD=./build
 BUILD_OS=$(shell uname)
 DIST=./dist
 FROZEN_PACKAGES=/tmp/requirements-frozen.txt
-ICON_SET_MAC="resources/$(APP_NAME).icns"
-ICON_SET_WINDOWS="resources/$(APP_NAME).ico"
+ICON_SET_MAC="$(RESOURCES)/$(APP_NAME).icns"
+ICON_SET_WINDOWS="$(RESOURCES)/$(APP_NAME).ico"
 MANPAGES=./manpages
 PACKAGE=$(shell cat package.txt)
 PACKAGES_UPDATE=/tmp/packages-update.txt
@@ -32,6 +33,13 @@ DEVPI_USER=$(shell cat ./devpi-user.txt)
 
 # Arch-agnostic targets:
 
+APP_DIST_ARCHIVE=$(APP_NAME)-Universal.zip
+
+bundle: ALWAYS
+	pushd $(DIST) && zip -9yr SSScore-Universal.zip *app && popd
+	ls -Al $(DIST)
+
+
 clean:
 	rm -Rf $(BUILD)/*
 	rm -Rf $(DIST)/*
@@ -43,6 +51,7 @@ clean:
 	rm -Rfv $$(find . | awk '/.ipynb_checkpoints/')
 	rm -Rfv ./.pytest_cache
 	rm -Rf $(API_DOC_DIR)/*
+	cat .env| awk -F "=" '/^\#/ { print; next; } /^$$/ { next; } { printf("%s=\"define your own here\"\n", $$1); }' > _env-SAMPLE
 	pip cache purge
 	mkdir -p ./dist
 	pushd ./dist ; pip uninstall -y $(PACKAGE)==$(VERSION) || true ; popd
@@ -84,13 +93,14 @@ dockerize: ALWAYS
 docs: ALWAYS
 	pip install -U pdoc
 	mkdir -p $(API_DOC_DIR)
-	VERSION="$(VERSION)" PDOC_ALLOW_EXEC=1 pdoc --logo="https://github.com/pr3d4t0r/SSScoring/blob/master/assets/ssscoring-logo.png?raw=true" --favicon="https://cime.net/upload_area/favicon.ico" -n -o $(API_DOC_DIR) -t ./resources $(PACKAGE)
+	VERSION="$(VERSION)" PDOC_ALLOW_EXEC=1 pdoc --logo="https://github.com/pr3d4t0r/SSScoring/blob/master/assets/ssscoring-logo.png?raw=true" --favicon="https://cime.net/upload_area/favicon.ico" -n -o $(API_DOC_DIR) -t $(RESOURCES) $(PACKAGE)
 
 
 DumbDriver: ALWAYS
 	if [ "$(BUILD_OS)" = "Darwin" ]; then \
 		osacompile -o $(DIST)/DumbDriver.app ./mac/DumbDriver.applescript; \
-		cp resources/DumbDriver.icns $(DIST)/DumbDriver.app/Contents/Resources/applet.icns; \
+		cp $(RESOURCES)/DumbDriver.icns $(DIST)/DumbDriver.app/Contents/Resources/applet.icns; \
+		./signapp $(DIST)/DumbDriver.app ; \
 		ls -Al $(DIST) | grep "\.app" ; \
 	fi
 
@@ -101,11 +111,11 @@ icons-mac: ALWAYS
 
 icons-win: ALWAYS
 	magick \
-          resources/$(APP_NAME).iconset/icon_16x16.png \
-          resources/$(APP_NAME).iconset/icon_32x32.png \
-          resources/$(APP_NAME).iconset/icon_48x48.png \
-          resources/$(APP_NAME).iconset/icon_128x128.png \
-          resources/$(APP_NAME).iconset/icon_256x256.png \
+          $(RESOURCES)/$(APP_NAME).iconset/icon_16x16.png \
+          $(RESOURCES)/$(APP_NAME).iconset/icon_32x32.png \
+          $(RESOURCES)/$(APP_NAME).iconset/icon_48x48.png \
+          $(RESOURCES)/$(APP_NAME).iconset/icon_128x128.png \
+          $(RESOURCES)/$(APP_NAME).iconset/icon_256x256.png \
           $(ICON_SET_WINDOWS)
 
 
@@ -133,6 +143,9 @@ manpage:
 	t=$$(mktemp) && awk -v "v=$(VERSION)" '/^%/ { $$4 = v; print; next; } { print; }' README.md > "$$t" && cat "$$t" > README.md && rm -f "$$t"
 	pandoc --standalone --to man README.md -o $(MANPAGES)/$(PACKAGE).3
 
+
+notarize: ALWAYS
+	./notarize $(DIST)
 
 nuke: ALWAYS
 	make clean
@@ -182,7 +195,8 @@ tools:
 umountFlySight: ALWAYS
 	if [ "$(BUILD_OS)" = "Darwin" ]; then \
 		osacompile -o $(DIST)/umountFlySight.app ./mac/umountFlySight.applescript; \
-		cp resources/FreeAgent.icns $(DIST)/umountFlySight.app/Contents/Resources/applet.icns; \
+		cp $(RESOURCES)/FreeAgent.icns $(DIST)/umountFlySight.app/Contents/Resources/applet.icns; \
+		./signapp $(DIST)/umountFlySight.app ; \
 		ls -Al $(DIST) | grep "\.app" ; \
 	fi
 

@@ -10,6 +10,8 @@
 include common.mk
 
 APP_BUNDLE="$(APP_NAME).app"
+APP_ENTITLEMENTS=$(RESOURCES)/entitlements.plist
+KEYCHAIN_PATH=~/Library/Keychains/login.keychain-db
 
 
 all: ALWAYS
@@ -27,7 +29,8 @@ all: ALWAYS
 app: ALWAYS
 	make icons-mac
 	pyinstaller --noconfirm --clean $(APP_NAME)_app.spec
+	find $(DIST)/$(APP_BUNDLE) -type f \( -name "*.so" -o -name "*.dylib" \) -exec codesign --remove-signature {} \; 2>/dev/null || true
+	./signapp $(DIST)/$(APP_BUNDLE) $(APP_ENTITLEMENTS)
 	@rm -rf $(DIST)/$(APP_NAME)
 	@lipo -info $(DIST)/$(APP_BUNDLE)/Contents/MacOS/SSScore
-
 
