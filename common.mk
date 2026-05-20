@@ -33,6 +33,8 @@ DEVPI_USER=$(shell cat ./devpi-user.txt)
 
 # Arch-agnostic targets:
 
+APP_DIST_ARCHIVE=$(APP_NAME)-Universal.zip
+
 bundle: ALWAYS
 	pushd $(DIST) && zip -9yr SSScore-Universal.zip *app && popd
 	ls -Al $(DIST)
@@ -141,6 +143,9 @@ manpage:
 	t=$$(mktemp) && awk -v "v=$(VERSION)" '/^%/ { $$4 = v; print; next; } { print; }' README.md > "$$t" && cat "$$t" > README.md && rm -f "$$t"
 	pandoc --standalone --to man README.md -o $(MANPAGES)/$(PACKAGE).3
 
+
+notarize: ALWAYS
+	./notarize $(DIST)
 
 nuke: ALWAYS
 	make clean

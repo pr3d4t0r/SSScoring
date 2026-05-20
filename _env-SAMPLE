@@ -1,3 +1,25 @@
 # .env - parameters used for building and debugging code.
-DEV_BBOWSER="define your own here"
+APPLE_ID="define your own here"
 APPLE_SIGNING_IDENTITY="define your own here"
+# =============================================================================
+# NOTARIZATION CREDENTIALS (required for xcrun notarytool)
+# =============================================================================
+#
+# APP_NOTARIZATION_PASSWORD is **NOT** your Apple ID password.
+# It must be an app-specific password generated at appleid.apple.com.
+#
+# How to create (one-time):
+#   1. Go to https://appleid.apple.com
+#   2. Sign in → Sign-In and Security → App-Specific Passwords → +
+#   3. Name it "SSScoring-Notary"
+#   4. Copy the 16-character password (you will never see it again)
+#
+# Then add to .env or notarize.zsh:
+#   APP_NOTARIZATION_PASSWORD="xxxxxxxxxxxxxxxx"
+#
+# Error "HTTP status code: 401" means you used your normal Apple ID password.
+# Re-run initializeAppKeychain() after fixing the password.
+# =============================================================================
+APP_NOTARIZATION_PASSWORD="define your own here"
+DEV_BBOWSER="define your own here"
+TEAM_ID="define your own here"

@@ -2,6 +2,14 @@
 
 # See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
 
+set -e
+
+# *** constants ***
+
+source .env
+APPS_ARCHIVE="apps-bundle-notarization.zip"
+NOTARIZATION_KEYCHAIN="SSScore-Notary"
+
 
 # *** functions ***
 
@@ -11,11 +19,64 @@ die() {
 } # die
 
 
-assertAppBundle() {
-} # assertAppBundle
+assertCredentialsAreConfigured() {
+    [[ -n "$APPLE_ID" ]] || die "APPLE_ID not set in environment or .env" 2
+    [[ -n "$APP_NOTARIZATION_PASSWORD" ]] || die "APP_NOTARIZATION_PASSWORD not set in environment or .env" 3
+    [[ -n "$TEAM_ID" ]] || die "TEAM_ID not set in environment or .env" 4
+} # assertAppBundlesExistIn
+
+
+assertAppBundlesExistIn() {
+    local distDir="$1"
+    local bundles=$(ls "$distDir"/*app)
+    [[ -n "$bundles" ]] || die "No app bundles present in $distDir" 1
+
+} # assertAppBundlesExistIn
+
+
+zipBundlesIn() {
+    local distDir="$1"
+
+    pushd "$distDir"
+    echo "Notarize:  $APPS_ARCHIVE"
+    zip -9yr "$APPS_ARCHIVE" *app
+    popd
+} # zipBundlesIn
+
+
+initializeAppKeychain() {
+    echo "Initializing keychain: $NOTARIZATION_KEYCHAIN"
+    xcrun notarytool store-credentials "$NOTARIZATION_KEYCHAIN" --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APP_NOTARIZATION_PASSWORD"
+} # initializeAppKeychain
+
+
+notarizeArchiveIn() {
+    local distDir="$1"
+    local archivePath="$distDir/$APPS_ARCHIVE"
+    echo "Submitting $archivePath to Apple for notarizaiton."
+    echo "This may take several minutes..."
+    xcrun notarytool submit "$archivePath" --keychain-profile "$NOTARIZATION_KEYCHAIN" --wait
+} # notarization
+
+
+stapleBundlesIn() {
+    local distDir="$1"
+    rm -f "$distDir/$APPS_ARCHIVE"
+    for bundle in "$distDir"/*app
+    do
+        xcrun stapler staple "$bundle"
+        spctl --assess --verbose --type exec "$bundle"
+    done
+} #stapleNotarization
 
 
 # +++ main +++
 
-assertAppBundle "$1"
+distDir="$1"
+assertCredentialsAreConfigured
+assertAppBundlesExistIn "$distDir"
+zipBundlesIn "$distDir"
+initializeAppKeychain
+notarizeArchiveIn "$distDir"
+stapleBundlesIn "$distDir"
 
