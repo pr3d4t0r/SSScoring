@@ -1,0 +1,78 @@
+#!/usr/bin/env zsh
+
+# See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
+
+emulate -L zsh
+setopt ERR_EXIT
+
+
+# *** functions ***
+
+die() {
+    echo "$1"
+    exit "$2"
+} # die
+
+
+resolveSigningIdentity() {
+    [[ -z "$APPLE_SIGNING_IDENTITY" && -f .env ]] && source .env
+    [[ -n "$APPLE_SIGNING_IDENTITY" ]] || die "APPLE_SIGNING_IDENTITY not defined (set it in .env)" 99
+} # resolveSigningIdentity
+
+
+assertBundleExists() {
+    [[ -d "$BUNDLE" ]] || die "'$BUNDLE' is not a directory" 1
+} # assertBundleExists
+
+
+resolveEntitlements() {
+    ENT_ARGS=()
+    [[ -z "$ENTITLEMENTS" ]] && return 0
+    [[ -f "$ENTITLEMENTS" ]] || die "entitlements file '$ENTITLEMENTS' not found" 2
+    ENT_ARGS=(--entitlements "$ENTITLEMENTS")
+} # resolveEntitlements
+
+
+displaySigningContext() {
+    echo "→ signing: $BUNDLE"
+    echo "  identity: $APPLE_SIGNING_IDENTITY"
+    echo "  entitlements: ${ENTITLEMENTS:-<none>}"
+} # displaySigningContext
+
+
+stripStaleSignatures() {
+    find "$BUNDLE" -type f \( -name "*.so" -o -name "*.dylib" \) \
+        -exec codesign --remove-signature {} \; 2>/dev/null || true
+} # stripStaleSignatures
+
+
+signBundle() {
+    codesign --deep --force --options=runtime \
+        "${ENT_ARGS[@]}" \
+        --sign "$APPLE_SIGNING_IDENTITY" \
+        --preserve-metadata=identifier,requirements,flags \
+        --timestamp \
+        "$BUNDLE"
+} # signBundle
+
+
+verifyBundle() {
+    codesign --verify --strict --verbose=2 "$BUNDLE"
+} # verifyBundle
+
+
+# *** main ***
+
+BUNDLE="${1:?usage: $0 <path-to-app-bundle> [entitlements.plist]}"
+ENTITLEMENTS="${2:-}"
+
+resolveSigningIdentity
+assertBundleExists
+resolveEntitlements
+displaySigningContext
+stripStaleSignatures
+signBundle
+verifyBundle
+
+echo "✓ signed: $BUNDLE"
+

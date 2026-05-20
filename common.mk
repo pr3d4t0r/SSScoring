@@ -49,6 +49,7 @@ clean:
 	rm -Rfv $$(find . | awk '/.ipynb_checkpoints/')
 	rm -Rfv ./.pytest_cache
 	rm -Rf $(API_DOC_DIR)/*
+	cat .env| awk -F "=" '/^\#/ { print; next; } /^$$/ { next; } { printf("%s=\"define your own here\"\n", $$1); }' > _env-SAMPLE
 	pip cache purge
 	mkdir -p ./dist
 	pushd ./dist ; pip uninstall -y $(PACKAGE)==$(VERSION) || true ; popd

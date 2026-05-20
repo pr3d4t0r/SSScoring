@@ -1,0 +1,3 @@
+# .env - parameters used for building and debugging code.
+DEV_BBOWSER="define your own here"
+APPLE_SIGNING_IDENTITY="define your own here"
