@@ -1,0 +1,21 @@
+#!/usr/bin/env zsh
+
+# See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
+
+
+# *** functions ***
+
+die() {
+    echo "$1"
+    exit "$2"
+} # die
+
+
+assertAppBundle() {
+} # assertAppBundle
+
+
+# +++ main +++
+
+assertAppBundle "$1"
+
