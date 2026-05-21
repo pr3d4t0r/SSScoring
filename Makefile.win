@@ -25,6 +25,6 @@ app: icons-win
 	ls -Alrt dist/*
 
 
-installer: app          ; depends on the onedir target producing dist/SSScore/
+installer: ALWAYS
 	MSYS2_ARG_CONV_EXCL='*' $(ISCC) //DAppVersion=$(APP_VERSION) installer.iss
 
