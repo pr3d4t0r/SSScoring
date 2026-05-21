@@ -87,13 +87,14 @@ analysis = Analysis(
 
 pyzArchive = PYZ(analysis.pure, analysis.zipped_data)
 
-# ==================== ONEFILE CHANGES START HERE ====================
 executable = EXE(
     pyzArchive,
     analysis.scripts,
-    analysis.binaries,      # ← bundled into the single exe
-    analysis.zipfiles,
-    analysis.datas,         # ← all data files bundled into the exe
+#     analysis.binaries,      # ← bundled into the single exe
+#     analysis.zipfiles,
+#     analysis.datas,         # ← all data files bundled into the exe
+    [],
+    exclude_binaries=True,
     name=APP_NAME,
     debug=False,
     bootloader_ignore_signals=False,
@@ -105,10 +106,19 @@ executable = EXE(
     disable_windowed_traceback=False,
     argv_emulation=False,
     icon=WIN_ICON,
-    onefile=True,           # ← THIS IS THE KEY CHANGE (was onedir)
-    runtime_tmpdir=None,    # optional: use system temp folder
+#     onefile=True,           # ← THIS IS THE KEY CHANGE (was onedir)
+#     runtime_tmpdir=None,    # optional: use system temp folder
 )
 
-
-# Removed the entire COLLECT block — not needed for onefile mode
+# onedir implementation - EC, 20260521
+collected = COLLECT(
+    executable,
+    analsys.binaries,
+    analysis.zipfiles,
+    analysis.datas,
+    strip=False,
+    upx=False,
+    upx_exclude=[],
+    name=APP_NAME,
+)
 

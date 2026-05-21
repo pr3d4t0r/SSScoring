@@ -18,6 +18,6 @@ all: ALWAYS
 
 app: icons-win
 	$(PYINST) --clean SSScore-Windows.spec
-	zip -9j dist/SSScore_exe.zip dist/SSScore.exe
+	echo zip -9j dist/SSScore_exe.zip dist/SSScore.exe
 	ls -Alrt dist/*
 
