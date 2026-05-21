@@ -4,9 +4,13 @@
 
 include common.mk
 
-VENV   := /c/Python-3_13_13-Win-x86_64
-PYTHON := python
-PYINST := $(VENV)/Scripts/pyinstaller
+
+
+VENV   = /c/Python-3_13_13-Win-x86_64
+
+ISCC   = "/c/Program Files (x86)/Inno Setup 6/ISCC.exe"
+PYTHON = python
+PYINST = $(VENV)/Scripts/pyinstaller
 
 
 all: ALWAYS
@@ -20,4 +24,8 @@ app: icons-win
 	$(PYINST) --clean SSScore-Windows.spec
 	echo zip -9j dist/SSScore_exe.zip dist/SSScore.exe
 	ls -Alrt dist/*
+
+
+installer: app          ; depends on the onedir target producing dist/SSScore/
+	MSYS2_ARG_CONV_EXCL='*' $(ISCC) //DAppVersion=$(APP_VERSION) installer.iss
 

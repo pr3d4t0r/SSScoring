@@ -8,7 +8,7 @@
 #endif
 
 [Setup]
-AppId={{GENERATE-A-GUID-IN-INNO-TOOLS-MENU}}    ; fixed GUID = clean upgrades/uninstall
+AppId={{3981C7AD-B9C3-4B7C-A24C-A6AA2DF2365B}}
 AppName=SSScore
 AppVersion={#AppVersion}
 AppPublisher=Eugene Ciurana

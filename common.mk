@@ -24,7 +24,7 @@ PACKAGE=$(shell cat package.txt)
 PACKAGES_UPDATE=/tmp/packages-update.txt
 REQUIREMENTS=requirements.txt
 REQUIREMENTS_DEV=requirements-dev.txt
-VERSION=$(shell echo "from $(PACKAGE) import __VERSION__; print(__VERSION__)" | python)
+VERSION := $(shell echo "from $(PACKAGE) import __VERSION__; print(__VERSION__)" | python)
 
 DEVPI_HOST=$(shell cat devpi-hostname.txt)
 DEVPI_PASSWORD=$(shell cat ./devpi-password.txt)
