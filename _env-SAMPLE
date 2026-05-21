@@ -1,9 +1,3 @@
-# See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
-
-# *****
-# macOS
-# *****
-
 # .env - parameters used for building and debugging code.
 APPLE_ID="define your own here"
 APPLE_SIGNING_IDENTITY="define your own here"
@@ -29,10 +23,3 @@ APPLE_SIGNING_IDENTITY="define your own here"
 APP_NOTARIZATION_PASSWORD="define your own here"
 DEV_BBOWSER="define your own here"
 TEAM_ID="define your own here"
-
-
-# *******
-# Windows
-# *******
-
-
