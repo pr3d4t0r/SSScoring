@@ -29,6 +29,6 @@ installer: ALWAYS
 	MSYS2_ARG_CONV_EXCL='*' $(ISCC) /DAppVersion=$(VERSION) installer.iss
 
 
-nuke: ALWAYS
+lobotomize: ALWAYS
 	cmd.exe /c start /wait "" "C:\Program Files\SSScore\Uninstall.exe" /VERYSILENT /NORESTART /SUPPRESSMSGBOXES
 
