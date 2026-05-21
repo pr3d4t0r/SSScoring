@@ -10,44 +10,32 @@
 [Setup]
 AppId={{3981C7AD-B9C3-4B7C-A24C-A6AA2DF2365B}}
 AppName=SSScore
-AppVersion={#AppVersion}
 AppPublisher=Eugene Ciurana
-DefaultDirName={autopf}\SSScore
-DisableProgramGroupPage=yes
-OutputDir=dist
-OutputBaseFilename=SSScore-{#AppVersion}-Setup
-Compression=lzma2/max
-SolidCompression=yes
+AppVersion={#AppVersion}
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible    ; lands in Program Files, not (x86)
+Compression=lzma2/max
+DefaultDirName={autopf}\SSScore
+DisableProgramGroupPage=yes
+MinVersion=10.0.19044
+OutputBaseFilename=SSScore-{#AppVersion}-Setup
+OutputDir=dist
 PrivilegesRequired=admin
-WizardStyle=modern
 SetupIconFile=resources\SSScore.ico
+SolidCompression=yes
 UninstallDisplayIcon={app}\SSScore.exe
+WizardStyle=modern
 
 [Tasks]
 Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional icons:"
 
 [Files]
 Source: "dist\SSScore\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
-Source: "redist\MicrosoftEdgeWebview2Setup.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 
 [Icons]
 Name: "{autoprograms}\SSScore"; Filename: "{app}\SSScore.exe"
 Name: "{autodesktop}\SSScore"; Filename: "{app}\SSScore.exe"; Tasks: desktopicon
 
 [Run]
-Filename: "{tmp}\MicrosoftEdgeWebview2Setup.exe"; Parameters: "/silent /install"; \
-  StatusMsg: "Installing Edge WebView2 Runtime..."; Flags: waituntilterminated; Check: NeedsWebView2
 Filename: "{app}\SSScore.exe"; Description: "Launch SSScore"; Flags: nowait postinstall skipifsilent
-
-[Code]
-function NeedsWebView2(): Boolean;
-var v: string;
-begin
-  // Evergreen runtime stamps its version in 'pv'; absent/empty => install it
-  Result := not RegQueryStringValue(HKLM,
-    'SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}',
-    'pv', v) or (v = '');
-end;
 
