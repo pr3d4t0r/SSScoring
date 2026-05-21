@@ -26,5 +26,5 @@ app: icons-win
 
 
 installer: ALWAYS
-	MSYS2_ARG_CONV_EXCL='*' $(ISCC) //DAppVersion=$(APP_VERSION) installer.iss
+	MSYS2_ARG_CONV_EXCL='*' $(ISCC) /DAppVersion=$(VERSION) installer.iss
 
