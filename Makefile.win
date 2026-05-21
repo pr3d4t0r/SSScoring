@@ -1,6 +1,6 @@
 # See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
 
-# Makefile.win — Windows build (onefile .exe, committable)
+# Makefile.win — Windows build (onedir, committable)
 
 include common.mk
 
