@@ -113,7 +113,7 @@ executable = EXE(
 # onedir implementation - EC, 20260521
 collected = COLLECT(
     executable,
-    analsys.binaries,
+    analysis.binaries,
     analysis.zipfiles,
     analysis.datas,
     strip=False,
