@@ -1,8 +1,5 @@
 # See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
 
-# SSScore-Windows.spec — dedicated Windows build (ONEFILE .exe)
-# Build: make -f Makefile.win app  (or pyinstaller --noconfirm --clean SSScore-Windows.spec)
-
 from pathlib import Path
 from PyInstaller.utils.hooks import collect_all, collect_submodules, copy_metadata
 
