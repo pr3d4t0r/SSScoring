@@ -29,6 +29,7 @@ installer: ALWAYS
 	MSYS2_ARG_CONV_EXCL='*' $(ISCC) /DAppVersion=$(VERSION) installer.iss
 
 
-lobotomize: ALWAYS
-	cmd.exe /c start /wait "" "C:\Program Files\SSScore\Uninstall.exe" /VERYSILENT /NORESTART /SUPPRESSMSGBOXES
+# TODO: Fix this action because this version hangs the MSYS session:
+# lobotomize: ALWAYS
+# 	cmd.exe /c start /wait "" "C:\Program Files\SSScore\Uninstall.exe" /VERYSILENT /NORESTART /SUPPRESSMSGBOXES
 
