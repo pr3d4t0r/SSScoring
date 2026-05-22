@@ -9,7 +9,9 @@
 
 include common.mk
 
-APP_BUNDLE="$(APP_NAME).app"
+APP_BUNDLE=$(APP_NAME).app
+APP_BUNDLE_INTEL=$(APP_NAME)-Intel.app
+APP_BUNDLE_UNIVERSAL=$(APP_NAME)-Universal.app
 APP_ENTITLEMENTS=$(RESOURCES)/entitlements.plist
 KEYCHAIN_PATH=~/Library/Keychains/login.keychain-db
 
@@ -30,7 +32,17 @@ app: ALWAYS
 	make icons-mac
 	pyinstaller --noconfirm --clean $(APP_NAME)_app.spec
 	find $(DIST)/$(APP_BUNDLE) -type f \( -name "*.so" -o -name "*.dylib" \) -exec codesign --remove-signature {} \; 2>/dev/null || true
-	./signapp $(DIST)/$(APP_BUNDLE) $(APP_ENTITLEMENTS)
 	@rm -rf $(DIST)/$(APP_NAME)
+	@lipo -info $(DIST)/$(APP_BUNDLE)/Contents/MacOS/SSScore
+
+
+universal: ALWAYS
+	cp -a $(DIST)/$(APP_BUNDLE) $(DIST)/$(APP_BUNDLE_UNIVERSAL)
+	./builduniversal $(DIST)/$(APP_BUNDLE) $(DIST)/$(APP_BUNDLE_INTEL) $(DIST)/$(APP_BUNDLE_UNIVERSAL)
+	rm -Rf $(DIST)/$(APP_BUNDLE)
+	mv $(DIST)/$(APP_BUNDLE_UNIVERSAL) $(DIST)/$(APP_BUNDLE)
+	plutil -replace CFBundleIdentifier -string eu.ciurana.ssscoring.universal $(DIST)/$(APP_BUNDLE)/Contents/Info.plist
+	rm -Rf $(DIST)/$(APP_BUNDLE_INTEL)
+	./signapp $(DIST)/$(APP_BUNDLE) $(APP_ENTITLEMENTS)
 	@lipo -info $(DIST)/$(APP_BUNDLE)/Contents/MacOS/SSScore
 
