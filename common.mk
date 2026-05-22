@@ -16,6 +16,7 @@ APP_NAME="SSScore"
 BUILD=./build
 BUILD_OS=$(shell uname)
 DIST=./dist
+DMG_STAGING=/tmp/ssscoring-dmg_staging
 FROZEN_PACKAGES=/tmp/requirements-frozen.txt
 ICON_SET_MAC="$(RESOURCES)/$(APP_NAME).icns"
 ICON_SET_WINDOWS="$(RESOURCES)/$(APP_NAME).ico"
@@ -29,6 +30,9 @@ VERSION := $(shell echo "from $(PACKAGE) import __VERSION__; print(__VERSION__)"
 DEVPI_HOST=$(shell cat devpi-hostname.txt)
 DEVPI_PASSWORD=$(shell cat ./devpi-password.txt)
 DEVPI_USER=$(shell cat ./devpi-user.txt)
+
+# *** most come after VERSION:
+DMG_NAME=$(APP_NAME)-$(VERSION).dmg
 
 
 # Arch-agnostic targets:
@@ -51,6 +55,7 @@ clean:
 	rm -Rfv $$(find . | awk '/.ipynb_checkpoints/')
 	rm -Rfv ./.pytest_cache
 	rm -Rf $(API_DOC_DIR)/*
+	rm -Rf $(DMG_STAGING)
 	cat .env| awk -F "=" '/^\#/ { print; next; } /^$$/ { next; } { printf("%s=\"define your own here\"\n", $$1); }' > _env-SAMPLE
 	pip cache purge
 	mkdir -p ./dist

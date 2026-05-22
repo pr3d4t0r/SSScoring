@@ -8,7 +8,6 @@ set -e
 
 source .env
 APPS_ARCHIVE="apps-bundle-notarization.zip"
-NOTARIZATION_KEYCHAIN="SSScore-Notary"
 
 
 # *** functions ***
@@ -74,9 +73,15 @@ stapleBundlesIn() {
 
 distDir="$1"
 assertCredentialsAreConfigured
-assertAppBundlesExistIn "$distDir"
-zipBundlesIn "$distDir"
-initializeAppKeychain
-notarizeArchiveIn "$distDir"
-stapleBundlesIn "$distDir"
+
+if [[ -z "$2" ]]
+then
+    assertAppBundlesExistIn "$distDir"
+    zipBundlesIn "$distDir"
+    initializeAppKeychain
+    notarizeArchiveIn "$distDir"
+    stapleBundlesIn "$distDir"
+else
+
+fi
 
