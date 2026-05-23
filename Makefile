@@ -16,7 +16,7 @@ APP_ENTITLEMENTS=$(RESOURCES)/entitlements.plist
 APPLE_SIGNING_IDENTITY=$(shell awk -F "\"" '/APPLE_SIGNING_IDENTITY/ { print($$2); }' .env)
 KEYCHAIN_PATH=~/Library/Keychains/login.keychain-db
 NOTARIZATION_KEYCHAIN=$(shell awk -F "\"" '/NOTARIZATION_KEYCHAIN/ { print($$2); }' .env)
-PYTHON_INTEL_VENV=~/Python-3_14_4-x86_64/bin/activate
+PYTHON_INTEL_VENV=$(shell awk -F "\"" '/PYTHON_INTEL_VENV/ { print($$2); }' .env)
 
 
 all: ALWAYS

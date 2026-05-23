@@ -5,6 +5,8 @@
 .SH Name
 \f[B]SSScoring\f[R] \- Speed Skydiving Scoring high level library in
 Python
+.PP
+   *   *   *   *   *
 .SH Synopsis
 .IP
 .EX
@@ -38,7 +40,7 @@ resources test\-data\-02:v1    451  164   295   387   441   452       25.0      
 .EE
 .PP
 [IMAGE: \c
-.UR https://github.com/pr3d4t0r/SSScoring/blob/master/resources/SSScoring-speed-run-summary.png?raw=true
+.UR https://raw.githubusercontent.com/pr3d4t0r/SSScoring/refs/heads/master/resources/SSScore-speed-run-analysis.png
 Speed run summary example
 .UE \c
 ] Speed run summary example:
@@ -51,17 +53,28 @@ Full API documentation is available at:
 .PP
 https://pr3d4t0r.github.io/SSScoring/ssscoring.html
 .PP
-SSScore app is available for interactive scoring from:
+The SSScore apps are available from:
+.IP \(bu 2
+web app: https://ssscore.streamlit.app
+.IP \(bu 2
+Mac: \f[I]download link coming soon\f[R]
+.IP \(bu 2
+Windows: \f[I]download link coming soon\f[R]
 .PP
-https://ssscore.streamlit.app
+   *   *   *   *   *
 .SH Installation and Requirements
 .IP \(bu 2
-Python 3.9.9 or later
+Python 3.12 or later
 .IP \(bu 2
 pandas and NumPy
-.PP
+.IP \(bu 2
 The requirements.txt file lists all the packages required for running
-SSScoring or using the API.
+SSScoring or using the API
+.IP \(bu 2
+The devrequirements.txt file lists all the pacckages required at build
+time
+.PP
+   *   *   *   *   *
 .SH Quickstart
 .IP \(bu 2
 The SSScoring interactive quickstart notebook for Jupyter/Lucyfer is the
@@ -72,12 +85,15 @@ functionality as the interactive quickstart, can be used for scoring
 speed skydives from the command line with minimum installation
 .IP \(bu 2
 Read the SSScoring API documentation
-.SS SSScore web tool
+.SS SSScore end\-user apps
 Analyze single tracks or a group of tracks using the SSScoring API in a
 full\-featured web application.
-Requires Internet connectivity.
-.PP
-URL: SSScore 2
+.IP \(bu 2
+Mac: \f[I]download link coming soon\f[R]
+.IP \(bu 2
+SSScore web app \- requires Internet connectivity
+.IP \(bu 2
+Windows: \f[I]download link coming soon\f[R]
 .SS ssscore command line tool
 \f[CR]ssscore\f[R] is a comnand line tool that scores one or more speed
 skydiving files with as little user participation as possible.
@@ -106,7 +122,9 @@ Total score = 1291.00, mean speed = 430.33
 .EE
 .PP
 See the \f[CR]ssscore\f[R] man page for details on this quickstart tool.
-.SH Running the stand\-alone apps
+.PP
+   *   *   *   *   *
+.SH Running the development stand\-alone apps
 While the web\-based app shows the single and multiple jumps scoring
 functions as part of a single app, they are two distinct executables.
 During development and for local execution, it\(cqs easier to run them
@@ -134,15 +152,10 @@ make local
 streamlit run ssscoring/ssscoremultiple.py
 .EE
 .PP
-\f[B]Scoring and analyzing a single jump\f[R]
-.IP
-.EX
-make local
-streamlit run ssscoring/ssscoresingle.py
-.EE
-.PP
 These commands will start a new SSScore instance, current branch
 version, in the system\(cqs default web browser.
+.PP
+   *   *   *   *   *
 .SH Description
 SSScoring provides analsysis tools for individual or bulk processing of
 FlySight GPS competition data gathered during speed skydiving training
@@ -248,6 +261,91 @@ of a FlySight device from a Macintosh computer
 \f[CR]DumbDriver\f[R] Mac app to disable the SMART SSD / SSHD / HDD
 kernel driver, used when the FlySight 2 isn\(cqt detected in Mac systems
 that have SMART drivers installed.
+.PP
+   *   *   *   *   *
+.SH Building the code
+.SS General
+.IP "1." 3
+Procure a Python 3.12.0 or later virtual environment for building
+(\f[CR]venv\f[R] or \f[CR]pyenv\f[R])
+.RS 4
+.IP \(bu 2
+Install both Apple Silicon and Intel Python run\-times if you plan to
+make universal binaries
+.RE
+.IP "2." 3
+Ensure that \f[CR]make\f[R] is available
+.IP "3." 3
+All shell commands retain backward compatibility with bash except for
+those specific to macOS
+.IP "4." 3
+All artifacts are generated to \f[CR]./dist\f[R]
+.RS 4
+.IP \(bu 2
+\f[CR]make clean\f[R] wipes the whole directory out
+.RE
+.SS Building all the Python, system\-independent artifacts
+.IP
+.EX
+make clean \f[B]&&\f[R] make all
+.EE
+.PP
+Generates all the Python weel, images, and documentation artifacts.
+.SS Mac build
+.IP "1." 3
+The builds are biased toward Apple Silicon\-first
+.IP "2." 3
+Ensure that Xcode command line tools are installed:
+\f[CR]xcode\-select \-\-install\f[R]
+.PP
+The \f[CR]SSScore.app\f[R] or the \f[CR]SSScore\-Intel.app\f[R] are
+generated to \f[CR]./dist\f[R]
+.SS macOS build
+.IP
+.EX
+make clean \f[B]&&\f[R] make all \f[B]&&\f[R] make app
+.EE
+.SS macOS Intel build
+Requires an Intel\-only, x86_64 Python virtual environment configured
+somewhere reachable in the file system.
+The user specifies this venv\(cqs path to the \f[CR]activate\f[R] script
+in \f[CR].env\f[R].
+Example:
+.IP
+.EX
+PYTHON_INTEL_VENV=\(dq\(ti/Python\-3_14_4\-x86_64/bin/activate\(dq
+.EE
+.PP
+The build command:
+.IP
+.EX
+make clean \f[B]&&\f[R] make all \f[B]&&\f[R] make app\-intel
+.EE
+.SS Universal binary build
+The universal binary build requires an Apple Developer Connection
+account and a signing certificate.
+See the Apple documentation for details.
+Building a universal binary isn\(cqt necessary for everyday, personal
+use.
+The build process is biased toward universal binaries for third\-party
+distribution.
+.IP
+.EX
+make clean \f[B]&&\f[R] make all \f[B]&&\f[R] make app \f[B]&&\f[R] make app\-intel \f[B]&&\f[R] make universal
+.EE
+.SS Productized macOS build
+Generates a disk image with universal binaries of all the SSScoring
+tools, signed, notarized, and ready for distribution:
+.IP
+.EX
+make clean \f[B]&&\f[R] make all \f[B]&&\f[R] make mac
+.EE
+.PP
+The disk image is generated to \f[CR]./dist\f[R] as
+\f[CR]SSScoring\-3.0.0.dmg\f[R], alongside the Python wheel and all
+other project artifacts.
+.PP
+   *   *   *   *   *
 .SH Contributors
 .PP
 .TS

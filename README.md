@@ -5,6 +5,7 @@ Name
 
 **SSScoring** - Speed Skydiving Scoring high level library in Python
 
+--- 
 
 Synopsis
 ========
@@ -38,7 +39,7 @@ resources test-data-01:v1    441  176   305   388   432   442       25.0       4
 resources test-data-02:v1    451  164   295   387   441   452       25.0       453
 ```
 
-![Speed run summary example](https://github.com/pr3d4t0r/SSScoring/blob/master/resources/SSScoring-speed-run-summary.png?raw=true)
+![Speed run summary example](https://raw.githubusercontent.com/pr3d4t0r/SSScoring/refs/heads/master/resources/SSScore-speed-run-analysis.png)
 Speed run summary example:
 https://raw.githubusercontent.com/pr3d4t0r/SSScoring/refs/heads/master/resources/SSScoring-speed-run-summary.png
 
@@ -54,16 +55,18 @@ The SSScore apps are available from:
 - Mac:  _download link coming soon_
 - Windows: _download link coming soon_
 
+---
 
 Installation and Requirements
 =============================
 
 - Python 3.12 or later
 - pandas and NumPy
+- The [requirements.txt](./requirements.txt) file lists all the packages required
+for running SSScoring or using the API
+- The [devrequirements.txt](./devrequirements.txt) file lists all the pacckages required at build time
 
-The [requirements.txt](./requirements.txt) file lists all the packages required
-for running SSScoring or using the API.
-
+---
 
 Quickstart
 ==========
@@ -115,9 +118,10 @@ Total score = 1291.00, mean speed = 430.33
 See the <a href='https://github.com/pr3d4t0r/SSScoring/blob/master/ssscore.md' target='_blank'>`ssscore` man page</a>
 for details on this quickstart tool.
 
+---
 
-Running the stand-alone apps
-============================
+Running the development stand-alone apps
+========================================
 
 While the web-based app shows the single and multiple jumps scoring functions as
 part of a single app, they are two distinct executables.  During development and
@@ -144,16 +148,10 @@ make local
 streamlit run ssscoring/ssscoremultiple.py
 ```
 
-**Scoring and analyzing a single jump**
-
-```bash
-make local
-streamlit run ssscoring/ssscoresingle.py
-```
-
 These commands will start a new SSScore instance, current branch version, in the
 system's default web browser.
 
+---
 
 Description
 ===========
@@ -243,6 +241,103 @@ representing all the training files for a competitive skydiver over 10 months.
   when the FlySight 2 isn't detected in Mac systems that have SMART drivers
   installed.
 
+---
+
+Building the code
+=================
+## General
+
+1. Procure a Python 3.12.0 or later virtual environment for building (`venv` or `pyenv`)
+	- Install both Apple Silicon and Intel Python run-times if you plan to make universal binaries
+2. Ensure that `make` is available
+3. All shell commands retain backward compatibility with bash except for those specific to macOS
+4. All artifacts are generated to `./dist`
+	- `make clean` wipes the whole directory out
+5. Versioning:  Release version follow standard conventions.  Beta and test releases use .99.99 and decrement with every release.  Artifact versions in the 99-80 range are considered "throw away development code."
+
+### Building all the Python, system-independent artifacts
+
+```zsh
+make clean && make all
+```
+
+Generates all the Python weel, images, and documentation artifacts.
+
+```
+-rw-r--r--  1 ciurana  staff  55699 May 23 08:46 ssscoring-2.98.97-py3-none-any.whl
+```
+
+## Mac build
+
+1. The builds are biased to Apple Silicon-first
+2. Ensure that Xcode command line tools are installed:  `xcode-select --install`
+
+### macOS build
+
+```zsh
+make clean && make all && make app
+```
+```
+drwxr-xr-x  3 ciurana  staff     96 May 23 08:51 SSScore.app
+-rw-r--r--  1 ciurana  staff  55699 May 23 08:46 ssscoring-2.98.97-py3-none-any.whl
+```
+
+#### macOS Intel build
+
+Requires an Intel-only, x86_64 Python virtual environment configured somewhere reachable in the file system.  The user specifies this venv's path to the `activate` script in `.env`.  Example:
+
+```bash
+PYTHON_INTEL_VENV="~/Python-3_14_4-x86_64/bin/activate"
+```
+The build command:
+
+```zsh
+make clean && make all && make app-intel
+```
+
+```
+drwxr-xr-x  3 ciurana  staff     96 May 23 08:56 SSScore-Intel.app
+drwxr-xr-x  3 ciurana  staff     96 May 23 08:51 SSScore.app
+-rw-r--r--  1 ciurana  staff  55699 May 23 08:46 ssscoring-2.98.97-py3-none-any.whl
+```
+
+### Universal binary build
+
+The universal binary build requires an Apple Developer Connection account and a signing certificate.  See the Apple documentation for details.  Building a universal binary isn't necessary for everyday, personal use.  The build process is biased toward universal binaries for third-party distribution.
+
+```zsh
+make clean && make all && make app && make app-intel && make universal
+```
+
+```
+drwxr-xr-x  3 ciurana  staff     96 May 23 08:51 SSScore.app
+-rw-r--r--  1 ciurana  staff  55699 May 23 08:46 ssscoring-2.98.97-py3-none-any.whl
+./dist/SSScore.app: satisfies its Designated Requirement
+✓ signed: ./dist/SSScore.app
+Architectures in the fat file: ./dist/SSScore.app/Contents/MacOS/SSScore are: x86_64 arm64 
+```
+
+### Productized macOS build
+
+Generates a disk image with universal binaries of all the SSScoring tools, signed, notarized, and ready for distribution:
+
+```zsh
+make clean && make all && make mac
+```
+
+The disk image is generated to `./dist` as `SSScoring-3.0.0.dmg`, alongside the Python wheel and all other project artifacts.  The full product build takes between 3 and 30 minutes to complete because it relies on compulsory Apple services for artifact notarization.
+
+```
+drwxr-xr-x  3 ciurana  staff         96 May 23 09:01 DumbDriver.app
+-rw-r--r--@ 1 ciurana  staff  190369691 May 23 09:06 SSScore-2.98.97.dmg
+drwxr-xr-x  3 ciurana  staff         96 May 23 08:51 SSScore.app
+-rw-r--r--  1 ciurana  staff      55699 May 23 08:46 ssscoring-2.98.97-py3-none-any.whl
+drwxr-xr-x  3 ciurana  staff         96 May 23 09:01 umountFlySight.app
+```
+
+
+
+---
 
 Contributors
 ============
