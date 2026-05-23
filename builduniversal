@@ -1,0 +1,29 @@
+#!/usr/bin/env zsh
+# See: https://github.com/pr4d4t0r/SSSCoring/blob/master/LICENSE.txt
+
+baseBundle="$1"
+x86Bundle="$2"
+universalBundle="$3"
+
+echo "=== Starting universal merge: $universalBundle ==="
+echo "Base (arm64): $baseBundle"
+echo "Intel:        $x86Bundle\n"
+
+merged=0
+
+find "$universalBundle" -type f -print0 | while IFS= read -d '' f; do
+  baseFile="${f/$universalBundle/$baseBundle}"
+  x86File="${f/$universalBundle/$x86Bundle}"
+
+  if [[ -f "$baseFile" && -f "$x86File" ]]; then
+    if file "$f" | grep -q 'Mach-O'; then
+      relPath="${f#$universalBundle/}"
+      echo "→ Merging Mach-O: $relPath"
+      lipo -create "$baseFile" "$x86File" -output "$f"
+      ((merged++))
+    fi
+  fi
+done
+
+echo "\n=== Merge complete: $merged Mach-O files processed ==="
+

@@ -16,6 +16,7 @@ APP_NAME="SSScore"
 BUILD=./build
 BUILD_OS=$(shell uname)
 DIST=./dist
+DMG_STAGING=/tmp/ssscoring-dmg_staging
 FROZEN_PACKAGES=/tmp/requirements-frozen.txt
 ICON_SET_MAC="$(RESOURCES)/$(APP_NAME).icns"
 ICON_SET_WINDOWS="$(RESOURCES)/$(APP_NAME).ico"
@@ -24,11 +25,14 @@ PACKAGE=$(shell cat package.txt)
 PACKAGES_UPDATE=/tmp/packages-update.txt
 REQUIREMENTS=requirements.txt
 REQUIREMENTS_DEV=requirements-dev.txt
-VERSION=$(shell echo "from $(PACKAGE) import __VERSION__; print(__VERSION__)" | python)
+VERSION := $(shell echo "from $(PACKAGE) import __VERSION__; print(__VERSION__)" | python)
 
 DEVPI_HOST=$(shell cat devpi-hostname.txt)
 DEVPI_PASSWORD=$(shell cat ./devpi-password.txt)
 DEVPI_USER=$(shell cat ./devpi-user.txt)
+
+# *** most come after VERSION:
+DMG_NAME=$(APP_NAME)-$(VERSION).dmg
 
 
 # Arch-agnostic targets:
@@ -51,6 +55,7 @@ clean:
 	rm -Rfv $$(find . | awk '/.ipynb_checkpoints/')
 	rm -Rfv ./.pytest_cache
 	rm -Rf $(API_DOC_DIR)/*
+	rm -Rf $(DMG_STAGING)
 	cat .env| awk -F "=" '/^\#/ { print; next; } /^$$/ { next; } { printf("%s=\"define your own here\"\n", $$1); }' > _env-SAMPLE
 	pip cache purge
 	mkdir -p ./dist
@@ -69,10 +74,6 @@ devpi:
 	devpi use $(DEVPI_USER)/dev
 	devpi -v use --set-cfg $(DEVPI_USER)/dev
 	@[[ -e "pip.conf-bak" ]] && rm -f "pip.conf-bak"
-
-
-dmg: ALWAYS
-	@if [[ -z "$(APP_BUNDLE)" ]] ; then echo "APP_BUNDLE target not defined in Makefile"; exit 99; fi
 
 
 dockerize.arm64: ALWAYS
@@ -141,10 +142,13 @@ manpage:
 	t=$$(mktemp) && awk -v "v=$(VERSION)" '/^%/ { $$4 = v; print; next; } { print; }' ssscore.md > "$$t" && cat "$$t" > ssscore.md && rm -f "$$t"
 	pandoc --standalone --to man ssscore.md -o $(MANPAGES)/ssscore.1
 	t=$$(mktemp) && awk -v "v=$(VERSION)" '/^%/ { $$4 = v; print; next; } { print; }' README.md > "$$t" && cat "$$t" > README.md && rm -f "$$t"
+	sed -i '' 's/SSScore-.*\.dmg/SSScore-$(VERSION).dmg/g' README.md
+	sed -i '' 's/SSScore-.*-Setup.exe/SSScore-$(VERSION)-Setup.exe/g' README.md
 	pandoc --standalone --to man README.md -o $(MANPAGES)/$(PACKAGE).3
 
 
 notarize: ALWAYS
+	source .env && xcrun notarytool store-credentials "SSScore-Notary" --apple-id "$$APPLE_ID" --team-id "$$TEAM_ID" --password "$$APP_NOTARIZATION_PASSWORD" && \
 	./notarize $(DIST)
 
 nuke: ALWAYS
