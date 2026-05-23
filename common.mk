@@ -76,10 +76,6 @@ devpi:
 	@[[ -e "pip.conf-bak" ]] && rm -f "pip.conf-bak"
 
 
-dmg: ALWAYS
-	@if [[ -z "$(APP_BUNDLE)" ]] ; then echo "APP_BUNDLE target not defined in Makefile"; exit 99; fi
-
-
 dockerize.arm64: ALWAYS
 	echo "$(VERSION)" > ./docker/ARM/dockerimageversion.txt
 	cat ./docker/ARM/dockerimageversion.txt

@@ -51,7 +51,7 @@ app-intel: ALWAYS
 	arch -x86_64 zsh -c 'source $(PYTHON_INTEL_VENV) && make -f Makefile.x86 app'
 
 
-dmg:
+dmg: ALWAYS
 	mkdir -p $(DMG_STAGING)
 	for f in $(DIST)/*app; do cp -a "$$f" $(DMG_STAGING); done
 	cp $(RESOURCES)/README.rtf $(DMG_STAGING)
@@ -62,6 +62,14 @@ dmg:
 	xcrun notarytool submit $(DIST)/$(DMG_NAME) --keychain-profile "$(NOTARIZATION_KEYCHAIN)" --wait
 	xcrun stapler staple $(DIST)/$(DMG_NAME)
 	spctl --assess --verbose --type open --context context:primary-signature $(DIST)/$(DMG_NAME)
+
+
+release: ALWAYS
+	gh release create v$(VERSION) --title "$(APP_NAME) $(VERSION)" --notes "" --latest $(DIST)/$(DMG_NAME)
+
+
+release-update: ALWAYS
+	gh release upload v$(VERSION) $(DIST)/$(DMG_NAME) --clobber
 
 
 universal: ALWAYS
