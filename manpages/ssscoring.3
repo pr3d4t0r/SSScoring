@@ -55,17 +55,22 @@ https://pr3d4t0r.github.io/SSScoring/ssscoring.html
 .PP
 The SSScore apps are available from:
 .IP \(bu 2
-web app: https://ssscore.streamlit.app
+web app: \f[B]\c
+.UR https://ssscore.streamlit.app
+.UE \c
+\f[R]
 .IP \(bu 2
-\c
+\f[B]\c
 .UR https://github.com/pr3d4t0r/SSScoring/releases/latest/download/SSScore-2.98.96.dmg
 SSScore for Mac (universal .dmg)
 .UE \c
+\f[R]
 .IP \(bu 2
-\c
+\f[B]\c
 .UR https://github.com/pr3d4t0r/SSScoring/releases/latest/download/SSScore-2.98.96-Setup.exe
 SSScore for Windows (installer)
 .UE \c
+\f[R]
 .PP
    *   *   *   *   *
 .SH Installation and Requirements
@@ -423,6 +428,38 @@ SSScore disk image
 .UE \c
 ]
 SSScore disk image
+.SS Publishing a new release
+Requirements:
+.IP \(bu 2
+A GitHub account with 2FA and your keys already define
+.IP \(bu 2
+The \f[CR]gh\f[R] package (installed from Homebrew or pacman, as
+applicable)
+.PP
+Sequence:
+.IP "1." 3
+On the macOS building machine, after successful notarized .dmg creation:
+.RS 4
+.IP
+.EX
+make release
+.EE
+.RE
+.IP "2." 3
+On the Windows building machine, after succcessful installer creation:
+.RS 4
+.IP
+.EX
+make release
+.EE
+.RE
+.PP
+The artifacts are listed, along with the current build version, in the
+\f[B]\c
+.UR https://github.com/pr3d4t0r/SSScoring/releases
+SSScore releases page
+.UE \c
+\f[R].
 .SS Windows build
 .IP "1." 3
 The builds are based on the latest versions of Windows 10, but Windows

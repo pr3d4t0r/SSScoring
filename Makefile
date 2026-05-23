@@ -59,8 +59,9 @@ dmg: ALWAYS
 	hdiutil create -volname $(DMG_NAME) -srcfolder $(DMG_STAGING) -ov -format ULMO -fs APFS $(DIST)/$(DMG_NAME)
 	codesign --force --sign "$(APPLE_SIGNING_IDENTITY)" --timestamp --verbose=4 $(DIST)/$(DMG_NAME)
 	codesign --verify --verbose $(DIST)/$(DMG_NAME)
-	xcrun notarytool submit $(DIST)/$(DMG_NAME) --keychain-profile "$(NOTARIZATION_KEYCHAIN)" --wait
-	xcrun stapler staple $(DIST)/$(DMG_NAME)
+	source .env && xcrun notarytool store-credentials "SSScore-Notary" --apple-id "$$APPLE_ID" --team-id "$$TEAM_ID" --password "$$APP_NOTARIZATION_PASSWORD" && \
+	xcrun notarytool submit $(DIST)/$(DMG_NAME) --keychain-profile "$(NOTARIZATION_KEYCHAIN)" --wait && \
+	xcrun stapler staple $(DIST)/$(DMG_NAME) && \
 	spctl --assess --verbose --type open --context context:primary-signature $(DIST)/$(DMG_NAME)
 
 

@@ -51,9 +51,9 @@ https://pr3d4t0r.github.io/SSScoring/ssscoring.html
 
 The SSScore apps are available from:
 
-- web app:  https://ssscore.streamlit.app
-- [SSScore for Mac (universal .dmg)](https://github.com/pr3d4t0r/SSScoring/releases/latest/download/SSScore-2.98.96.dmg)
-- [SSScore for Windows (installer)](https://github.com/pr3d4t0r/SSScoring/releases/latest/download/SSScore-2.98.96-Setup.exe)
+- web app:  **[https://ssscore.streamlit.app](https://ssscore.streamlit.app)**
+- **[SSScore for Mac (universal .dmg)](https://github.com/pr3d4t0r/SSScoring/releases/latest/download/SSScore-2.98.96.dmg)**
+- **[SSScore for Windows (installer)](https://github.com/pr3d4t0r/SSScoring/releases/latest/download/SSScore-2.98.96-Setup.exe)**
 
 ---
 
@@ -353,6 +353,29 @@ drwxr-xr-x  3 ciurana  staff         96 May 23 09:01 umountFlySight.app
 ```
 
 ![SSScore disk image](https://raw.githubusercontent.com/pr3d4t0r/SSScoring/refs/heads/master/resources/SSScore-disk-image-example.jpg)
+
+### Publishing a new release
+
+Requirements:
+
+- A GitHub account with 2FA and your keys already define
+- The `gh` package (installed from Homebrew or pacman, as applicable)
+
+Sequence:
+
+1. On the macOS building machine, after successful notarized .dmg creation:
+
+	```zsh
+	make release
+	```
+
+2. On the Windows building machine, after succcessful installer creation:
+
+	```bash
+	make release
+	```
+
+The artifacts are listed, along with the current build version, in the **[SSScore releases page](https://github.com/pr3d4t0r/SSScoring/releases)**.
 
 ## Windows build
 

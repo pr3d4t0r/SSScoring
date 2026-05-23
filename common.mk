@@ -148,7 +148,7 @@ manpage:
 
 
 notarize: ALWAYS
-	source .env && xcrun notarytool store-credentials "SSScore-Notary" --apple-id "$$APPLE_ID" --team-id "$$TEAM_ID" --password "$$APP_NOTARIZATION_PASSWORD"
+	source .env && xcrun notarytool store-credentials "SSScore-Notary" --apple-id "$$APPLE_ID" --team-id "$$TEAM_ID" --password "$$APP_NOTARIZATION_PASSWORD" && \
 	./notarize $(DIST)
 
 nuke: ALWAYS
