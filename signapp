@@ -75,4 +75,3 @@ signBundle
 verifyBundle
 
 echo "✓ signed: $BUNDLE"
-

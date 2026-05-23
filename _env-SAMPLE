@@ -22,4 +22,6 @@ APPLE_SIGNING_IDENTITY="define your own here"
 # =============================================================================
 APP_NOTARIZATION_PASSWORD="define your own here"
 DEV_BBOWSER="define your own here"
+NOTARIZATION_KEYCHAIN="define your own here"
+PYTHON_INTEL_VENV="define your own here"
 TEAM_ID="define your own here"

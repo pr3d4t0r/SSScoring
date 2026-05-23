@@ -382,7 +382,7 @@ def setSideBarAndMain(icon: str, singleTrack: bool, selectDZState):
         if trackFiles:
             st.session_state.trackFiles = trackFiles
     st.sidebar.button('Clear', on_click=selectDZState)
-    st.sidebar.button('Display DZ coordinates', on_click=displayDZCoordinates, disabled=(st.session_state.currentDropZone == None))
+    st.sidebar.button('Show DZ coordinates', on_click=displayDZCoordinates, disabled=(st.session_state.currentDropZone == None))
     st.sidebar.link_button('Report missing DZ', 'https://github.com/pr3d4t0r/SSScoring/issues/new?template=report-missing-dz.md', icon=':material/breaking_news_alt_1:')
     st.sidebar.link_button('Feature request or bug report', 'https://github.com/pr3d4t0r/SSScoring/issues/new?template=Blank+issue', icon=':material/breaking_news_alt_1:')
 
