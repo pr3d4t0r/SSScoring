@@ -337,6 +337,60 @@ drwxr-xr-x  3 ciurana  staff         96 May 23 09:01 umountFlySight.app
 
 ![SSScore disk image](https://raw.githubusercontent.com/pr3d4t0r/SSScoring/refs/heads/master/resources/SSScore-disk-image-example.jpg)
 
+## Windows build
+
+1. The builds are based on the latest versions of Windows 10, but Windows 11 works best
+2. Only Windows Intel is supported.
+3. Ensure that MSYS 2 is installed.
+
+There is a concerted, ground up, no-compromises, no bullshit directive tokeep this codebase free of Windows tooling unless there is no alternative.  That's non-negotiable project and repository policy.
+
+At the time of writing, the optimal MSYS2 session is UCRT64.
+
+### Windows building steps
+
+Requires an Intel-only Python virtual environment configured somewhere in the MSYS + user file system (something like `C:/msys/home/joeuser/Python-3_13_3-x86_64`).  Whenever possible, avoid `/c/whatever` paths and keep everything in Unix-land.
+
+**Important**: PyInstaller support for Windows lags about a minor release version vs the macOS and Linux versions.
+
+The build command, in the virtual environment:
+
+```bash
+alias winmake='make -f Makefile.win'
+winmake clean && winmake all
+```
+
+```
+-rw-r--r-- 1 crystal None 56233 May 23 12:36 ssscoring-2.98.97-py3-none-any.whl
+drwxr-xr-x 1 crystal None     0 May 23 12:37 SSScore
+
+```
+
+SSScore is packaged as a Windows `onedir` application.  Ensure to deploy all the contents of `./dist/SSScore` together, or the application won't start.  The SSScoring API, Python and data science components are all in the `SSScore/_internal` sugdirectory.
+
+### Productized Windows build
+
+Windows builds aren't signed or notarized, but they do come with a productized installer.  Contributors to the project are welcome to help notarize the SSScore installer for Windows.  As far as building a distributable version, it's super easy, barely an inconvenience:
+
+```zsh
+winmake clean && winmake all && winmake installer
+```
+
+This produces a standar Windows installer wizard.  SSScore is installed as a first class citizen in `C:/Program Files` like any other software with all the expected Windows app behavior.
+
+Image
+
+```
+drwxr-xr-x 1 crystal None        0 May 23 12:43 SSScore
+-rwxr-xr-x 1 crystal None 79116394 May 23 12:44 SSScore-2.98.97-Setup.exe
+-rw-r--r-- 1 crystal None    56233 May 23 12:42 ssscoring-2.98.97-py3-none-any.whl
+```
+`./dist` ends up with three distributable packages, ready to go:
+
+- `SSScore` - `onedir` executable
+- `SSScore-V.vv.rr-Setup.exe` standard installer
+- Python wheel with the latest code (the same one you'll find in PyPI)
+
 ---
 
 Contributors
