@@ -23,7 +23,6 @@ all: ALWAYS
 	make docs
 	make umountFlySight
 	make DumbDriver
-	make app
 
 
 app: ALWAYS
