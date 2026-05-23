@@ -142,10 +142,13 @@ manpage:
 	t=$$(mktemp) && awk -v "v=$(VERSION)" '/^%/ { $$4 = v; print; next; } { print; }' ssscore.md > "$$t" && cat "$$t" > ssscore.md && rm -f "$$t"
 	pandoc --standalone --to man ssscore.md -o $(MANPAGES)/ssscore.1
 	t=$$(mktemp) && awk -v "v=$(VERSION)" '/^%/ { $$4 = v; print; next; } { print; }' README.md > "$$t" && cat "$$t" > README.md && rm -f "$$t"
+	sed -i '' 's/SSScore-.*\.dmg/SSScore-$(VERSION).dmg/g' README.md
+	sed -i '' 's/SSScore-.*-Setup.exe/SSScore-$(VERSION)-Setup.exe/g' README.md
 	pandoc --standalone --to man README.md -o $(MANPAGES)/$(PACKAGE).3
 
 
 notarize: ALWAYS
+	source .env && xcrun notarytool store-credentials "SSScore-Notary" --apple-id "$$APPLE_ID" --team-id "$$TEAM_ID" --password "$$APP_NOTARIZATION_PASSWORD"
 	./notarize $(DIST)
 
 nuke: ALWAYS
