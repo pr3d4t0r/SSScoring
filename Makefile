@@ -53,9 +53,10 @@ app-intel: ALWAYS
 
 dmg:
 	mkdir -p $(DMG_STAGING)
-	cp -a $(DIST)/$(APP_BUNDLE) $(DMG_STAGING)
+	for f in $(DIST)/*app; do cp -a "$$f" $(DMG_STAGING); done
+	cp $(RESOURCES)/README.rtf $(DMG_STAGING)
 	cd $(DMG_STAGING) && ln -sf /Applications ./Applications
-	hdiutil create -volname "SSScore" -srcfolder $(DMG_STAGING) -ov -format ULMO -fs APFS $(DIST)/$(DMG_NAME)
+	hdiutil create -volname $(DMG_NAME) -srcfolder $(DMG_STAGING) -ov -format ULMO -fs APFS $(DIST)/$(DMG_NAME)
 	codesign --force --sign "$(APPLE_SIGNING_IDENTITY)" --timestamp --verbose=4 $(DIST)/$(DMG_NAME)
 	codesign --verify --verbose $(DIST)/$(DMG_NAME)
 	xcrun notarytool submit $(DIST)/$(DMG_NAME) --keychain-profile "$(NOTARIZATION_KEYCHAIN)" --wait

@@ -48,15 +48,17 @@ API documentation is available at:
 
 https://pr3d4t0r.github.io/SSScoring/ssscoring.html
 
-SSScore app is available for interactive scoring from:
+The SSScore apps are available from:
 
-https://ssscore.streamlit.app
+- web app:  https://ssscore.streamlit.app
+- Mac:  _download link coming soon_
+- Windows: _download link coming soon_
 
 
 Installation and Requirements
 =============================
 
-- Python 3.9.9 or later
+- Python 3.12 or later
 - pandas and NumPy
 
 The [requirements.txt](./requirements.txt) file lists all the packages required
@@ -74,13 +76,14 @@ Quickstart
 - Read the <a href='https://pr3d4t0r.github.io/SSScoring/ssscoring.html' target='_blank'>SSScoring API documentation</a>
 
 
-### SSScore web tool
+### SSScore end-user apps
 
 Analyze single tracks or a group of tracks using the SSScoring API in a
-full-featured web application.  Requires Internet connectivity.
+full-featured web application.
 
-URL:  <a href='https://ssscore.streamlit.app/' target='_blank'>SSScore 2</a>
-
+- Mac: _download link coming soon_
+- <a href='https://ssscore.streamlit.app/' target='_blank'>SSScore web app</a> - requires Internet connectivity
+- Windows:  _download link coming soon_
 
 ### ssscore command line tool
 
