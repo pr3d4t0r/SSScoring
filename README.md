@@ -335,7 +335,7 @@ drwxr-xr-x  3 ciurana  staff         96 May 23 08:51 SSScore.app
 drwxr-xr-x  3 ciurana  staff         96 May 23 09:01 umountFlySight.app
 ```
 
-
+![SSScore disk image](https://raw.githubusercontent.com/pr3d4t0r/SSScoring/refs/heads/master/resources/SSScore-disk-image-example.jpg)
 
 ---
 
