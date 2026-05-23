@@ -378,7 +378,7 @@ winmake clean && winmake all && winmake installer
 
 This produces a standar Windows installer wizard.  SSScore is installed as a first class citizen in `C:/Program Files` like any other software with all the expected Windows app behavior.
 
-Image
+![SSScore Windows installer](https://raw.githubusercontent.com/pr3d4t0r/SSScoring/refs/heads/master/resources/SSScore-Winblows-installer.jpg)
 
 ```
 drwxr-xr-x 1 crystal None        0 May 23 12:43 SSScore
