@@ -151,6 +151,23 @@ streamlit run ssscoring/ssscoremultiple.py
 These commands will start a new SSScore instance, current branch version, in the
 system's default web browser.
 
+### Running a SSScore container
+
+The `docker-compose.yaml` files included in the master SSScoring repository are ready to run on any Docker-enabled system with access to Docker Hub.  They'll pull the latest SSScore web app image from the cloud for local use.  Users don't need to build their own images in order to use this feature.
+
+- Intel:
+
+	```zsh
+	docker compose -f dockerize/docker-compose.yaml up
+	```
+- ARM:
+
+	```zsh
+	docker compose -f dockerize/ARM/docker-compose.yaml up
+	```	
+
+Once it's running click on [SSScore web app](http://localhost:8501) link to score your jumps or go to http://localhost:8501 in your favorite web browser.
+
 ---
 
 Description
@@ -390,6 +407,51 @@ drwxr-xr-x 1 crystal None        0 May 23 12:43 SSScore
 - `SSScore` - `onedir` executable
 - `SSScore-V.vv.rr-Setup.exe` standard installer
 - Python wheel with the latest code (the same one you'll find in PyPI)
+
+## Docker build
+
+Dockerized SSScore is a good alternative to the native installations for users who prefer to work in a web browser environment.
+
+These instructions are system-agnostic, as long as a somewhat recent version of Docker is available in the local system.
+
+You may want to modify these two files to match your Docker environment and your Docker Hub account:
+
+- `dockerimagename.txt`
+- `dockerimageversion.txt`
+	- The build process automagically updates the version number during the build, to make it consistent with the current branch.  That's the reason why Docker images for human consumption are always built from the `master` branch.  This version number is consistent across `master`, PyPI, and Docker Hub.
+
+### Dockerized SSScore for Intel
+
+```zsh
+git fetch && git pull && git checkout master
+
+make clean && make dockerize
+```
+
+- Gets the latest stable version
+- The `Dockerfile` will pull the same wheel from PyPI
+- The Intel Docker image is ready for deployment
+
+### Dockerized SSScore for ARM
+
+```zsh
+git fetch && git pull && git checkout master
+
+make clean && make dockerize.arm64
+```
+
+- Guaranteed to work on Apple Silicon and RasPi 5
+- Uses the latest stable version from PyPI
+
+```
+IMAGE                                        ID             DISK USAGE   CONTENT SIZE   EXTRA
+pr3d4t0r/ssscore-p:2.10.13                   1216fd1debf0       2.25GB             0B        
+pr3d4t0r/ssscore-p:latest                    1216fd1debf0       2.25GB             0B        
+pr3d4t0r/ssscore:2.10.13                     c9771dea3985       1.91GB             0B        
+pr3d4t0r/ssscore:latest                      c9771dea3985       1.91GB             0B        
+```
+
+Yes, the images are big.  Apache dependencies in pandas are the reason.  A lot of surgery, love, and care went into slimming down the macOS and Windows standalone executables.
 
 ---
 
