@@ -256,6 +256,8 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
         'longitude': data.lon,
         'verticalAccuracy': data.vAcc,
         'speedAccuracyISC': speedAccuracyISC,
+        'velocityNorth': data.velN,
+        'velocityEast': data.velE,
     })
 
     return data
@@ -264,7 +266,7 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
 def _dataGroups(data):
     data_ = data.copy()
     data_['positive'] = (data_.vMetersPerSecond > 0)
-    data_['group'] = (data_.positive != data_.positive.shift(1)).astype(int).cumsum()-1
+    data_['group'] = (data_.positive != data_.positive.shift(1)).fillna(True).astype(int).cumsum()-1
 
     return data_
 
@@ -324,13 +326,26 @@ def getSpeedSkydiveFrom(data: pd.DataFrame) -> tuple:
 
             validationWindowStart = windowEnd+VALIDATION_WINDOW_LENGTH
             data = data[data.altitudeAGL >= windowEnd]
+            refN = float(data.velocityNorth.iloc[0])
+            refE = float(data.velocityEast.iloc[0])
+            refMag = (refN**2.0 + refE**2.0)**0.5
+            unitN, unitE = (refN/refMag, refE/refMag) if refMag > 0.0 else (1.0, 0.0)
+            signedHMPS = (data.velocityNorth*unitN + data.velocityEast*unitE).to_numpy(dtype=float, na_value=0.0)
+            vMS = data.vMetersPerSecond.to_numpy(dtype=float, na_value=0.0)
+            data = data.copy()
+            data['speedAngle'] = np.round(
+                np.where(signedHMPS == 0.0, 90.0, np.degrees(np.arctan(vMS/signedHMPS))),
+                decimals=2,
+            )
+            data = data.drop(['velocityNorth', 'velocityEast',], axis=1)
             performanceWindow = PerformanceWindow(windowStart, windowEnd, validationWindowStart)
         else:
+            data = data.drop(['velocityNorth', 'velocityEast',], axis=1)
             performanceWindow = None
 
         return performanceWindow, data
     else:
-        return None, data
+        return None, data.drop(['velocityNorth', 'velocityEast',], axis=1)
 
 
 def _verticalAcceleration(vKMh: pd.Series, time: pd.Series, interval=TABLE_INTERVAL) -> pd.Series:

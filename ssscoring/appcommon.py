@@ -124,7 +124,7 @@ def initDropZonesFromResource() -> pd.DataFrame:
     """
     try:
         buffer = fetchResource(DZ_DIRECTORY)
-        dropZones = pd.read_csv(buffer, sep=',', dtype_backend='pyarrow')
+        dropZones = pd.read_csv(buffer, sep=',')
     except Exception as e:
         raise SSScoringError('Invalid resource - %s' % str(e))
 

@@ -175,10 +175,10 @@ def getAllSpeedJumpFilesFrom(dataLake: Path) -> dict:
                 stat = os.stat(jumpFileName)
                 if all(x not in fileName for x in ('EVENT', 'SENSOR', 'TRACK')):
                     # FlySight 1 track format
-                    data = pd.read_csv(jumpFileName, skiprows = (1, 1), index_col = False, dtype_backend='pyarrow')
+                    data = pd.read_csv(jumpFileName, skiprows = (1, 1), index_col = False)
                 elif 'TRACK' in fileName:
                     # FlySight 2 track custom format
-                    data = pd.read_csv(jumpFileName, names = FLYSIGHT_2_HEADER, skiprows = 6, index_col = False, na_values = ['NA', ], dtype_backend='pyarrow')
+                    data = pd.read_csv(jumpFileName, names = FLYSIGHT_2_HEADER, skiprows = 6, index_col = False, na_values = ['NA', ])
                     data = skipOverFS2MetadataRowsIn(data)
                     data.drop('GNSS', inplace = True, axis = 1)
                     version = '2'
@@ -265,7 +265,7 @@ def readVersion1CSV(fileThing: obj) -> pd.DataFrame:
     A FlySight dataframe with the original column names, normalized for
     manipulation as a dataframe instead of a file or CSV object.
     """
-    return pd.read_csv(fileThing, skiprows = (1, 1), index_col = False, dtype_backend='pyarrow')
+    return pd.read_csv(fileThing, skiprows = (1, 1), index_col = False)
 
 
 def _tagVersion1From(fileThing: str) -> str:
@@ -297,7 +297,7 @@ def readVersion2CSV(jumpFile: str) -> pd.DataFrame:
     manipulation as a dataframe instead of a file or CSV object.
     """
 
-    rawData = pd.read_csv(jumpFile, names = FLYSIGHT_2_HEADER, skiprows = 6, index_col = False, dtype_backend='pyarrow', na_values=['NA',])
+    rawData = pd.read_csv(jumpFile, names = FLYSIGHT_2_HEADER, skiprows = 6, index_col = False, na_values=['NA',])
     rawData = skipOverFS2MetadataRowsIn(rawData)
     rawData.drop('GNSS', inplace = True, axis = 1)
     return rawData
