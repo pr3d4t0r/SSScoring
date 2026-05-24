@@ -118,25 +118,27 @@ def validFlySightHeaderIn(fileThingCSV) -> bool:
     -------
     `True` if `fileThingCSV` is a FlySight CSV file, otherwise `False`.
     """
-    delimiters =  [',', ]
-    hasAllHeaders = False
-    stream = None
+    delimiters = [',']
+
     if isinstance(fileThingCSV, bytes):
         stream = StringIO(fileThingCSV.decode(FLYSIGHT_FILE_ENCODING))
     else:
         stream = open(fileThingCSV, 'r')
 
-    try:
-        dialect = csv.Sniffer().sniff(stream.readline(), delimiters = delimiters)
-    except:
-        return False
-    if dialect.delimiter in delimiters:
+    with stream:
+        try:
+            dialect = csv.Sniffer().sniff(stream.readline(), delimiters=delimiters)
+        except csv.Error:
+            return False
+
+        if dialect.delimiter not in delimiters:
+            return False
         stream.seek(0)
-        header = next(csv.reader(stream))
-    else:
-        return False
-    hasAllHeaders = True if header[0] == '$FLYS' else FLYSIGHT_1_HEADER.issubset(header)
-    return hasAllHeaders
+        try:
+            header = next(csv.reader(stream))
+        except StopIteration:
+            return False
+    return header[0] == '$FLYS' or FLYSIGHT_1_HEADER.issubset(header)
 
 
 def getAllSpeedJumpFilesFrom(dataLake: Path) -> dict:
@@ -173,10 +175,10 @@ def getAllSpeedJumpFilesFrom(dataLake: Path) -> dict:
                 stat = os.stat(jumpFileName)
                 if all(x not in fileName for x in ('EVENT', 'SENSOR', 'TRACK')):
                     # FlySight 1 track format
-                    data = pd.read_csv(jumpFileName, skiprows = (1, 1), index_col = False)
+                    data = pd.read_csv(jumpFileName, skiprows = (1, 1), index_col = False, dtype_backend='pyarrow')
                 elif 'TRACK' in fileName:
                     # FlySight 2 track custom format
-                    data = pd.read_csv(jumpFileName, names = FLYSIGHT_2_HEADER, skiprows = 6, index_col = False, na_values = ['NA', ], dtype={ 'hMSL': float, })
+                    data = pd.read_csv(jumpFileName, names = FLYSIGHT_2_HEADER, skiprows = 6, index_col = False, na_values = ['NA', ], dtype_backend='pyarrow')
                     data = skipOverFS2MetadataRowsIn(data)
                     data.drop('GNSS', inplace = True, axis = 1)
                     version = '2'
@@ -245,4 +247,152 @@ def detectFlySightFileVersionOf(fileThing) -> FlySightVersion:
         return FlySightVersion.V1
     else:
         raise SSScoringError('%s file is not a FlySight v1 or v2 file')
+
+
+def readVersion1CSV(fileThing: obj) -> pd.DataFrame:
+    """
+    Read a FlySight file version 1 into a dataframe.  It scrubes blank rows that
+    get in the way of correct parsing.
+
+    Arguments
+    ---------
+        fileThing
+    A string or a `pathlib.Path` object.  It can be a relative or an absolute
+    path.
+
+    Returns
+    -------
+    A FlySight dataframe with the original column names, normalized for
+    manipulation as a dataframe instead of a file or CSV object.
+    """
+    return pd.read_csv(fileThing, skiprows = (1, 1), index_col = False, dtype_backend='pyarrow')
+
+
+def _tagVersion1From(fileThing: str) -> str:
+    return fileThing.replace('.CSV', '').replace('.csv', '').replace('/data', '').replace('/', ' ').strip()+':v1'
+
+
+def _tagVersion2From(fileThing: str) -> str:
+    if '/' in fileThing:
+        return fileThing.split('/')[-2]+':v2'
+    else:
+        return fileThing.replace('.CSV', '').replace('.csv', '')+':v2'
+
+
+def readVersion2CSV(jumpFile: str) -> pd.DataFrame:
+    """
+    Read a FlySight file version 2 into a dataframe.  It scrubes blank rows that
+    get in the way of correct parsing and drops the `GNSS` column because it
+    just makes dataframe management murkier.
+
+    Arguments
+    ---------
+        fileThing
+    A string or a `pathlib.Path` object.  It can be a relative or an absolute
+    path.
+
+    Returns
+    -------
+    A FlySight dataframe with the original column names, normalized for
+    manipulation as a dataframe instead of a file or CSV object.
+    """
+
+    rawData = pd.read_csv(jumpFile, names = FLYSIGHT_2_HEADER, skiprows = 6, index_col = False, dtype_backend='pyarrow', na_values=['NA',])
+    rawData = skipOverFS2MetadataRowsIn(rawData)
+    rawData.drop('GNSS', inplace = True, axis = 1)
+    return rawData
+
+
+def getFlySightDataFromCSVBuffer(buffer:bytes, bufferName:str) -> tuple:
+    """
+    Ingress a buffer with known FlySight or SkyTrax file data for SSScoring
+    processing.
+
+    Arguments
+    ---------
+        buffer
+    A binary data buffer, bag of bytes, containing a known FlySight track file.
+
+        bufferName
+    An arbitrary name for the buffer of type `str`.  It's used for constructing
+    the full buffer tag value for human identification.
+
+    Returns
+    -------
+    A `tuple` with two items:
+        - `rawData` - a dataframe representation of the CSV with the original
+          headers but without the data type header
+        - `tag` - a string with an identifying tag derived from the path name
+          and file version in the form `some name:vX`.  It uses the current
+          path as metadata to infer the name.  There's no semantics enforcement.
+
+    Raises
+    ------
+    `SSScoringError` if the CSV file is invalid in any way.
+    """
+    if not isinstance(buffer, bytes):
+        raise SSScoringError('buffer must be an instance of bytes, a bytes buffer')
+    try:
+        stringIO = StringIO(buffer.decode(FLYSIGHT_FILE_ENCODING))
+    except Exception as e:
+        raise SSScoringError('invalid buffer endcoding - %s' % str(e))
+    try:
+        version = detectFlySightFileVersionOf(buffer)
+    except Exception:
+        tag = '%s:INVALID' % bufferName
+        rawData = None
+    else:
+        if version == FlySightVersion.V1:
+            rawData = readVersion1CSV(stringIO)
+            tag = _tagVersion1From(bufferName)
+        elif version == FlySightVersion.V2:
+            rawData = readVersion2CSV(stringIO)
+            tag = _tagVersion2From(bufferName)
+    return (rawData, tag)
+
+
+def getFlySightDataFromCSVFileName(jumpFile) -> tuple:
+    """
+    Ingress a known FlySight or SkyTrax file into memory for SSScoring
+    processing.
+
+    Arguments
+    ---------
+        jumpFile
+    A string or `pathlib.Path` object; can be a relative or an asbolute path.
+
+    Returns
+    -------
+    A `tuple` with two items:
+        - `rawData` - a dataframe representation of the CSV with the original
+          headers but without the data type header
+        - `tag` - a string with an identifying tag derived from the path name
+          and file version in the form `some name:vX`.  It uses the current
+          path as metadata to infer the name.  There's no semantics enforcement.
+
+    Raises
+    ------
+    `SSScoringError` if the CSV file is invalid in any way.
+    """
+    if isinstance(jumpFile, Path):
+        jumpFile = jumpFile.as_posix()
+    elif isinstance(jumpFile, str):
+        pass
+    else:
+        raise SSScoringError('jumpFile must be a string or a Path object')
+    if not validFlySightHeaderIn(jumpFile):
+        raise SSScoringError('%s is an invalid speed skydiving file')
+    try:
+        version = detectFlySightFileVersionOf(jumpFile)
+    except Exception:
+        tag = 'NA'
+        rawData = None
+    else:
+        if version == FlySightVersion.V1:
+            rawData = readVersion1CSV(jumpFile)
+            tag = _tagVersion1From(jumpFile)
+        elif version == FlySightVersion.V2:
+            rawData = readVersion2CSV(jumpFile)
+            tag = _tagVersion2From(jumpFile)
+    return (rawData, tag)
 

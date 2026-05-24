@@ -8,8 +8,6 @@ from ssscoring.calc import calculateDistance
 from ssscoring.calc import collateAnglesByTimeFromExit
 from ssscoring.calc import convertFlySight2SSScoring
 from ssscoring.calc import dropNonSkydiveDataFrom
-from ssscoring.calc import getFlySightDataFromCSVBuffer
-from ssscoring.calc import getFlySightDataFromCSVFileName
 from ssscoring.calc import getSpeedSkydiveFrom
 from ssscoring.calc import isValidJumpISC
 from ssscoring.calc import isValidMaximumAltitude
@@ -25,6 +23,8 @@ from ssscoring.constants import FT_IN_M
 from ssscoring.datatypes import JumpStatus
 from ssscoring.errors import SSScoringError
 from ssscoring.flysight import getAllSpeedJumpFilesFrom
+from ssscoring.flysight import getFlySightDataFromCSVBuffer
+from ssscoring.flysight import getFlySightDataFromCSVFileName
 
 import os
 import pathlib
@@ -287,7 +287,7 @@ def test_aggregateResults():
     assert 'maxSpeed' in _speeds.columns
 
     with pytest.raises(SSScoringError):
-        speeds = aggregateResults(dict())
+        _ = aggregateResults(dict())
 
 
 def test_collateAnglesByTimeFromExit():

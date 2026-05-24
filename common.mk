@@ -25,6 +25,7 @@ PACKAGE=$(shell cat package.txt)
 PACKAGES_UPDATE=/tmp/packages-update.txt
 REQUIREMENTS=requirements.txt
 REQUIREMENTS_DEV=requirements-dev.txt
+TEST_COVERAGE_DIR=./htmlcov
 VERSION := $(shell echo "from $(PACKAGE) import __VERSION__; print(__VERSION__)" | python)
 
 DEVPI_HOST=$(shell cat devpi-hostname.txt)
@@ -45,17 +46,18 @@ bundle: ALWAYS
 
 
 clean:
+	rm -Rf $(API_DOC_DIR)/*
 	rm -Rf $(BUILD)/*
 	rm -Rf $(DIST)/*
-	rm -Rf $(MANPAGES)/*
+	rm -Rf $(DMG_STAGING)
 	rm -Rf $(ICON_SET_MAC)
 	rm -Rf $(ICON_SET_WINDOWS)
+	rm -Rf $(MANPAGES)/*
+	rm -Rf $(TEST_COVERAGE_DIR)/*
 	rm -Rfv $$(find $(PACKAGE)/ | awk '/__pycache__$$/')
-	rm -Rfv $$(find tests | awk '/__pycache__$$/')
 	rm -Rfv $$(find . | awk '/.ipynb_checkpoints/')
+	rm -Rfv $$(find tests | awk '/__pycache__$$/')
 	rm -Rfv ./.pytest_cache
-	rm -Rf $(API_DOC_DIR)/*
-	rm -Rf $(DMG_STAGING)
 	cat .env| awk -F "=" '/^\#/ { print; next; } /^$$/ { next; } { printf("%s=\"define your own here\"\n", $$1); }' > _env-SAMPLE
 	pip cache purge
 	mkdir -p ./dist
