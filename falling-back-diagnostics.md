@@ -9,10 +9,12 @@
 
 ## 1. Problem Statement
 
-Speed skydivers are scored on their mean vertical speed over a 1000 m window.
-A skydiver who *falls on their back* inside the scoring window generates an
-artificially high `speedAngle` while simultaneously braking — their score is
-degraded but the cause is not flagged in the current output.
+Speed skydivers are scored on their highest mean vertical speed over any
+3-second interval within the **performance window** — a 7,400 ft (2,256 m)
+altitude band that starts when vertical speed first reaches 10 m/s (ISC §2.3,
+§5.5.1). A skydiver who *falls on their back* inside the performance window
+generates an artificially high `speedAngle` while simultaneously braking —
+their score is degraded but the cause is not flagged in the current output.
 
 The diagnostic goal: detect the back-fall onset time and quantify its severity
 from FlySight GPS data alone, without additional sensors.
@@ -137,6 +139,14 @@ Both cases share the same physical cause — horizontal velocity reversing —
 but they appear in different geometric dimensions depending on whether the
 skydiver turned post-exit.
 
+> **ISC §5.1.3 note:** All competitors are *required* to turn 90° off the
+> jump run immediately after the forward throw dissipates. This means
+> **Case 2 (lateral reversal) is the primary expected back-fall signature**
+> for any rule-compliant jumper. Case 1 (along-run reversal) would
+> simultaneously constitute an exit procedure violation. Both cases are
+> handled by the two-axis decomposition; the framing as "straight vs. turned"
+> reflects the geometric distinction, not a judgement on frequency.
+
 **Case 1** is caught by: *distance from exit point decreasing.*
 
 **Case 2** is caught by: *perpendicular distance from the jump run line
@@ -147,7 +157,7 @@ lateral collapse.
 Decomposing each position into (forward, lateral) components relative to the
 jump run reference handles both cases with two clean invariants:
 
-1. Forward component is non-decreasing throughout the scoring window.
+1. Forward component is non-decreasing throughout the performance window.
 2. Lateral absolute value is non-decreasing from turn establishment onward.
 
 ---
@@ -167,9 +177,10 @@ from the data. Three options were considered:
 
 **Selected: first 15 samples (3 seconds) post-exit.**
 
-Exit inertia keeps the skydiver on the aircraft's track for at least 3 seconds
+The aircraft's **forward throw** (ISC §5.1.3: "forward throw/momentum of the
+aircraft") carries the skydiver along the jump run for at least 3 seconds
 regardless of intended direction — even a skydiver who immediately begins
-turning is still predominantly carried forward by momentum during this window.
+turning is still predominantly carried forward during this phase.
 The mean bearing over these 15 samples is the jump run reference direction.
 
 ### 6.2 Reference Frame Construction
@@ -266,7 +277,7 @@ tested and **rejected**:
 | Post-exit seconds 0–7 | 247.2° | +4.5° marginal |
 | Post-exit seconds 0–24 | 252.9° | **+10.2° ✗** |
 
-Root cause: after the scoring window (~12 s), horizontal speed drops to
+Root cause: after the performance window (~12 s), horizontal speed drops to
 4–8 m/s. GPS bearing at that speed is dominated by wind drift and measurement
 noise, not direction of travel. Seconds 20–24 show +26° to +36° deviations.
 Averaging these into the reference bearing introduces a 10° systematic error
@@ -298,7 +309,7 @@ jd     = result.data.reset_index(drop=True)
 # Aircraft position at t: project_point(exit_lat, exit_lon, bearing=245.0°, dist=38.0*t)
 ```
 
-**Score: 482.75 km/h | Jump run: 245.0° | Scoring window: 0–23 s**
+**Score: 482.75 km/h | Jump run: 245.0° | Performance window: 0–23 s**
 
 | t (s) | Skydiver lat | Skydiver lon | Aircraft lat | Aircraft lon | Sep. (m) | AGL (m) |
 |------:|-------------:|-------------:|-------------:|-------------:|---------:|--------:|
@@ -352,7 +363,7 @@ No schema changes required. `velN`/`velE` are **not** needed.
 ```python
 def jumpRunBearing(jumpData: pd.DataFrame, nSamples: int = 15) -> float:
     """
-    Mean bearing over the first nSamples rows of the scoring window.
+    Mean bearing over the first nSamples rows of the performance window.
     Returns bearing in degrees [0, 360).
     """
 ```

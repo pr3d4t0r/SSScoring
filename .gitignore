@@ -118,6 +118,7 @@ venv.bak/
 # directory MUST be set to chmod 777 to grant it access from inside the
 # container.  The Jupyter instance in the container (Lab, Notebook) won't
 # persist state without these settings.
+**/.DS_Store**
 **/.bash_history
 **/.bash_logout
 **/.bash_profile
@@ -143,6 +144,7 @@ venv.bak/
 **/devpi-*
 **/lucy
 **/lucyfer-compose.yaml
+**/memory/*
 **/scoring/*zip
 **/scoring/_jupyter/jupyter_notebook_config.json
 **/scoring/_jupyter/lab/*
@@ -152,7 +154,6 @@ venv.bak/
 **/test.json
 **/test.py
 **/tmp/*
-**/.DS_Store**
 .lesshst
 .vimrc
 README-1ST.ipynb
