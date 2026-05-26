@@ -1,11 +1,11 @@
-% ssscoring(3) Version 3.0.0 | Speed Skydiving Scoring API documentation
+% ssscoring(3) Version 3.0.1 | Speed Skydiving Scoring API documentation
 
 Name
 ====
 
 **SSScoring** - Speed Skydiving Scoring high level library in Python
 
---- 
+---
 
 Synopsis
 ========
@@ -52,8 +52,8 @@ https://pr3d4t0r.github.io/SSScoring/ssscoring.html
 The SSScore apps are available from:
 
 - web app:  **[https://ssscore.streamlit.app](https://ssscore.streamlit.app)**
-- **[SSScore for Mac (universal .dmg)](https://github.com/pr3d4t0r/SSScoring/releases/latest/download/SSScore-3.0.0.dmg)**
-- **[SSScore for Windows (installer)](https://github.com/pr3d4t0r/SSScoring/releases/latest/download/SSScore-3.0.0-Setup.exe)**
+- **[SSScore for Mac (universal .dmg)](https://github.com/pr3d4t0r/SSScoring/releases/latest/download/SSScore-3.0.1.dmg)**
+- **[SSScore for Windows (installer)](https://github.com/pr3d4t0r/SSScoring/releases/latest/download/SSScore-3.0.1-Setup.exe)**
 
 ---
 
@@ -164,7 +164,7 @@ The `docker-compose.yaml` files included in the master SSScoring repository are 
 
 	```zsh
 	docker compose -f dockerize/ARM/docker-compose.yaml up
-	```	
+	```
 
 Once it's running click on [SSScore web app](http://localhost:8501) link to score your jumps or go to http://localhost:8501 in your favorite web browser.
 
@@ -331,7 +331,7 @@ drwxr-xr-x  3 ciurana  staff     96 May 23 08:51 SSScore.app
 -rw-r--r--  1 ciurana  staff  55699 May 23 08:46 ssscoring-2.98.97-py3-none-any.whl
 ./dist/SSScore.app: satisfies its Designated Requirement
 ✓ signed: ./dist/SSScore.app
-Architectures in the fat file: ./dist/SSScore.app/Contents/MacOS/SSScore are: x86_64 arm64 
+Architectures in the fat file: ./dist/SSScore.app/Contents/MacOS/SSScore are: x86_64 arm64
 ```
 
 ### Productized macOS build
@@ -346,7 +346,7 @@ The disk image is generated to `./dist` as `SSScoring-3.0.0.dmg`, alongside the 
 
 ```
 drwxr-xr-x  3 ciurana  staff         96 May 23 09:01 DumbDriver.app
--rw-r--r--@ 1 ciurana  staff  190369691 May 23 09:06 SSScore-3.0.0.dmg
+-rw-r--r--@ 1 ciurana  staff  190369691 May 23 09:06 SSScore-3.0.1.dmg
 drwxr-xr-x  3 ciurana  staff         96 May 23 08:51 SSScore.app
 -rw-r--r--  1 ciurana  staff      55699 May 23 08:46 ssscoring-2.98.97-py3-none-any.whl
 drwxr-xr-x  3 ciurana  staff         96 May 23 09:01 umountFlySight.app
@@ -422,13 +422,13 @@ This produces a standar Windows installer wizard.  SSScore is installed as a fir
 
 ```
 drwxr-xr-x 1 crystal None        0 May 23 12:43 SSScore
--rwxr-xr-x 1 crystal None 79116394 May 23 12:44 SSScore-3.0.0-Setup.exe
+-rwxr-xr-x 1 crystal None 79116394 May 23 12:44 SSScore-3.0.1-Setup.exe
 -rw-r--r-- 1 crystal None    56233 May 23 12:42 ssscoring-2.98.97-py3-none-any.whl
 ```
 `./dist` ends up with three distributable packages, ready to go:
 
 - `SSScore` - `onedir` executable
-- `SSScore-3.0.0-Setup.exe` standard installer
+- `SSScore-3.0.1-Setup.exe` standard installer
 - Python wheel with the latest code (the same one you'll find in PyPI)
 
 ## Docker build
@@ -468,10 +468,10 @@ make clean && make dockerize.arm64
 
 ```
 IMAGE                                        ID             DISK USAGE   CONTENT SIZE   EXTRA
-pr3d4t0r/ssscore-p:2.10.13                   1216fd1debf0       2.25GB             0B        
-pr3d4t0r/ssscore-p:latest                    1216fd1debf0       2.25GB             0B        
-pr3d4t0r/ssscore:2.10.13                     c9771dea3985       1.91GB             0B        
-pr3d4t0r/ssscore:latest                      c9771dea3985       1.91GB             0B        
+pr3d4t0r/ssscore-p:2.10.13                   1216fd1debf0       2.25GB             0B
+pr3d4t0r/ssscore-p:latest                    1216fd1debf0       2.25GB             0B
+pr3d4t0r/ssscore:2.10.13                     c9771dea3985       1.91GB             0B
+pr3d4t0r/ssscore:latest                      c9771dea3985       1.91GB             0B
 ```
 
 Yes, the images are big.  Apache dependencies in pandas are the reason.  A lot of surgery, love, and care went into slimming down the macOS and Windows standalone executables.
