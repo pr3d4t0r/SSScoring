@@ -5,3 +5,4 @@ pyflakes
 pyinstaller
 pytest
 pytest-cov
+twine
