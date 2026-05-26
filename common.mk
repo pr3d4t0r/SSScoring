@@ -166,7 +166,6 @@ prune:
 
 
 publish:
-	pip install -U twine
 	twine --no-color check $(DIST)/*whl
 	twine --no-color upload --verbose $(DIST)/*whl
 

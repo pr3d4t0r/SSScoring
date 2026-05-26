@@ -26,6 +26,8 @@
 
 ## Tips and tricks
 
+- Desktop apps:  [**Mac** and Windows](https://github.com/pr3d4t0r/SSScoring/releases) - GitHub
+- **[Web app](https://speedskydiving.app)**
 - You can add or remove files from the track file uploader as you go, without
   having to clear every time; SSScore uses the DZ elevation to validate the
   jump but otherwise doesn't enforce if two track files come from the same DZ
@@ -38,7 +40,7 @@
 
 
 ---
-Copyright &copy; 2019-2025 by Eugene Ciurana DBA **pr3d4t0r Speed Skydiving
+Copyright &copy; 2019-2026 by Eugene Ciurana DBA **pr3d4t0r Speed Skydiving
 Team**, and CIME Sofware Ltd.
 
 **<a href='https://github.com/pr3d4t0r/SSScoring' target='_blank'>SSScore</a>** and all its components are released under the BSD-3 open source license.
