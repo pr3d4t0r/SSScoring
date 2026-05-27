@@ -1,6 +1,6 @@
 # Back-Fall Detection: Analysis and Design
 
-- **Author:** Eugene Ciurana + Deirdre
+- **Author:** pr3d4t0r and Deirdre
 - **Date:** 2026-05-24
 - **Branch:** 99998-Claude-Code-integration
 - **Status:** Design complete, ready for implementation
