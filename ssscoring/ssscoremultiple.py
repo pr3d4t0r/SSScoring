@@ -191,7 +191,7 @@ def main():
                         showIt=False
                     )
                     st.session_state.displayScorePoint = st.toggle('Display max score / max speed point', value=True, help='Show the fastest speed or score point along the flight path', key=tag)
-                    displayTrackOnMap(speedJumpTrajectory(jumpResult, st.session_state.displayScorePoint), st.session_state.displayScorePoint)
+                    displayTrackOnMap(speedJumpTrajectory(jumpResult, st.session_state.displayScorePoint), st.session_state.displayScorePoint, showJumpRunLegend=True)
                     _displayAllJumpDataIn(jumpResult.data)
                     _displayScoresIn(jumpResult.scores)
                 elif jumpStatus == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT:
