@@ -15,6 +15,7 @@ from ssscoring.constants import BREAKOFF_ALTITUDE
 from ssscoring.constants import DEG_IN_RADIANS
 from ssscoring.constants import EXIT_SPEED
 from ssscoring.constants import FT_IN_M
+from ssscoring.constants import JUMP_RUN_SAMPLES
 from ssscoring.constants import KMH_AS_MS
 from ssscoring.constants import LAST_TIME_TRANCHE
 from ssscoring.constants import MAX_ALTITUDE_METERS
@@ -500,6 +501,137 @@ def calcScoreISC(data: pd.DataFrame) -> tuple:
     return (max(scores), scores)
 
 
+def jumpRunBearing(jumpData: pd.DataFrame, nSamples: int = JUMP_RUN_SAMPLES) -> float:
+    """
+    Estimates the jump run bearing from the first `nSamples` rows of the
+    performance window using the aircraft's residual forward throw (ISC §5.1.3).
+
+    Arguments
+    ---------
+        jumpData : pd.DataFrame
+    Performance-window data in SSScoring format with `plotTime >= 0`.
+
+        nSamples : int
+    Number of post-exit samples to average.  Default: `JUMP_RUN_SAMPLES` (15,
+    i.e. 3 seconds at 5 Hz).
+
+    Returns
+    -------
+    Mean bearing in degrees [0, 360).
+    """
+    samples = jumpData.head(nSamples)
+    lats = samples.latitude.to_numpy(dtype=float)
+    lons = samples.longitude.to_numpy(dtype=float)
+    sinSum = 0.0
+    cosSum = 0.0
+    count = 0
+    for i in range(len(lats) - 1):
+        lat1, lon1, lat2, lon2 = map(math.radians, [lats[i], lons[i], lats[i + 1], lons[i + 1]])
+        dLon = lon2 - lon1
+        x = math.sin(dLon) * math.cos(lat2)
+        y = math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(lat2) * math.cos(dLon)
+        if x != 0.0 or y != 0.0:
+            b = math.atan2(x, y)
+            sinSum += math.sin(b)
+            cosSum += math.cos(b)
+            count += 1
+    if count == 0:
+        return 0.0
+    return (math.degrees(math.atan2(sinSum / count, cosSum / count)) + 360.0) % 360.0
+
+
+def forwardLateralDisplacement(
+    jumpData: pd.DataFrame,
+    exitLat: float,
+    exitLon: float,
+    bearing: float,
+) -> pd.DataFrame:
+    """
+    Adds `forwardM` and `lateralM` columns to `jumpData`: signed displacement
+    in metres along and perpendicular to the jump run axis from the exit point.
+    Positive `forwardM` = moving away from exit; negative = reversed.
+    Positive `lateralM` = right of jump run; negative = left.
+
+    Arguments
+    ---------
+        jumpData : pd.DataFrame
+    Performance-window data in SSScoring format.
+
+        exitLat, exitLon : float
+    Exit point coordinates (latitude, longitude).
+
+        bearing : float
+    Jump run bearing in degrees [0, 360), typically from `jumpRunBearing()`.
+
+    Returns
+    -------
+    Copy of `jumpData` with `forwardM` and `lateralM` columns appended.
+    """
+    bearingRad = math.radians(bearing)
+    lats = jumpData.latitude.to_numpy(dtype=float)
+    lons = jumpData.longitude.to_numpy(dtype=float)
+    distances = np.array([
+        calculateDistance((exitLat, exitLon), (lat, lon))
+        for lat, lon in zip(lats, lons)
+    ])
+    lat1Rad = math.radians(exitLat)
+    lon1Rad = math.radians(exitLon)
+    lat2Rad = np.radians(lats)
+    dLon = np.radians(lons) - lon1Rad
+    x = np.sin(dLon) * np.cos(lat2Rad)
+    y = math.cos(lat1Rad) * np.sin(lat2Rad) - math.sin(lat1Rad) * np.cos(lat2Rad) * np.cos(dLon)
+    ptBearings = np.arctan2(x, y)
+    deltas = ptBearings - bearingRad
+    result = jumpData.copy()
+    result['forwardM'] = np.round(distances * np.cos(deltas), decimals=2)
+    result['lateralM'] = np.round(distances * np.sin(deltas), decimals=2)
+    return result
+
+
+def detectBackFall(jumpData: pd.DataFrame) -> dict:
+    """
+    Detects whether the skydiver fell to their back during the performance
+    window and quantifies the severity using GPS ground track geometry.
+
+    A back-fall produces a reversal in the skydiver's displacement along the
+    jump run axis (forward reversal) or perpendicular to it (lateral reversal).
+    Both axes are checked; either non-zero reversal depth flags a back-fall.
+
+    Arguments
+    ---------
+        jumpData : pd.DataFrame
+    Performance-window data in SSScoring format, with `plotTime` column set
+    (i.e., called after `processJump` sets `plotTime`).
+
+    Returns
+    -------
+    dict with keys:
+
+    - `backFall` : bool — `True` if any reversal detected
+    - `onsetTime` : float | None — `plotTime` at peak forward displacement;
+      `None` if no back-fall detected
+    - `forwardReversalM` : float — metres reversed along jump run axis (≥ 0)
+    - `lateralReversalM` : float — metres reversed on lateral axis (≥ 0)
+    """
+    exitLat = float(jumpData.latitude.iloc[0])
+    exitLon = float(jumpData.longitude.iloc[0])
+    bearing = jumpRunBearing(jumpData)
+    df = forwardLateralDisplacement(jumpData, exitLat, exitLon, bearing)
+    forwardMax = float(df.forwardM.max())
+    onsetIdx = df.forwardM.idxmax()
+    onsetTime = float(df.loc[onsetIdx].plotTime)
+    forwardReversalM = round(max(0.0, forwardMax - float(df.forwardM.iloc[-1])), 2)
+    lateralAbsMax = float(df.lateralM.abs().max())
+    lateralReversalM = round(max(0.0, lateralAbsMax - float(df.lateralM.abs().iloc[-1])), 2)
+    backFall = forwardReversalM > 0.0 or lateralReversalM > 0.0
+    return {
+        'backFall': backFall,
+        'onsetTime': onsetTime if backFall else None,
+        'forwardReversalM': forwardReversalM,
+        'lateralReversalM': lateralReversalM,
+    }
+
+
 def processJump(data: pd.DataFrame) -> JumpResults:
     """
     Take a dataframe in SSScoring format and process it for display.  It
@@ -530,6 +662,10 @@ def processJump(data: pd.DataFrame) -> JumpResults:
     workData = data.copy()
     workData = dropNonSkydiveDataFrom(workData)
     window, workData = getSpeedSkydiveFrom(workData)
+    backFall = False
+    backFallOnset = None
+    forwardReversalM = 0.0
+    lateralReversalM = 0.0
     if workData.empty and not window:
         workData = None
         maxSpeed = -1.0
@@ -546,15 +682,19 @@ def processJump(data: pd.DataFrame) -> JumpResults:
         baseTime = workData.iloc[0].timeUnix
         workData['plotTime'] = round(workData.timeUnix-baseTime, 2)
         if jumpStatus == JumpStatus.OK:
-            table = None
             table = jumpAnalysisTable(workData)
             maxSpeed = data.vKMh.max()
             score, scores = calcScoreISC(workData)
+            backFallResult = detectBackFall(workData)
+            backFall = backFallResult['backFall']
+            backFallOnset = backFallResult['onsetTime']
+            forwardReversalM = backFallResult['forwardReversalM']
+            lateralReversalM = backFallResult['lateralReversalM']
         else:
             maxSpeed = -1
             if not len(workData):
                 jumpStatus = JumpStatus.INVALID_SPEED_FILE
-    return JumpResults(workData, maxSpeed, score, scores, table, window, jumpStatus)
+    return JumpResults(workData, maxSpeed, score, scores, table, window, jumpStatus, backFall, backFallOnset, forwardReversalM, lateralReversalM)
 
 
 def processAllJumpFiles(jumpFiles: list, altitudeDZMeters = 0.0) -> dict:
