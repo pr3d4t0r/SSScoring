@@ -208,6 +208,12 @@ Speed accuracy for the FlySight device.
 """
 
 
+SSSCORE_DOWNLOAD_PNG = 'SSScore-download.png'
+"""
+SSScore app icon used in the instructions page download link.
+"""
+
+
 SSSCORE_INSTRUCTIONS_MD = 'instructions.md'
 """
 Markdown representation of the end-user instructions on how to use SSScore.

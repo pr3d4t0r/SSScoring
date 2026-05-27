@@ -9,6 +9,7 @@ Process a group of jumps uploaded from a file uploader.
 from ssscoring import __VERSION__
 from ssscoring.appcommon import displayJumpDataIn
 from ssscoring.appcommon import displayTrackOnMap
+from ssscoring.appcommon import fetchInstructionsHTML
 from ssscoring.appcommon import fetchResource
 from ssscoring.appcommon import initFileUploaderState
 from ssscoring.appcommon import interpretJumpResult
@@ -23,7 +24,6 @@ from ssscoring.constants import DEFAULT_PLOT_INCREMENT
 from ssscoring.constants import DEFAULT_PLOT_MAX_V_SCALE
 from ssscoring.constants import M_2_FT
 from ssscoring.constants import SPEED_ACCURACY_THRESHOLD
-from ssscoring.constants import SSSCORE_INSTRUCTIONS_MD
 from ssscoring.datatypes import JumpStatus
 from ssscoring.datatypes import PerformanceWindow
 from ssscoring.mapview import multipleSpeedJumpsTrajectories
@@ -207,7 +207,7 @@ def main():
                         _displaySpeedSummary(aggregate, allJumpsPlot)
                         _displayAllTracksOnMap(jumpResults)
     else:
-        st.write(fetchResource(SSSCORE_INSTRUCTIONS_MD).read(), unsafe_allow_html=True)
+        st.write(fetchInstructionsHTML(), unsafe_allow_html=True)
 
 
 if '__main__' == __name__:

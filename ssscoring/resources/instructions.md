@@ -1,5 +1,13 @@
 # Speed Skydiving Scoring
 
+## Desktop app
+
+{{SSSCORE_ICON_128}}
+
+Run SSScore from your computer:  [**Mac** and Windows](https://github.com/pr3d4t0r/SSScoring/releases) - GitHub.
+
+You can score and analyze jumps even if there's no Internet at the drop zone!
+
 ## To score one or more jumps
 
 1. Set the starting/drop zone ground-level elevation in meters by **selecting
@@ -26,7 +34,6 @@
 
 ## Tips and tricks
 
-- Desktop apps:  [**Mac** and Windows](https://github.com/pr3d4t0r/SSScoring/releases) - GitHub
 - **[Web app](https://speedskydiving.app)**
 - You can add or remove files from the track file uploader as you go, without
   having to clear every time; SSScore uses the DZ elevation to validate the

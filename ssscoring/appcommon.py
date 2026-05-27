@@ -8,6 +8,8 @@ package.
 from importlib_resources import files
 from io import StringIO
 
+import base64
+
 from ssscoring import __VERSION__
 from ssscoring.calc import isValidMaximumAltitude
 from ssscoring.calc import isValidMinimumAltitude
@@ -17,6 +19,8 @@ from ssscoring.constants import DZ_DIRECTORY
 from ssscoring.constants import FLYSIGHT_FILE_ENCODING
 from ssscoring.constants import M_2_FT
 from ssscoring.constants import RESOURCES
+from ssscoring.constants import SSSCORE_DOWNLOAD_PNG
+from ssscoring.constants import SSSCORE_INSTRUCTIONS_MD
 from ssscoring.datatypes import JumpResults
 from ssscoring.datatypes import JumpStatus
 from ssscoring.errors import SSScoringError
@@ -105,6 +109,39 @@ def fetchResource(resourceName: str) -> StringIO:
         return StringIO(files(RESOURCES).joinpath(resourceName).read_bytes().decode(FLYSIGHT_FILE_ENCODING))
     except Exception as e:
         raise SSScoringError('Invalid resource - %s' % str(e))
+
+
+_SSSCORE_ICON_PLACEHOLDER = '{{SSSCORE_ICON_128}}'
+_SSSCORE_ICON_LINK = 'https://github.com/pr3d4t0r/SSScoring/releases'
+_SSSCORE_ICON_HTML = (
+    '<div style="text-align: left; margin: 0.75em 0 1em 0;">'
+    '<a href="%s" target="_blank">'
+    '<img src="data:image/png;base64,{b64}" width="128" height="128"'
+    ' style="border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.25);"'
+    ' alt="Download SSScore"/>'
+    '</a>'
+    '</div>'
+) % _SSSCORE_ICON_LINK
+
+
+@st.cache_data
+def fetchInstructionsHTML() -> str:
+    """
+    Load `instructions.md` and substitute the `{{SSSCORE_ICON_128}}`
+    placeholder with an inline base64 PNG icon linked to the GitHub releases
+    page.  The PNG is read from the package resource, so the result is
+    self-contained and works offline and from within a Python wheel.
+
+    Returns
+    -------
+    The instructions Markdown/HTML string, ready for `st.write(...,
+    unsafe_allow_html=True)`.
+    """
+    text = fetchResource(SSSCORE_INSTRUCTIONS_MD).read()
+    iconBytes = files(RESOURCES).joinpath(SSSCORE_DOWNLOAD_PNG).read_bytes()
+    b64 = base64.b64encode(iconBytes).decode('ascii')
+    iconHTML = _SSSCORE_ICON_HTML.format(b64=b64)
+    return text.replace(_SSSCORE_ICON_PLACEHOLDER, iconHTML)
 
 
 def initDropZonesFromResource() -> pd.DataFrame:
