@@ -1,4 +1,5 @@
 build
+haversine
 pdoc
 ptpython
 pyflakes
@@ -6,3 +7,4 @@ pyinstaller
 pytest
 pytest-cov
 twine
+watchdog

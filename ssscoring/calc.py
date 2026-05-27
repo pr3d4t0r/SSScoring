@@ -659,6 +659,7 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
                 finalSpeed = None
 
             t = pd.pivot_table(t, columns=t.time)
+            t.columns = [str(c) for c in t.columns]
             d = pd.DataFrame([jumpResult.score], index=[jumpResultIndex], columns=['score'])
 
             for column in t.columns:
@@ -670,14 +671,14 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
             if finalSpeed is not None:
                 d['finalSpeed'] = [finalSpeed]
             else:
-                d['finalSpeed'] = [d.get(25.0, [0.0])[0]]
+                d['finalSpeed'] = [d.get('25.0', [0.0])[0]]
 
             if speeds.empty:
                 speeds = d.copy()
             else:
                 speeds = pd.concat([speeds, d])
 
-    cols = ['score', 5.0, 10.0, 15.0, 20.0, 'finalSpeed', 'finalTime', 'maxSpeed']
+    cols = ['score', '5.0', '10.0', '15.0', '20.0', 'finalSpeed', 'finalTime', 'maxSpeed']
     speeds = speeds[[c for c in cols if c in speeds.columns]]
     speeds = speeds.replace(np.nan, 0.0)
     return speeds.sort_index()
@@ -759,6 +760,7 @@ def collateAnglesByTimeFromExit(jumpResults: dict) -> pd.DataFrame:
             t.iloc[-1].time = LAST_TIME_TRANCHE
 
             t = pd.pivot_table(t, columns=t.time)
+            t.columns = [str(c) for c in t.columns]
             d = pd.DataFrame([jumpResult.score], index=[jumpResultIndex], columns=['score'])
 
             for column in t.columns:
@@ -772,7 +774,7 @@ def collateAnglesByTimeFromExit(jumpResults: dict) -> pd.DataFrame:
             else:
                 angles = pd.concat([angles, d])
 
-    cols = ['score', 5.0, 10.0, 15.0, 20.0, 'finalAngle', 'finalTime']
+    cols = ['score', '5.0', '10.0', '15.0', '20.0', 'finalAngle', 'finalTime']
     angles = angles[[c for c in cols if c in angles.columns]]
     angles = angles.replace(np.nan, 0.0)
 

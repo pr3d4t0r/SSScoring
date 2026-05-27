@@ -1,7 +1,0 @@
-pandas
-ptpython
-pudb
-pyinstaller
-pytest
-pytest-cov
-streamlit
