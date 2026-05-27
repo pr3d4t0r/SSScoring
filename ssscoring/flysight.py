@@ -249,7 +249,7 @@ def detectFlySightFileVersionOf(fileThing) -> FlySightVersion:
         raise SSScoringError('%s file is not a FlySight v1 or v2 file')
 
 
-def readVersion1CSV(fileThing: obj) -> pd.DataFrame:
+def readVersion1CSV(fileThing: object) -> pd.DataFrame:
     """
     Read a FlySight file version 1 into a dataframe.  It scrubes blank rows that
     get in the way of correct parsing.
