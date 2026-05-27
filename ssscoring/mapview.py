@@ -1,6 +1,7 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 from geopy import distance
+from ssscoring.calc import jumpRunBearing
 from ssscoring.constants import SAMPLE_RATE
 from ssscoring.constants import SCORING_INTERVAL
 from ssscoring.datatypes import JumpResults
@@ -17,6 +18,17 @@ DISTANCE_FROM_MIDDLE = 400.0
 """
 The distance in meters from the middle of the skydive to the outer bounding box
 for the initial view of a new rendered map.
+"""
+
+JUMP_RUN_BACK_M = 100.0
+"""
+Distance in meters back along the approach (upjump) direction from exit.
+"""
+
+JUMP_RUN_AHEAD_M = 750.0
+"""
+Distance in meters ahead along the jump run from exit — long arm so judges
+can visually check whether the jumper stayed on jump run throughout the dive.
 """
 
 
@@ -101,7 +113,23 @@ def speedJumpTrajectory(jumpResult: JumpResults,
             maxValueTime = _resolveMaxSpeedTimeFrom(jumpResult)
             maxColorOuter = [ 255, 0, 0, 255, ]  # red
             maxCollorDot = [ 255, 255, 0, 255, ]  # yellow
+        bearing = jumpRunBearing(jumpResult.data)
+        exitRow = workData.iloc[0]
+        exitPoint = (exitRow.latitude, exitRow.longitude)
+        backPoint = distance.distance(meters=JUMP_RUN_BACK_M).destination(exitPoint, bearing=(bearing+180)%360)
+        aheadPoint = distance.distance(meters=JUMP_RUN_AHEAD_M).destination(exitPoint, bearing=bearing)
+        jumpRunPath = pd.DataFrame({
+            'path': [[[backPoint[1], backPoint[0]], [exitRow.longitude, exitRow.latitude], [aheadPoint[1], aheadPoint[0]]]],
+            'color': [[200, 200, 200, 180]],
+        })
         layers = [
+            pdk.Layer(
+                'PathLayer',
+                data=jumpRunPath,
+                get_path='path',
+                get_color='color',
+                width_min_pixels=2,
+            ),
             pdk.Layer(
                 'ScatterplotLayer',
                 data=workData.head(1),

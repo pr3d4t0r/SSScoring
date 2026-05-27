@@ -4,10 +4,12 @@
 # from ssscoring.appcommon import initFileUploaderState
 from ssscoring.appcommon import STREAMLIT_SIG_KEY
 from ssscoring.appcommon import STREAMLIT_SIG_VALUE
+from ssscoring.appcommon import fetchInstructionsHTML
 from ssscoring.appcommon import fetchResource
 from ssscoring.appcommon import initDropZonesFromResource
 from ssscoring.appcommon import interpretJumpResult
 from ssscoring.appcommon import isStreamlitHostedApp
+from ssscoring.constants import SSSCORE_DOWNLOAD_PNG
 from ssscoring.calc import convertFlySight2SSScoring
 from ssscoring.calc import processJump
 from ssscoring.constants import DZ_DIRECTORY
@@ -97,6 +99,15 @@ def test_fetchResource():
         buffer = fetchResource('bogus.dat')
 
 
+def test_fetchInstructionsHTML():
+    html = fetchInstructionsHTML()
+    assert isinstance(html, str)
+    assert SSSCORE_DOWNLOAD_PNG not in html
+    assert 'data:image/png;base64,' in html
+    assert '{{SSSCORE_ICON_128}}' not in html
+
+
 # test_interpretJumpResult()
 # test_fetchResource()
+# test_fetchInstructionsHTML()
 

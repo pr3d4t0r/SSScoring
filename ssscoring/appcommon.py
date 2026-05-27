@@ -322,7 +322,8 @@ def initFileUploaderState(filesObject:str, uploaderKey:str ='uploaderKey'):
 
 
 def displayTrackOnMap(deck: pdk.Deck,
-                      displayScore=True):
+                      displayScore=True,
+                      showJumpRunLegend=False):
     """
     Displays a track map drawn using PyDeck.
 
@@ -333,11 +334,25 @@ def displayTrackOnMap(deck: pdk.Deck,
 
         displayScore
     If `True`, display the max score point; else display the max speed point.
+
+        showJumpRunLegend
+    If `True`, render a colour legend for the speed run and jump run lines.
+    Only meaningful for single-jump views where the jump run PathLayer is present.
     """
     if deck is not None:
         label = 'score' if displayScore else 'speed'
         st.write('Brightest point shows the max **%s** point.  Exit at orange point.  Each track dot is 4 m in diameter.' % label)
         st.pydeck_chart(deck)
+        if showJumpRunLegend:
+            st.markdown(
+                '<div style="display:flex; gap:1.5em; align-items:center; margin-top:0.4em;">'
+                '<span><span style="display:inline-block; width:28px; height:4px;'
+                ' background:#6495ed; vertical-align:middle; margin-right:5px;"></span>Speed run</span>'
+                '<span><span style="display:inline-block; width:28px; height:4px;'
+                ' background:rgba(200,200,200,0.9); vertical-align:middle; margin-right:5px;"></span>Jump run</span>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
 
 
 @st.dialog('DZ Coordinates')
