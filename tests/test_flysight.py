@@ -1,20 +1,25 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
 
+from io import StringIO
 from pathlib import Path
 
 from ssscoring.constants import BREAKOFF_ALTITUDE
 from ssscoring.constants import FLYSIGHT_2_HEADER
 from ssscoring.errors import SSScoringError
+from ssscoring.flysight import FLYSIGHT_1_HEADER
+from ssscoring.flysight import FLYSIGHT_FILE_ENCODING
 from ssscoring.flysight import FlySightVersion
 from ssscoring.flysight import detectFlySightFileVersionOf
 from ssscoring.flysight import fixCRMangledCSV
 from ssscoring.flysight import getAllSpeedJumpFilesFrom
+from ssscoring.flysight import getFlySightDataFromCSVBuffer
+from ssscoring.flysight import getFlySightDataFromCSVFileName
 from ssscoring.flysight import isCRMangledCSV
+from ssscoring.flysight import readVersion1CSV
+from ssscoring.flysight import readVersion2CSV
 from ssscoring.flysight import skipOverFS2MetadataRowsIn
 from ssscoring.flysight import validFlySightHeaderIn
-
-
 
 import os
 import pytest
@@ -126,7 +131,7 @@ def test_detectFlySightFileVersionOf(_missingColumnInCSV):
     with open(TEST_FLYSIGHT_1_DATA, 'rb') as inputFile:
         buffer = inputFile.read()
 
-    x = detectFlySightFileVersionOf(buffer)
+    _ = detectFlySightFileVersionOf(buffer)
 
 
 def test_isCRMangledCSV():
@@ -146,4 +151,79 @@ def test_fixCRMangledCSV():
     fixCRMangledCSV(tempFile)
     assert not isCRMangledCSV(tempFile)
     os.unlink(tempFile)
+
+
+def test_readVersion1CSV():
+    rawData = readVersion1CSV(TEST_FLYSIGHT_1_DATA.as_posix())
+    assert isinstance(rawData, pd.DataFrame)
+    assert len(rawData) > 0
+    assert FLYSIGHT_1_HEADER.issubset(set(rawData.columns))
+
+    rawData = readVersion1CSV(TEST_FLYSIGHT_1_DATA)
+    assert isinstance(rawData, pd.DataFrame)
+    assert len(rawData) > 0
+
+    with open(TEST_FLYSIGHT_1_DATA, 'rb') as inputFile:
+        buffer = inputFile.read()
+    rawData = readVersion1CSV(StringIO(buffer.decode(FLYSIGHT_FILE_ENCODING)))
+    assert isinstance(rawData, pd.DataFrame)
+    assert len(rawData) > 0
+
+
+def test_readVersion2CSV():
+    rawData = readVersion2CSV(TEST_FLYSIGHT_2_DATA.as_posix())
+    assert isinstance(rawData, pd.DataFrame)
+    assert len(rawData) > 0
+    assert 'GNSS' not in rawData.columns
+    assert pd.notnull(rawData.iloc[0].time)
+
+    rawData = readVersion2CSV(TEST_FLYSIGHT_2_DATA)
+    assert isinstance(rawData, pd.DataFrame)
+    assert len(rawData) > 0
+    assert 'GNSS' not in rawData.columns
+
+
+def test_getFlySightDataFromCSVBuffer():
+    with pytest.raises(SSScoringError):
+        getFlySightDataFromCSVBuffer('not bytes', 'test')
+
+    rawData, tag = getFlySightDataFromCSVBuffer(b'col1,col2\n1,2\n', 'bogus.CSV')
+    assert rawData is None
+    assert 'INVALID' in tag
+
+    with open(TEST_FLYSIGHT_1_DATA, 'rb') as inputFile:
+        buffer = inputFile.read()
+    rawData, tag = getFlySightDataFromCSVBuffer(buffer, TEST_FLYSIGHT_1_DATA.name)
+    assert isinstance(rawData, pd.DataFrame)
+    assert tag.endswith(':v1')
+
+    with open(TEST_FLYSIGHT_2_DATA, 'rb') as inputFile:
+        buffer = inputFile.read()
+    rawData, tag = getFlySightDataFromCSVBuffer(buffer, TEST_FLYSIGHT_2_DATA.name)
+    assert isinstance(rawData, pd.DataFrame)
+    assert tag.endswith(':v2')
+
+
+def test_getFlySightDataFromCSVFileName(_missingColumnInCSV):
+    with pytest.raises(SSScoringError):
+        getFlySightDataFromCSVFileName(42)
+
+    with pytest.raises(SSScoringError):
+        getFlySightDataFromCSVFileName(_missingColumnInCSV)
+
+    rawData, tag = getFlySightDataFromCSVFileName(TEST_FLYSIGHT_1_DATA.as_posix())
+    assert isinstance(rawData, pd.DataFrame)
+    assert tag.endswith(':v1')
+
+    rawData, tag = getFlySightDataFromCSVFileName(TEST_FLYSIGHT_1_DATA)
+    assert isinstance(rawData, pd.DataFrame)
+    assert tag.endswith(':v1')
+
+    rawData, tag = getFlySightDataFromCSVFileName(TEST_FLYSIGHT_2_DATA.as_posix())
+    assert isinstance(rawData, pd.DataFrame)
+    assert tag.endswith(':v2')
+
+    rawData, tag = getFlySightDataFromCSVFileName(TEST_FLYSIGHT_2_DATA)
+    assert isinstance(rawData, pd.DataFrame)
+    assert tag.endswith(':v2')
 

@@ -174,6 +174,14 @@ The package resources in the manifest or package wheel resources.
 """
 
 
+JUMP_RUN_SAMPLES = 15
+"""
+Number of post-exit samples (3 seconds at 5 Hz) used to estimate the jump run
+bearing.  The aircraft's forward throw keeps the skydiver on the jump run
+heading for this window regardless of intended turn direction (ISC §5.1.3).
+"""
+
+
 SAMPLE_RATE = 0.2
 """
 Expected interval, in seconds, for the FlySight sample rate.

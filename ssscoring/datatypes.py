@@ -28,7 +28,11 @@ class JumpStatus(Enum):
     WARM_UP_FILE = 300
 
 
-JumpResults = namedtuple('JumpResults', 'data maxSpeed score scores table window status')
+JumpResults = namedtuple(
+    'JumpResults',
+    'data maxSpeed score scores table window status backFall backFallOnset forwardReversalM lateralReversalM',
+    defaults=(False, None, 0.0, 0.0),
+)
 """
 A named tuple containing the score, maximum speed, scores throught the
 performance window, the results table for a jump, the output color for the
@@ -44,7 +48,11 @@ Attributes
              for the speed run
 - `table` - summary table of results of the speed run
 - `window` - the scoring window data, an instance of `PerformanceWindow`
-- 'status' - An instance of `ssscoring.datatypes.JumpStatus`
+- `status` - An instance of `ssscoring.datatypes.JumpStatus`
+- `backFall` - `True` if a back-fall was detected within the performance window
+- `backFallOnset` - `plotTime` (seconds from exit) at back-fall onset, or `None`
+- `forwardReversalM` - metres of reversed ground travel along the jump run axis
+- `lateralReversalM` - metres of reversed ground travel on the lateral axis
 """
 
 

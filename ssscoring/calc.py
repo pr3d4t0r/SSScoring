@@ -6,7 +6,6 @@ Functions and logic for analyzing and manipulating FlySight dataframes.
 
 
 from io import BytesIO
-from io import StringIO
 from pathlib import Path
 
 from haversine import haversine
@@ -15,8 +14,8 @@ from haversine import Unit
 from ssscoring.constants import BREAKOFF_ALTITUDE
 from ssscoring.constants import DEG_IN_RADIANS
 from ssscoring.constants import EXIT_SPEED
-from ssscoring.constants import FLYSIGHT_FILE_ENCODING
 from ssscoring.constants import FT_IN_M
+from ssscoring.constants import JUMP_RUN_SAMPLES
 from ssscoring.constants import KMH_AS_MS
 from ssscoring.constants import LAST_TIME_TRANCHE
 from ssscoring.constants import MAX_ALTITUDE_METERS
@@ -31,8 +30,8 @@ from ssscoring.datatypes import JumpResults
 from ssscoring.datatypes import JumpStatus
 from ssscoring.datatypes import PerformanceWindow
 from ssscoring.errors import SSScoringError
-from ssscoring.flysight import FlySightVersion
-from ssscoring.flysight import detectFlySightFileVersionOf
+from ssscoring.flysight import getFlySightDataFromCSVBuffer
+from ssscoring.flysight import getFlySightDataFromCSVFileName
 
 import math
 import warnings
@@ -258,6 +257,8 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
         'longitude': data.lon,
         'verticalAccuracy': data.vAcc,
         'speedAccuracyISC': speedAccuracyISC,
+        'velocityNorth': data.velN,
+        'velocityEast': data.velE,
     })
 
     return data
@@ -266,7 +267,7 @@ def convertFlySight2SSScoring(rawData: pd.DataFrame,
 def _dataGroups(data):
     data_ = data.copy()
     data_['positive'] = (data_.vMetersPerSecond > 0)
-    data_['group'] = (data_.positive != data_.positive.shift(1)).astype(int).cumsum()-1
+    data_['group'] = (data_.positive != data_.positive.shift(1)).fillna(True).astype(int).cumsum()-1
 
     return data_
 
@@ -326,13 +327,26 @@ def getSpeedSkydiveFrom(data: pd.DataFrame) -> tuple:
 
             validationWindowStart = windowEnd+VALIDATION_WINDOW_LENGTH
             data = data[data.altitudeAGL >= windowEnd]
+            refN = float(data.velocityNorth.iloc[0])
+            refE = float(data.velocityEast.iloc[0])
+            refMag = (refN**2.0 + refE**2.0)**0.5
+            unitN, unitE = (refN/refMag, refE/refMag) if refMag > 0.0 else (1.0, 0.0)
+            signedHMPS = (data.velocityNorth*unitN + data.velocityEast*unitE).to_numpy(dtype=float, na_value=0.0)
+            vMS = data.vMetersPerSecond.to_numpy(dtype=float, na_value=0.0)
+            data = data.copy()
+            data['speedAngle'] = np.round(
+                np.where(signedHMPS == 0.0, 90.0, np.degrees(np.arctan(vMS/signedHMPS))),
+                decimals=2,
+            )
+            data = data.drop(['velocityNorth', 'velocityEast',], axis=1)
             performanceWindow = PerformanceWindow(windowStart, windowEnd, validationWindowStart)
         else:
+            data = data.drop(['velocityNorth', 'velocityEast',], axis=1)
             performanceWindow = None
 
         return performanceWindow, data
     else:
-        return None, data
+        return None, data.drop(['velocityNorth', 'velocityEast',], axis=1)
 
 
 def _verticalAcceleration(vKMh: pd.Series, time: pd.Series, interval=TABLE_INTERVAL) -> pd.Series:
@@ -487,6 +501,137 @@ def calcScoreISC(data: pd.DataFrame) -> tuple:
     return (max(scores), scores)
 
 
+def jumpRunBearing(jumpData: pd.DataFrame, nSamples: int = JUMP_RUN_SAMPLES) -> float:
+    """
+    Estimates the jump run bearing from the first `nSamples` rows of the
+    performance window using the aircraft's residual forward throw (ISC §5.1.3).
+
+    Arguments
+    ---------
+        jumpData : pd.DataFrame
+    Performance-window data in SSScoring format with `plotTime >= 0`.
+
+        nSamples : int
+    Number of post-exit samples to average.  Default: `JUMP_RUN_SAMPLES` (15,
+    i.e. 3 seconds at 5 Hz).
+
+    Returns
+    -------
+    Mean bearing in degrees [0, 360).
+    """
+    samples = jumpData.head(nSamples)
+    lats = samples.latitude.to_numpy(dtype=float)
+    lons = samples.longitude.to_numpy(dtype=float)
+    sinSum = 0.0
+    cosSum = 0.0
+    count = 0
+    for i in range(len(lats) - 1):
+        lat1, lon1, lat2, lon2 = map(math.radians, [lats[i], lons[i], lats[i + 1], lons[i + 1]])
+        dLon = lon2 - lon1
+        x = math.sin(dLon) * math.cos(lat2)
+        y = math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(lat2) * math.cos(dLon)
+        if x != 0.0 or y != 0.0:
+            b = math.atan2(x, y)
+            sinSum += math.sin(b)
+            cosSum += math.cos(b)
+            count += 1
+    if count == 0:
+        return 0.0
+    return (math.degrees(math.atan2(sinSum / count, cosSum / count)) + 360.0) % 360.0
+
+
+def forwardLateralDisplacement(
+    jumpData: pd.DataFrame,
+    exitLat: float,
+    exitLon: float,
+    bearing: float,
+) -> pd.DataFrame:
+    """
+    Adds `forwardM` and `lateralM` columns to `jumpData`: signed displacement
+    in metres along and perpendicular to the jump run axis from the exit point.
+    Positive `forwardM` = moving away from exit; negative = reversed.
+    Positive `lateralM` = right of jump run; negative = left.
+
+    Arguments
+    ---------
+        jumpData : pd.DataFrame
+    Performance-window data in SSScoring format.
+
+        exitLat, exitLon : float
+    Exit point coordinates (latitude, longitude).
+
+        bearing : float
+    Jump run bearing in degrees [0, 360), typically from `jumpRunBearing()`.
+
+    Returns
+    -------
+    Copy of `jumpData` with `forwardM` and `lateralM` columns appended.
+    """
+    bearingRad = math.radians(bearing)
+    lats = jumpData.latitude.to_numpy(dtype=float)
+    lons = jumpData.longitude.to_numpy(dtype=float)
+    distances = np.array([
+        calculateDistance((exitLat, exitLon), (lat, lon))
+        for lat, lon in zip(lats, lons)
+    ])
+    lat1Rad = math.radians(exitLat)
+    lon1Rad = math.radians(exitLon)
+    lat2Rad = np.radians(lats)
+    dLon = np.radians(lons) - lon1Rad
+    x = np.sin(dLon) * np.cos(lat2Rad)
+    y = math.cos(lat1Rad) * np.sin(lat2Rad) - math.sin(lat1Rad) * np.cos(lat2Rad) * np.cos(dLon)
+    ptBearings = np.arctan2(x, y)
+    deltas = ptBearings - bearingRad
+    result = jumpData.copy()
+    result['forwardM'] = np.round(distances * np.cos(deltas), decimals=2)
+    result['lateralM'] = np.round(distances * np.sin(deltas), decimals=2)
+    return result
+
+
+def detectBackFall(jumpData: pd.DataFrame) -> dict:
+    """
+    Detects whether the skydiver fell to their back during the performance
+    window and quantifies the severity using GPS ground track geometry.
+
+    A back-fall produces a reversal in the skydiver's displacement along the
+    jump run axis (forward reversal) or perpendicular to it (lateral reversal).
+    Both axes are checked; either non-zero reversal depth flags a back-fall.
+
+    Arguments
+    ---------
+        jumpData : pd.DataFrame
+    Performance-window data in SSScoring format, with `plotTime` column set
+    (i.e., called after `processJump` sets `plotTime`).
+
+    Returns
+    -------
+    dict with keys:
+
+    - `backFall` : bool — `True` if any reversal detected
+    - `onsetTime` : float | None — `plotTime` at peak forward displacement;
+      `None` if no back-fall detected
+    - `forwardReversalM` : float — metres reversed along jump run axis (≥ 0)
+    - `lateralReversalM` : float — metres reversed on lateral axis (≥ 0)
+    """
+    exitLat = float(jumpData.latitude.iloc[0])
+    exitLon = float(jumpData.longitude.iloc[0])
+    bearing = jumpRunBearing(jumpData)
+    df = forwardLateralDisplacement(jumpData, exitLat, exitLon, bearing)
+    forwardMax = float(df.forwardM.max())
+    onsetIdx = df.forwardM.idxmax()
+    onsetTime = float(df.loc[onsetIdx].plotTime)
+    forwardReversalM = round(max(0.0, forwardMax - float(df.forwardM.iloc[-1])), 2)
+    lateralAbsMax = float(df.lateralM.abs().max())
+    lateralReversalM = round(max(0.0, lateralAbsMax - float(df.lateralM.abs().iloc[-1])), 2)
+    backFall = forwardReversalM > 0.0 or lateralReversalM > 0.0
+    return {
+        'backFall': backFall,
+        'onsetTime': onsetTime if backFall else None,
+        'forwardReversalM': forwardReversalM,
+        'lateralReversalM': lateralReversalM,
+    }
+
+
 def processJump(data: pd.DataFrame) -> JumpResults:
     """
     Take a dataframe in SSScoring format and process it for display.  It
@@ -517,6 +662,10 @@ def processJump(data: pd.DataFrame) -> JumpResults:
     workData = data.copy()
     workData = dropNonSkydiveDataFrom(workData)
     window, workData = getSpeedSkydiveFrom(workData)
+    backFall = False
+    backFallOnset = None
+    forwardReversalM = 0.0
+    lateralReversalM = 0.0
     if workData.empty and not window:
         workData = None
         maxSpeed = -1.0
@@ -533,137 +682,19 @@ def processJump(data: pd.DataFrame) -> JumpResults:
         baseTime = workData.iloc[0].timeUnix
         workData['plotTime'] = round(workData.timeUnix-baseTime, 2)
         if jumpStatus == JumpStatus.OK:
-            table = None
             table = jumpAnalysisTable(workData)
             maxSpeed = data.vKMh.max()
             score, scores = calcScoreISC(workData)
+            backFallResult = detectBackFall(workData)
+            backFall = backFallResult['backFall']
+            backFallOnset = backFallResult['onsetTime']
+            forwardReversalM = backFallResult['forwardReversalM']
+            lateralReversalM = backFallResult['lateralReversalM']
         else:
             maxSpeed = -1
             if not len(workData):
                 jumpStatus = JumpStatus.INVALID_SPEED_FILE
-    return JumpResults(workData, maxSpeed, score, scores, table, window, jumpStatus)
-
-
-def _readVersion1CSV(fileThing: str) -> pd.DataFrame:
-    return pd.read_csv(fileThing, skiprows = (1, 1), index_col = False)
-
-
-def _tagVersion1From(fileThing: str) -> str:
-    return fileThing.replace('.CSV', '').replace('.csv', '').replace('/data', '').replace('/', ' ').strip()+':v1'
-
-
-def _tagVersion2From(fileThing: str) -> str:
-    if '/' in fileThing:
-        return fileThing.split('/')[-2]+':v2'
-    else:
-        return fileThing.replace('.CSV', '').replace('.csv', '')+':v2'
-
-
-
-def _readVersion2CSV(jumpFile: str) -> pd.DataFrame:
-    from ssscoring.constants import FLYSIGHT_2_HEADER
-    from ssscoring.flysight import skipOverFS2MetadataRowsIn
-
-    rawData = pd.read_csv(jumpFile, names = FLYSIGHT_2_HEADER, skiprows = 6, index_col = False)
-    rawData = skipOverFS2MetadataRowsIn(rawData)
-    rawData.drop('GNSS', inplace = True, axis = 1)
-    return rawData
-
-
-def getFlySightDataFromCSVBuffer(buffer:bytes, bufferName:str) -> tuple:
-    """
-    Ingress a buffer with known FlySight or SkyTrax file data for SSScoring
-    processing.
-
-    Arguments
-    ---------
-        buffer
-    A binary data buffer, bag of bytes, containing a known FlySight track file.
-
-        bufferName
-    An arbitrary name for the buffer of type `str`.  It's used for constructing
-    the full buffer tag value for human identification.
-
-    Returns
-    -------
-    A `tuple` with two items:
-        - `rawData` - a dataframe representation of the CSV with the original
-          headers but without the data type header
-        - `tag` - a string with an identifying tag derived from the path name
-          and file version in the form `some name:vX`.  It uses the current
-          path as metadata to infer the name.  There's no semantics enforcement.
-
-    Raises
-    ------
-    `SSScoringError` if the CSV file is invalid in any way.
-    """
-    if not isinstance(buffer, bytes):
-        raise SSScoringError('buffer must be an instance of bytes, a bytes buffer')
-    try:
-        stringIO = StringIO(buffer.decode(FLYSIGHT_FILE_ENCODING))
-    except Exception as e:
-        raise SSScoringError('invalid buffer endcoding - %s' % str(e))
-    try:
-        version = detectFlySightFileVersionOf(buffer)
-    except Exception:
-        tag = '%s:INVALID' % bufferName
-        rawData = None
-    else:
-        if version == FlySightVersion.V1:
-            rawData = _readVersion1CSV(stringIO)
-            tag = _tagVersion1From(bufferName)
-        elif version == FlySightVersion.V2:
-            rawData = _readVersion2CSV(stringIO)
-            tag = _tagVersion2From(bufferName)
-    return (rawData, tag)
-
-
-def getFlySightDataFromCSVFileName(jumpFile) -> tuple:
-    """
-    Ingress a known FlySight or SkyTrax file into memory for SSScoring
-    processing.
-
-    Arguments
-    ---------
-        jumpFile
-    A string or `pathlib.Path` object; can be a relative or an asbolute path.
-
-    Returns
-    -------
-    A `tuple` with two items:
-        - `rawData` - a dataframe representation of the CSV with the original
-          headers but without the data type header
-        - `tag` - a string with an identifying tag derived from the path name
-          and file version in the form `some name:vX`.  It uses the current
-          path as metadata to infer the name.  There's no semantics enforcement.
-
-    Raises
-    ------
-    `SSScoringError` if the CSV file is invalid in any way.
-    """
-    from ssscoring.flysight import validFlySightHeaderIn
-
-    if isinstance(jumpFile, Path):
-        jumpFile = jumpFile.as_posix()
-    elif isinstance(jumpFile, str):
-        pass
-    else:
-        raise SSScoringError('jumpFile must be a string or a Path object')
-    if not validFlySightHeaderIn(jumpFile):
-        raise SSScoringError('%s is an invalid speed skydiving file')
-    try:
-        version = detectFlySightFileVersionOf(jumpFile)
-    except Exception:
-        tag = 'NA'
-        rawData = None
-    else:
-        if version == FlySightVersion.V1:
-            rawData = _readVersion1CSV(jumpFile)
-            tag = _tagVersion1From(jumpFile)
-        elif version == FlySightVersion.V2:
-            rawData = _readVersion2CSV(jumpFile)
-            tag = _tagVersion2From(jumpFile)
-    return (rawData, tag)
+    return JumpResults(workData, maxSpeed, score, scores, table, window, jumpStatus, backFall, backFallOnset, forwardReversalM, lateralReversalM)
 
 
 def processAllJumpFiles(jumpFiles: list, altitudeDZMeters = 0.0) -> dict:
@@ -768,6 +799,7 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
                 finalSpeed = None
 
             t = pd.pivot_table(t, columns=t.time)
+            t.columns = [str(c) for c in t.columns]
             d = pd.DataFrame([jumpResult.score], index=[jumpResultIndex], columns=['score'])
 
             for column in t.columns:
@@ -779,14 +811,14 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
             if finalSpeed is not None:
                 d['finalSpeed'] = [finalSpeed]
             else:
-                d['finalSpeed'] = [d.get(25.0, [0.0])[0]]
+                d['finalSpeed'] = [d.get('25.0', [0.0])[0]]
 
             if speeds.empty:
                 speeds = d.copy()
             else:
                 speeds = pd.concat([speeds, d])
 
-    cols = ['score', 5.0, 10.0, 15.0, 20.0, 'finalSpeed', 'finalTime', 'maxSpeed']
+    cols = ['score', '5.0', '10.0', '15.0', '20.0', 'finalSpeed', 'finalTime', 'maxSpeed']
     speeds = speeds[[c for c in cols if c in speeds.columns]]
     speeds = speeds.replace(np.nan, 0.0)
     return speeds.sort_index()
@@ -868,6 +900,7 @@ def collateAnglesByTimeFromExit(jumpResults: dict) -> pd.DataFrame:
             t.iloc[-1].time = LAST_TIME_TRANCHE
 
             t = pd.pivot_table(t, columns=t.time)
+            t.columns = [str(c) for c in t.columns]
             d = pd.DataFrame([jumpResult.score], index=[jumpResultIndex], columns=['score'])
 
             for column in t.columns:
@@ -881,7 +914,7 @@ def collateAnglesByTimeFromExit(jumpResults: dict) -> pd.DataFrame:
             else:
                 angles = pd.concat([angles, d])
 
-    cols = ['score', 5.0, 10.0, 15.0, 20.0, 'finalAngle', 'finalTime']
+    cols = ['score', '5.0', '10.0', '15.0', '20.0', 'finalAngle', 'finalTime']
     angles = angles[[c for c in cols if c in angles.columns]]
     angles = angles.replace(np.nan, 0.0)
 

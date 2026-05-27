@@ -7,14 +7,15 @@ from ssscoring.calc import calcScoreMeanVelocity
 from ssscoring.calc import calculateDistance
 from ssscoring.calc import collateAnglesByTimeFromExit
 from ssscoring.calc import convertFlySight2SSScoring
+from ssscoring.calc import detectBackFall
 from ssscoring.calc import dropNonSkydiveDataFrom
-from ssscoring.calc import getFlySightDataFromCSVBuffer
-from ssscoring.calc import getFlySightDataFromCSVFileName
+from ssscoring.calc import forwardLateralDisplacement
 from ssscoring.calc import getSpeedSkydiveFrom
 from ssscoring.calc import isValidJumpISC
 from ssscoring.calc import isValidMaximumAltitude
 from ssscoring.calc import isValidMinimumAltitude
 from ssscoring.calc import jumpAnalysisTable
+from ssscoring.calc import jumpRunBearing
 from ssscoring.calc import processAllJumpFiles
 from ssscoring.calc import processJump
 from ssscoring.calc import roundedAggregateResults
@@ -25,6 +26,8 @@ from ssscoring.constants import FT_IN_M
 from ssscoring.datatypes import JumpStatus
 from ssscoring.errors import SSScoringError
 from ssscoring.flysight import getAllSpeedJumpFilesFrom
+from ssscoring.flysight import getFlySightDataFromCSVBuffer
+from ssscoring.flysight import getFlySightDataFromCSVFileName
 
 import os
 import pathlib
@@ -216,6 +219,43 @@ def test_calcScoreISC():
     assert type(scores) == dict
 
 
+def test_jumpRunBearing():
+    bearing = jumpRunBearing(_data)
+    assert 0.0 <= bearing < 360.0
+
+
+def test_forwardLateralDisplacement():
+    exitLat = float(_data.latitude.iloc[0])
+    exitLon = float(_data.longitude.iloc[0])
+    bearing = jumpRunBearing(_data)
+    result = forwardLateralDisplacement(_data, exitLat, exitLon, bearing)
+    assert 'forwardM' in result.columns
+    assert 'lateralM' in result.columns
+    assert float(result.forwardM.iloc[0]) == pytest.approx(0.0, abs=1e-6)
+    assert float(result.lateralM.iloc[0]) == pytest.approx(0.0, abs=1e-6)
+    assert float(result.forwardM.iloc[-1]) > 0.0
+
+
+def test_detectBackFall():
+    rawData, _ = getFlySightDataFromCSVFileName(TEST_FLYSIGHT_DATA_V1)
+    data = convertFlySight2SSScoring(rawData)
+    data = dropNonSkydiveDataFrom(data)
+    _, data = getSpeedSkydiveFrom(data)
+    data = data.copy()
+    baseTime = data.iloc[0].timeUnix
+    data['plotTime'] = np.round(data.timeUnix - baseTime, decimals=2)
+    result = detectBackFall(data)
+    assert isinstance(result, dict)
+    assert 'backFall' in result
+    assert 'onsetTime' in result
+    assert 'forwardReversalM' in result
+    assert 'lateralReversalM' in result
+    assert result['backFall'] == False
+    assert result['onsetTime'] is None
+    assert result['forwardReversalM'] == 0.0
+    assert result['lateralReversalM'] == 0.0
+
+
 def test_processJump():
     data = convertFlySight2SSScoring(pd.read_csv(TEST_FLYSIGHT_DATA_V1, skiprows = (1,1)))
     jumpResults = processJump(data)
@@ -224,6 +264,10 @@ def test_processJump():
     assert '{0:,.2f}'.format(jumpResults.score) == '451.86'
     assert jumpResults.maxSpeed == 452.664
     assert isinstance(jumpResults.scores, dict)
+    assert jumpResults.backFall == False
+    assert jumpResults.backFallOnset is None
+    assert jumpResults.forwardReversalM == 0.0
+    assert jumpResults.lateralReversalM == 0.0
 
 
 def test_processJump_WarmUpFile():
@@ -287,7 +331,7 @@ def test_aggregateResults():
     assert 'maxSpeed' in _speeds.columns
 
     with pytest.raises(SSScoringError):
-        speeds = aggregateResults(dict())
+        _ = aggregateResults(dict())
 
 
 def test_collateAnglesByTimeFromExit():
