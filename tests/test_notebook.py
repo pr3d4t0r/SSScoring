@@ -122,7 +122,7 @@ def test_graphGroundTrack():
     graphGroundTrack(figure, jumpResult)
     assert len(figure.data) == 4
     names = [trace.name for trace in figure.data]
-    assert 'speed (km/h)' in names
+    assert 'fwd (m)' in names
     assert 'exit' in names
     assert 'end' in names
 
@@ -131,7 +131,7 @@ def test_graphGroundTrack_traceLengthsMatch():
     jumpResult = _jumpResultFixture()
     figure = initializeGroundTrackPlot('test')
     graphGroundTrack(figure, jumpResult)
-    speedTrace = next(t for t in figure.data if t.name == 'speed (km/h)')
+    speedTrace = next(t for t in figure.data if t.name == 'fwd (m)')
     lineTrace = next(t for t in figure.data if t.name == 'track')
     assert len(speedTrace.x) == len(speedTrace.y)
     assert len(lineTrace.x) == len(speedTrace.x)
@@ -158,8 +158,8 @@ def test_graphForwardDisplacement():
     jumpResult = _jumpResultFixture()
     figure = initializePlot('test', yLabel='forward (m)', backgroundColorName='#2c2c2c')
     graphForwardDisplacement(figure, jumpResult)
-    assert len(figure.data) == 2
-    displacementTrace = next(t for t in figure.data if t.name == 'forward (m)')
+    assert len(figure.data) == 3
+    displacementTrace = next(t for t in figure.data if t.name == 'fwd (m)')
     assert displacementTrace is not None
     assert len(displacementTrace.x) > 0
 
@@ -168,7 +168,7 @@ def test_graphForwardDisplacement_zeroReferenceBounds():
     jumpResult = _jumpResultFixture()
     figure = initializePlot('test', yLabel='forward (m)', backgroundColorName='#2c2c2c')
     graphForwardDisplacement(figure, jumpResult)
-    zeroTrace = next(t for t in figure.data if t.name is None or t.name == '')
+    zeroTrace = next(t for t in figure.data if len(t.x) == 2 and list(t.y) == [0.0, 0.0])
     assert list(zeroTrace.y) == [0.0, 0.0]
     assert len(zeroTrace.x) == 2
 
@@ -177,15 +177,7 @@ def test_graphForwardDisplacement_xAxisMatchesPlotTime():
     jumpResult = _jumpResultFixture()
     figure = initializePlot('test', yLabel='forward (m)', backgroundColorName='#2c2c2c')
     graphForwardDisplacement(figure, jumpResult)
-    displacementTrace = next(t for t in figure.data if t.name == 'forward (m)')
+    displacementTrace = next(t for t in figure.data if t.name == 'fwd (m)')
     assert float(displacementTrace.x[0]) == pytest.approx(float(jumpResult.data.plotTime.iloc[0]), abs=0.01)
     assert float(displacementTrace.x[-1]) == pytest.approx(float(jumpResult.data.plotTime.iloc[-1]), abs=0.01)
-
-
-def test_graphForwardDisplacement_customColor():
-    jumpResult = _jumpResultFixture()
-    figure = initializePlot('test', yLabel='forward (m)', backgroundColorName='#2c2c2c')
-    graphForwardDisplacement(figure, jumpResult, lineColor='gold')
-    displacementTrace = next(t for t in figure.data if t.name == 'forward (m)')
-    assert displacementTrace.line.color == 'gold'
 

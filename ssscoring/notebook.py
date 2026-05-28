@@ -9,7 +9,11 @@ from ssscoring.calc import jumpRunBearing
 from ssscoring.constants import DEFAULT_PLOT_MAX_V_SCALE
 from ssscoring.constants import DEFAULT_SPEED_ACCURACY_SCALE
 from ssscoring.constants import MAX_ALTITUDE_FT
+from ssscoring.constants import MAX_HORIZONTAL_DISTANCE
+from ssscoring.constants import SAFE_HORIZONTAL_COLOR
+from ssscoring.constants import SAFE_HORIZONTAL_DISTANCE
 from ssscoring.constants import SPEED_ACCURACY_THRESHOLD
+from ssscoring.constants import UNSAFE_HORIZONTAL_COLOR
 from ssscoring.datatypes import PerformanceWindow
 from ssscoring.errors import SSScoringError
 
@@ -272,10 +276,9 @@ def graphJumpResult(fig,
 
 ```python
     graphJumpResult(fig, result)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 ```
     """
-    # TODO: Fix this in the documentation ⬆️
     if jumpResult.data is not None:
         data = jumpResult.data
         scores = jumpResult.scores
@@ -525,7 +528,7 @@ def graphGroundTrack(figure,
 ```python
     figure = initializeGroundTrackPlot(tag)
     graphGroundTrack(figure, jumpResult)
-    st.plotly_chart(figure, use_container_width=True)
+    st.plotly_chart(figure, width='stretch')
 ```
     """
     data = jumpResult.data
@@ -548,20 +551,29 @@ def graphGroundTrack(figure,
         x=displacement.forwardM,
         y=displacement.lateralM,
         mode='markers',
-        name='speed (km/h)',
+        name='fwd (m)',
         marker=dict(
-            color=displacement.vKMh,
-            colorscale=[[0, 'red'], [1, 'dodgerblue']],
+            color=displacement.forwardM.clip(lower=0, upper=MAX_HORIZONTAL_DISTANCE),
+            colorscale=[
+                [0.0, SAFE_HORIZONTAL_COLOR],
+                [SAFE_HORIZONTAL_DISTANCE / MAX_HORIZONTAL_DISTANCE, SAFE_HORIZONTAL_COLOR],
+                [1.0, UNSAFE_HORIZONTAL_COLOR],
+            ],
+            cmin=0,
+            cmax=MAX_HORIZONTAL_DISTANCE,
+            cauto=False,
             size=5,
             showscale=True,
             colorbar=dict(
-                title=dict(text='km/h', font=dict(color=DEFAULT_AXIS_COLOR)),
+                title=dict(text='fwd (m)', font=dict(color=DEFAULT_AXIS_COLOR)),
                 tickfont=dict(color=DEFAULT_AXIS_COLOR),
+                tickvals=[0, SAFE_HORIZONTAL_DISTANCE, MAX_HORIZONTAL_DISTANCE],
+                ticktext=['0', f'{int(SAFE_HORIZONTAL_DISTANCE)}m', f'{int(MAX_HORIZONTAL_DISTANCE)}m'],
                 thickness=12,
                 len=0.75,
             ),
         ),
-        hovertemplate='fwd: %{x:.1f} m  lat: %{y:.1f} m  v: %{marker.color:.1f} km/h<extra></extra>',
+        hovertemplate='fwd: %{x:.1f} m  lat: %{y:.1f} m<extra></extra>',
     ))
 
     figure.add_trace(go.Scatter(
@@ -570,7 +582,7 @@ def graphGroundTrack(figure,
         mode='markers',
         name='exit',
         marker=dict(symbol='circle', size=10,
-                    color='limegreen',
+                    color=SAFE_HORIZONTAL_COLOR,
                     line=dict(color='white', width=1)),
         hovertemplate='exit<extra></extra>',
     ))
@@ -581,15 +593,14 @@ def graphGroundTrack(figure,
         mode='markers',
         name='end',
         marker=dict(symbol='square', size=10,
-                    color='tomato',
+                    color=UNSAFE_HORIZONTAL_COLOR,
                     line=dict(color='white', width=1)),
         hovertemplate='end: fwd %{x:.1f} m  lat: %{y:.1f} m<extra></extra>',
     ))
 
 
 def graphForwardDisplacement(figure,
-                             jumpResult,
-                             lineColor='dodgerblue'):
+                             jumpResult):
     """
     Graph the forward displacement (metres along the jump run from exit) as a
     time series on the primary Y axis.
@@ -597,6 +608,11 @@ def graphForwardDisplacement(figure,
     A skydiver on a clean belly run produces a monotonically rising curve.  A
     back-fall inflects and drops — the onset time and reversal depth are
     immediately readable from the shape of the line and the zero reference.
+
+    Markers are coloured by the same green→red gradient used in the ground
+    track: SAFE_HORIZONTAL_COLOR up to SAFE_HORIZONTAL_DISTANCE, linear
+    transition to UNSAFE_HORIZONTAL_COLOR at MAX_HORIZONTAL_DISTANCE, solid
+    red beyond.
 
     Pair this with graphJumpResult() on a second figure (same plotTime X axis)
     to show the temporal relationship between displacement reversal and speed
@@ -612,15 +628,12 @@ def graphForwardDisplacement(figure,
     A jump results named tuple.  jumpResult.data must contain latitude,
     longitude, and plotTime (all present after processJump()).
 
-        lineColor: str
-    A valid CSS colour name or hex string for the displacement trace.
-
     Streamlit usage:
 
 ```python
     figure = initializePlot(tag, yLabel='forward (m)', backgroundColorName='#2c2c2c')
     graphForwardDisplacement(figure, jumpResult)
-    st.plotly_chart(figure, use_container_width=True)
+    st.plotly_chart(figure, width='stretch')
 ```
     """
     data = jumpResult.data
@@ -633,8 +646,37 @@ def graphForwardDisplacement(figure,
         x=displacement.plotTime,
         y=displacement.forwardM,
         mode='lines',
-        name='forward (m)',
-        line=dict(color=lineColor, width=2),
+        line=dict(color='rgba(255,255,255,0.15)', width=1),
+        showlegend=False,
+        hoverinfo='skip',
+    ))
+
+    figure.add_trace(go.Scatter(
+        x=displacement.plotTime,
+        y=displacement.forwardM,
+        mode='markers',
+        name='fwd (m)',
+        marker=dict(
+            color=displacement.forwardM.clip(lower=0, upper=MAX_HORIZONTAL_DISTANCE),
+            colorscale=[
+                [0.0, SAFE_HORIZONTAL_COLOR],
+                [SAFE_HORIZONTAL_DISTANCE / MAX_HORIZONTAL_DISTANCE, SAFE_HORIZONTAL_COLOR],
+                [1.0, UNSAFE_HORIZONTAL_COLOR],
+            ],
+            cmin=0,
+            cmax=MAX_HORIZONTAL_DISTANCE,
+            cauto=False,
+            size=4,
+            showscale=True,
+            colorbar=dict(
+                title=dict(text='fwd (m)', font=dict(color=DEFAULT_AXIS_COLOR)),
+                tickfont=dict(color=DEFAULT_AXIS_COLOR),
+                tickvals=[0, SAFE_HORIZONTAL_DISTANCE, MAX_HORIZONTAL_DISTANCE],
+                ticktext=['0', f'{int(SAFE_HORIZONTAL_DISTANCE)}m', f'{int(MAX_HORIZONTAL_DISTANCE)}m'],
+                thickness=12,
+                len=0.75,
+            ),
+        ),
         yaxis='y',
         hovertemplate='t: %{x:.1f} s  fwd: %{y:.1f} m<extra></extra>',
     ))
