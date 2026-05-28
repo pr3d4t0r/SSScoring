@@ -551,7 +551,7 @@ def graphGroundTrack(figure,
         name='speed (km/h)',
         marker=dict(
             color=displacement.vKMh,
-            colorscale='Plasma',
+            colorscale=[[0, 'red'], [1, 'dodgerblue']],
             size=5,
             showscale=True,
             colorbar=dict(
@@ -589,7 +589,7 @@ def graphGroundTrack(figure,
 
 def graphForwardDisplacement(figure,
                              jumpResult,
-                             lineColor='mediumorchid'):
+                             lineColor='dodgerblue'):
     """
     Graph the forward displacement (metres along the jump run from exit) as a
     time series on the primary Y axis.

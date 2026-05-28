@@ -29,7 +29,10 @@ from ssscoring.datatypes import PerformanceWindow
 from ssscoring.mapview import multipleSpeedJumpsTrajectories
 from ssscoring.mapview import speedJumpTrajectory
 from ssscoring.notebook import SPEED_COLORS
+from ssscoring.notebook import graphForwardDisplacement
+from ssscoring.notebook import graphGroundTrack
 from ssscoring.notebook import graphJumpResult
+from ssscoring.notebook import initializeGroundTrackPlot
 from ssscoring.notebook import initializePlot
 # TODO: Remove this if present after 20260531
 # from streamlit_bokeh import streamlit_bokeh
@@ -183,6 +186,16 @@ def main():
                     displayJumpDataIn(jumpResult.table)
                     st.write('Max score = crosshairs.  Max speed = diamond. V-accel = exponential mean average over 4 seconds.')
                     plotJumpResult(tag, jumpResult)
+                    with st.expander('**Horizontal displacement**', expanded=True):
+                        colGroundTrack, colForwardDisplacement = st.columns(2)
+                        with colGroundTrack:
+                            groundTrackFigure = initializeGroundTrackPlot(tag, backgroundColorName='#2c2c2c')
+                            graphGroundTrack(groundTrackFigure, jumpResult)
+                            st.plotly_chart(groundTrackFigure, use_container_width=True)
+                        with colForwardDisplacement:
+                            displacementFigure = initializePlot(tag, yLabel='forward (m)', backgroundColorName='#2c2c2c', height=450)
+                            graphForwardDisplacement(displacementFigure, jumpResult)
+                            st.plotly_chart(displacementFigure, use_container_width=True)
                     graphJumpResult(
                         allJumpsPlot,
                         jumpResult,
