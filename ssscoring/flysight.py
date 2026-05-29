@@ -209,13 +209,16 @@ def detectFlySightFileVersionOf(fileThing) -> FlySightVersion:
     `ssscoring.errors.SSScoringError` if the file is not a CSV and it's some
     other invalid format.
     """
-    if isinstance(fileThing, Path):
-        fileName = fileThing.as_posix()
-    elif isinstance(fileThing, str):
-        fileName = fileThing
-        fileThing = Path(fileThing)
-    elif isinstance(fileThing, bytes):
-        fileName = '00-00-00.CSV'
+    match fileThing:
+        case Path():
+            fileName = fileThing.as_posix()
+        case str():
+            fileName = fileThing
+            fileThing = Path(fileThing)
+        case bytes():
+            fileName = '00-00-00.CSV'
+        case _:
+            raise SSScoringError('fileThing must be a Path, str, or bytes')
 
     delimiters =  [',', ]
     stream = None

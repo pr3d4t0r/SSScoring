@@ -136,6 +136,38 @@ section 5.3.
 """
 
 
+MAX_HORIZONTAL_DISTANCE = 600.0
+"""
+Forward displacement at which the ground track is coloured fully
+UNSAFE_HORIZONTAL_COLOR.  Displacements above this value are clamped to the
+same solid colour.
+"""
+
+
+SAFE_HORIZONTAL_COLOR = '#009E73'
+"""
+Okabe-Ito bluish green — colorblind-safe indicator used for forward
+displacements within the safe zone (≤ SAFE_HORIZONTAL_DISTANCE).
+Paired with UNSAFE_HORIZONTAL_COLOR.
+"""
+
+
+SAFE_HORIZONTAL_DISTANCE = 480.0
+"""
+Forward displacement below which the track is displayed in SAFE_HORIZONTAL_COLOR.
+Above this and up to MAX_HORIZONTAL_DISTANCE the colour transitions linearly
+to UNSAFE_HORIZONTAL_COLOR.
+"""
+
+
+UNSAFE_HORIZONTAL_COLOR = '#D55E00'
+"""
+Okabe-Ito vermillion — colorblind-safe indicator used for forward
+displacements at or beyond MAX_HORIZONTAL_DISTANCE.
+Paired with SAFE_HORIZONTAL_COLOR.
+"""
+
+
 M_2_FT = 3.28084
 """
 Meters to feet conversion factor.

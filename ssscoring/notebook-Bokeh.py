@@ -278,7 +278,7 @@ def graphJumpResult(plot,
     ```python
     # Streamlit app with speed accuracy overlay
     graphJumpResult(plot, result, showIt=False)
-    st.bokeh_chart(plot, use_container_width=True)
+    st.bokeh_chart(plot, width='stretch')
     ```
 
     Returns

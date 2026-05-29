@@ -99,11 +99,13 @@ def test_validFlySightHeaderIn(_badDelimitersCSV, _missingColumnInCSV, _invalidM
 
 def test_getAllSpeedJumpFilesFrom(_tooSmallCSV):
     files = getAllSpeedJumpFilesFrom(TEST_FLYSIGHT_DATA_LAKE)
-    # Manual ./ because path.resolve(strict = False) resolves to the full path
-    # vs implementation that uses os.walk() uses the relative path.
-    testFiles = [ TEST_FLYSIGHT_1_DATA, TEST_FLYSIGHT_2_DATA ]
     assert len(files) >= 1
-    assert set(testFiles).issubset(set(files.keys()))
+    assert TEST_FLYSIGHT_1_DATA in files.keys()
+    assert TEST_FLYSIGHT_2_DATA in files.keys()
+    assert files[TEST_FLYSIGHT_2_DATA] == '2'
+    assert not any('SENSOR' in str(k) for k in files.keys())
+    assert not any('EVENT' in str(k) for k in files.keys())
+    assert not any('UBX' in str(k) for k in files.keys())
     assert not len(getAllSpeedJumpFilesFrom('./bogus'))
 
 

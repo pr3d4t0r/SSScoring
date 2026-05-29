@@ -4,10 +4,16 @@
 ## Utility reusable code for notebooks.
 """
 
+from ssscoring.calc import forwardLateralDisplacement
+from ssscoring.calc import jumpRunBearing
 from ssscoring.constants import DEFAULT_PLOT_MAX_V_SCALE
 from ssscoring.constants import DEFAULT_SPEED_ACCURACY_SCALE
 from ssscoring.constants import MAX_ALTITUDE_FT
+from ssscoring.constants import MAX_HORIZONTAL_DISTANCE
+from ssscoring.constants import SAFE_HORIZONTAL_COLOR
+from ssscoring.constants import SAFE_HORIZONTAL_DISTANCE
 from ssscoring.constants import SPEED_ACCURACY_THRESHOLD
+from ssscoring.constants import UNSAFE_HORIZONTAL_COLOR
 from ssscoring.datatypes import PerformanceWindow
 from ssscoring.errors import SSScoringError
 
@@ -270,10 +276,9 @@ def graphJumpResult(fig,
 
 ```python
     graphJumpResult(fig, result)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 ```
     """
-    # TODO: Fix this in the documentation ⬆️
     if jumpResult.data is not None:
         data = jumpResult.data
         scores = jumpResult.scores
@@ -408,6 +413,281 @@ def graphAcceleration(fig,
         line=dict(color=lineColor, width=2),
         yaxis=yaxis,
         hovertemplate='a (EMA): %{y:.2f} m/s²<extra></extra>',
+    ))
+
+
+def initializeGroundTrackPlot(jumpTitle: str,
+                              height=450,
+                              backgroundColorName='#1a1a1a',
+                              colorName=DEFAULT_AXIS_COLOR):
+    """
+    Initialize a Plotly figure for the ground-track plot, configured with equal
+    axis scaling so that forward and lateral distances are not distorted.
+
+    X axis: metres forward along the jump run from exit.
+    Y axis: metres lateral (right = positive, left = negative).
+
+    Unlike initializePlot(), no extra Y ranges are added — this canvas is
+    dedicated to spatial displacement only.
+
+    Arguments
+    ---------
+        jumpTitle: str
+    Figure title, usually the jump tag.
+
+        height: int
+    Plot height in pixels.  Default 450 — shorter than the main plot since
+    this is a companion chart.
+
+        backgroundColorName: str
+    CSS colour name or hex string for the plot and paper background.
+
+        colorName: str
+    CSS colour name or hex string for axes, tick labels, and title text.
+
+    Returns
+    -------
+    A `plotly.graph_objects.Figure` ready to receive graphGroundTrack() traces.
+    """
+    figure = go.Figure()
+    figure.update_layout(
+        title=dict(text=jumpTitle, font=dict(color=colorName)),
+        height=height,
+        autosize=True,
+        plot_bgcolor=backgroundColorName,
+        paper_bgcolor=backgroundColorName,
+        font=dict(color=colorName),
+        hovermode='closest',
+        showlegend=True,
+        legend=dict(font=dict(color=colorName)),
+        xaxis=dict(
+            title=dict(text='forward (m)', font=dict(color=colorName)),
+            autorange=True,
+            color=colorName,
+            tickfont=dict(color=colorName),
+            showgrid=True,
+            gridcolor='rgba(255,255,255,0.08)',
+            showline=True,
+            linecolor=colorName,
+            zeroline=True,
+            zerolinecolor='rgba(255,255,255,0.25)',
+            zerolinewidth=1,
+        ),
+        yaxis=dict(
+            title=dict(text='lateral (m)', font=dict(color=colorName)),
+            autorange=True,
+            color=colorName,
+            tickfont=dict(color=colorName),
+            showgrid=True,
+            gridcolor='rgba(255,255,255,0.08)',
+            showline=True,
+            linecolor=colorName,
+            zeroline=True,
+            zerolinecolor='rgba(255,255,255,0.25)',
+            zerolinewidth=1,
+            scaleanchor='x',
+            scaleratio=1,
+        ),
+    )
+    return figure
+
+
+def graphGroundTrack(figure,
+                     jumpResult,
+                     lineColor='deepskyblue'):
+    """
+    Graph the skydiver's ground track during the performance window as forward
+    vs. lateral displacement from exit, with markers coloured by vertical speed.
+
+    X axis = metres forward along the jump run (negative = reversed, i.e. back-
+    fall).  Y axis = metres lateral (positive = right of jump run).  Marker
+    colour encodes vKMh so the speed progression is visible without a separate
+    time axis.
+
+    A clean belly-to-earth run produces a smooth rightward curve staying close
+    to the lateral zero line.  A back-fall reverses toward the origin; the
+    line literally doubles back on itself — unmistakable at a glance.
+
+    Requires a figure initialised by initializeGroundTrackPlot() so that the
+    spatial axes are equal-scaled and the zero lines are present.
+
+    Arguments
+    ---------
+        figure
+    A Plotly Figure initialised by initializeGroundTrackPlot().
+
+        jumpResult: ssscoring.JumpResults
+    A jump results named tuple.  jumpResult.data must contain latitude,
+    longitude, plotTime, and vKMh columns (all present after processJump()).
+
+        lineColor: str
+    A valid CSS colour name or hex string for the connecting track line.
+
+    Streamlit usage:
+
+```python
+    figure = initializeGroundTrackPlot(tag)
+    graphGroundTrack(figure, jumpResult)
+    st.plotly_chart(figure, width='stretch')
+```
+    """
+    data = jumpResult.data
+    exitLat = float(data.latitude.iloc[0])
+    exitLon = float(data.longitude.iloc[0])
+    bearing = jumpRunBearing(data)
+    displacement = forwardLateralDisplacement(data, exitLat, exitLon, bearing)
+
+    figure.add_trace(go.Scatter(
+        x=displacement.forwardM,
+        y=displacement.lateralM,
+        mode='lines',
+        name='track',
+        line=dict(color='rgba(255,255,255,0.15)', width=1),
+        showlegend=False,
+        hoverinfo='skip',
+    ))
+
+    figure.add_trace(go.Scatter(
+        x=displacement.forwardM,
+        y=displacement.lateralM,
+        mode='markers',
+        name='fwd (m)',
+        marker=dict(
+            color=displacement.forwardM.clip(lower=0, upper=MAX_HORIZONTAL_DISTANCE),
+            colorscale=[
+                [0.0, SAFE_HORIZONTAL_COLOR],
+                [SAFE_HORIZONTAL_DISTANCE / MAX_HORIZONTAL_DISTANCE, SAFE_HORIZONTAL_COLOR],
+                [1.0, UNSAFE_HORIZONTAL_COLOR],
+            ],
+            cmin=0,
+            cmax=MAX_HORIZONTAL_DISTANCE,
+            cauto=False,
+            size=5,
+            showscale=True,
+            colorbar=dict(
+                title=dict(text='fwd (m)', font=dict(color=DEFAULT_AXIS_COLOR)),
+                tickfont=dict(color=DEFAULT_AXIS_COLOR),
+                tickvals=[0, SAFE_HORIZONTAL_DISTANCE, MAX_HORIZONTAL_DISTANCE],
+                ticktext=['0', f'{int(SAFE_HORIZONTAL_DISTANCE)}m', f'{int(MAX_HORIZONTAL_DISTANCE)}m'],
+                thickness=12,
+                len=0.75,
+            ),
+        ),
+        hovertemplate='fwd: %{x:.1f} m  lat: %{y:.1f} m<extra></extra>',
+    ))
+
+    figure.add_trace(go.Scatter(
+        x=[displacement.forwardM.iloc[0]],
+        y=[displacement.lateralM.iloc[0]],
+        mode='markers',
+        name='exit',
+        marker=dict(symbol='circle', size=10,
+                    color=SAFE_HORIZONTAL_COLOR,
+                    line=dict(color='white', width=1)),
+        hovertemplate='exit<extra></extra>',
+    ))
+
+    figure.add_trace(go.Scatter(
+        x=[displacement.forwardM.iloc[-1]],
+        y=[displacement.lateralM.iloc[-1]],
+        mode='markers',
+        name='end',
+        marker=dict(symbol='square', size=10,
+                    color=UNSAFE_HORIZONTAL_COLOR,
+                    line=dict(color='white', width=1)),
+        hovertemplate='end: fwd %{x:.1f} m  lat: %{y:.1f} m<extra></extra>',
+    ))
+
+
+def graphForwardDisplacement(figure,
+                             jumpResult):
+    """
+    Graph the forward displacement (metres along the jump run from exit) as a
+    time series on the primary Y axis.
+
+    A skydiver on a clean belly run produces a monotonically rising curve.  A
+    back-fall inflects and drops — the onset time and reversal depth are
+    immediately readable from the shape of the line and the zero reference.
+
+    Markers are coloured by the same green→red gradient used in the ground
+    track: SAFE_HORIZONTAL_COLOR up to SAFE_HORIZONTAL_DISTANCE, linear
+    transition to UNSAFE_HORIZONTAL_COLOR at MAX_HORIZONTAL_DISTANCE, solid
+    red beyond.
+
+    Pair this with graphJumpResult() on a second figure (same plotTime X axis)
+    to show the temporal relationship between displacement reversal and speed
+    loss.
+
+    Arguments
+    ---------
+        figure
+    A Plotly Figure initialised by initializePlot() with xLabel='seconds from
+    exit' and yLabel='forward (m)'.
+
+        jumpResult: ssscoring.JumpResults
+    A jump results named tuple.  jumpResult.data must contain latitude,
+    longitude, and plotTime (all present after processJump()).
+
+    Streamlit usage:
+
+```python
+    figure = initializePlot(tag, yLabel='forward (m)', backgroundColorName='#2c2c2c')
+    graphForwardDisplacement(figure, jumpResult)
+    st.plotly_chart(figure, width='stretch')
+```
+    """
+    data = jumpResult.data
+    exitLat = float(data.latitude.iloc[0])
+    exitLon = float(data.longitude.iloc[0])
+    bearing = jumpRunBearing(data)
+    displacement = forwardLateralDisplacement(data, exitLat, exitLon, bearing)
+
+    figure.add_trace(go.Scatter(
+        x=displacement.plotTime,
+        y=displacement.forwardM,
+        mode='lines',
+        line=dict(color='rgba(255,255,255,0.15)', width=1),
+        showlegend=False,
+        hoverinfo='skip',
+    ))
+
+    figure.add_trace(go.Scatter(
+        x=displacement.plotTime,
+        y=displacement.forwardM,
+        mode='markers',
+        name='fwd (m)',
+        marker=dict(
+            color=displacement.forwardM.clip(lower=0, upper=MAX_HORIZONTAL_DISTANCE),
+            colorscale=[
+                [0.0, SAFE_HORIZONTAL_COLOR],
+                [SAFE_HORIZONTAL_DISTANCE / MAX_HORIZONTAL_DISTANCE, SAFE_HORIZONTAL_COLOR],
+                [1.0, UNSAFE_HORIZONTAL_COLOR],
+            ],
+            cmin=0,
+            cmax=MAX_HORIZONTAL_DISTANCE,
+            cauto=False,
+            size=4,
+            showscale=True,
+            colorbar=dict(
+                title=dict(text='fwd (m)', font=dict(color=DEFAULT_AXIS_COLOR)),
+                tickfont=dict(color=DEFAULT_AXIS_COLOR),
+                tickvals=[0, SAFE_HORIZONTAL_DISTANCE, MAX_HORIZONTAL_DISTANCE],
+                ticktext=['0', f'{int(SAFE_HORIZONTAL_DISTANCE)}m', f'{int(MAX_HORIZONTAL_DISTANCE)}m'],
+                thickness=12,
+                len=0.75,
+            ),
+        ),
+        yaxis='y',
+        hovertemplate='t: %{x:.1f} s  fwd: %{y:.1f} m<extra></extra>',
+    ))
+
+    figure.add_trace(go.Scatter(
+        x=[displacement.plotTime.iloc[0], displacement.plotTime.iloc[-1]],
+        y=[0.0, 0.0],
+        mode='lines',
+        line=dict(color='rgba(255,255,255,0.25)', width=1, dash='dot'),
+        showlegend=False,
+        hoverinfo='skip',
     ))
 
 

@@ -252,18 +252,19 @@ def interpretJumpResult(tag: str,
     window = jumpResult.window
     jumpStatus = jumpResult.status
     jumpStatusInfo = ''
-    if jumpResult.status == JumpStatus.WARM_UP_FILE:
-        badJumpLegend = '<span style="color: red">Warm up file or SMD ran out of battery - nothing to do<br>'
-        scoringInfo = ''
-    elif jumpResult.status == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT:
-        badJumpLegend = '<span style="color: red">%s - RE-JUMP: speed accuracy exceeds ISC threshold<br>' % tag
-        scoringInfo = ''
-    elif jumpResult.status == JumpStatus.INVALID_SPEED_FILE:
-        badJumpLegend = '<span style="color: red">Invalid or corrupted FlySight file - it\'s neither version 1 nor version 2<br>'
-        scoringInfo = ''
-    else:
-        scoringInfo = 'Max speed = {0:,.0f}; '.format(maxSpeed)+('exit at %d m (%d ft)<br>Validation window starts at %d m (%d ft)<br>End scoring window at %d m (%d ft)<br>' % \
-                        (window.start, M_2_FT*window.start, window.validationStart, M_2_FT*window.validationStart, window.end, M_2_FT*window.end))
+    match jumpResult.status:
+        case JumpStatus.WARM_UP_FILE:
+            badJumpLegend = '<span style="color: red">Warm up file or SMD ran out of battery - nothing to do<br>'
+            scoringInfo = ''
+        case JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT:
+            badJumpLegend = '<span style="color: red">%s - RE-JUMP: speed accuracy exceeds ISC threshold<br>' % tag
+            scoringInfo = ''
+        case JumpStatus.INVALID_SPEED_FILE:
+            badJumpLegend = '<span style="color: red">Invalid or corrupted FlySight file - it\'s neither version 1 nor version 2<br>'
+            scoringInfo = ''
+        case _:
+            scoringInfo = 'Max speed = {0:,.0f}; '.format(maxSpeed)+('exit at %d m (%d ft)<br>Validation window starts at %d m (%d ft)<br>End scoring window at %d m (%d ft)<br>' % \
+                            (window.start, M_2_FT*window.start, window.validationStart, M_2_FT*window.validationStart, window.end, M_2_FT*window.end))
     if (processBadJump and jumpStatus != JumpStatus.OK and jumpStatus != JumpStatus.WARM_UP_FILE and jumpStatus != JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT and jumpStatus != JumpStatus.INVALID_SPEED_FILE) or jumpStatus == JumpStatus.OK:
         jumpStatusInfo = '<span style="color: %s">%s jump - %s - %.02f km/h</span><br>' % ('green', tag, 'VALID', jumpResult.score)
         belowMaxAltitude = isValidMaximumAltitude(jumpResult.data.altitudeAGL.max())
