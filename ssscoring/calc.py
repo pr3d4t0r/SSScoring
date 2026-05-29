@@ -34,6 +34,7 @@ from ssscoring.flysight import getFlySightDataFromCSVBuffer
 from ssscoring.flysight import getFlySightDataFromCSVFileName
 
 import math
+import re
 import warnings
 
 import numpy as np
@@ -737,15 +738,22 @@ def processAllJumpFiles(jumpFiles: list, altitudeDZMeters = 0.0) -> dict:
     if not isinstance(jumpFiles, dict) and not isinstance(jumpFiles, list):
         raise SSScoringError('dict with jump file names and FS versions or list of byte bags expected')
     if isinstance(jumpFiles, dict):
-        objectsList = sorted(list(jumpFiles.keys()))
+        objectsList = sorted(list(jumpFiles.keys()), key=str)
     elif isinstance(jumpFiles, list):
         objectsList = jumpFiles
     obj = objectsList[0]
     if not isinstance(obj, Path) and not isinstance(obj, str) and not isinstance(obj, BytesIO):
         raise SSScoringError('jumpFiles must contain file-like things or BytesIO objects')
+    _v1Pattern = re.compile(r'^\d{2}-\d{2}-\d{2}\.CSV$', re.IGNORECASE)
     for jumpFile in objectsList:
         if isinstance(jumpFile, BytesIO):
+            fileName = jumpFile.name
+            if not _v1Pattern.match(fileName) and not fileName.upper().endswith('TRACK.CSV'):
+                continue
             rawData, tag = getFlySightDataFromCSVBuffer(jumpFile.getvalue(), jumpFile.name)
+        elif isinstance(jumpFiles, dict) and isinstance(jumpFiles[jumpFile], pd.DataFrame):
+            rawData = jumpFiles[jumpFile]
+            tag = jumpFile
         else:
             rawData, tag = getFlySightDataFromCSVFileName(jumpFile)
         try:

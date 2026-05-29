@@ -1,5 +1,7 @@
 # See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txt
 
+from io import BytesIO
+
 from ssscoring.calc import _verticalAcceleration
 from ssscoring.calc import aggregateResults
 from ssscoring.calc import calcScoreISC
@@ -49,6 +51,14 @@ TEST_FLYSIGHT_DATA_V1_WARM_UP = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 
 TEST_FLYSIGHT_DATA_V1_EXCEEDS_MAX_ALT = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-06-exceeds-max-alt.CSV'
 TEST_FLYSIGHT_DATA_V1_EXCEEDS_ISC_THRESHOLD = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-07-BAD-ISC.CSV'
 TEST_FLYSIGHT_DATA_V2_STRATOSPHERE = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS2' / '02-00-00-startosphere' / 'TRACK.CSV'
+TEST_FLYSIGHT_DATA_V2 = pathlib.Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS2' / '01-00-00' / 'TRACK.CSV'
+
+
+class _NamedBytesIO(BytesIO):
+    """BytesIO with a .name attribute, mirroring Streamlit's UploadedFile."""
+    def __init__(self, data: bytes, name: str):
+        super().__init__(data)
+        self.name = name
 
 
 # +++ globals +++
@@ -320,6 +330,37 @@ def test_processAllJumpFiles():
     jumpFiles = getAllSpeedJumpFilesFrom(bogusDataLake)
     with pytest.raises(SSScoringError):
          processAllJumpFiles(jumpFiles)
+
+
+def test_processAllJumpFiles_filenameFilter():
+    with open(TEST_FLYSIGHT_DATA, 'rb') as inputFile:
+        v1Bytes = inputFile.read()
+    with open(TEST_FLYSIGHT_DATA_V2, 'rb') as inputFile:
+        v2Bytes = inputFile.read()
+
+    excluded = [
+        _NamedBytesIO(v1Bytes, 'SENSOR.CSV'),
+        _NamedBytesIO(v1Bytes, 'EVENT.CSV'),
+        _NamedBytesIO(b'\x00\x01binary', 'RAW.UBX'),
+    ]
+    valid = _NamedBytesIO(v1Bytes, '08-40-06.CSV')
+
+    results = processAllJumpFiles(excluded + [valid])
+    assert not any('SENSOR' in tag for tag in results)
+    assert not any('EVENT' in tag for tag in results)
+    assert not any('UBX' in tag for tag in results)
+    assert len(results) == 1
+
+    resultsLower = processAllJumpFiles([_NamedBytesIO(v1Bytes, '08-40-06.csv')])
+    assert len(resultsLower) == 1
+
+    resultsV2 = processAllJumpFiles([_NamedBytesIO(v2Bytes, 'TRACK.CSV')])
+    assert len(resultsV2) == 1
+    assert any(tag.endswith(':v2') for tag in resultsV2)
+
+    resultsV2Lower = processAllJumpFiles([_NamedBytesIO(v2Bytes, 'track.csv')])
+    assert len(resultsV2Lower) == 1
+    assert any(tag.endswith(':v2') for tag in resultsV2Lower)
 
 
 def test_aggregateResults():
