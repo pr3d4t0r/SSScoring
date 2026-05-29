@@ -122,14 +122,14 @@ def _displayJumpsInSet(aggregate: pd.DataFrame):
 
 def _displaySpeedSummary(aggregate: pd.DataFrame,
                          allJumpsPlot):
-    st.html('<h2>Speed summary</h2>')
-    summary = totalResultsFrom(aggregate)
+    with st.expander('Speed summary', expanded=True):
+        summary = totalResultsFrom(aggregate)
 
-    st.dataframe(
-        summary.style.format("{:.2f}"),
-        hide_index=True
-    )
-    st.plotly_chart(allJumpsPlot, width='stretch')
+        st.dataframe(
+            summary.style.format("{:.2f}"),
+            hide_index=True
+        )
+        st.plotly_chart(allJumpsPlot, width='stretch')
 
 
 def _displaySpeedAngles(jumpResults: dict):
@@ -184,8 +184,9 @@ def main():
                 st.html("<br>If this was NOT a warm-up file, it's probably an ISC altitude violation; please report to Eugene/pr3d4t0r and attach the TRACK.CSV file</h3>" if jumpStatus in [ JumpStatus.WARM_UP_FILE, ] else '</h3>')
                 if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
                     displayJumpDataIn(jumpResult.table)
-                    st.write('Max score = crosshairs.  Max speed = diamond. V-accel = exponential mean average over 4 seconds.')
-                    plotJumpResult(tag, jumpResult)
+                    with st.expander('Max score = crosshairs.  Max speed = diamond. V-accel = exponential mean average over 4 seconds.', expanded=True):
+                        # st.write('Max score = crosshairs.  Max speed = diamond. V-accel = exponential mean average over 4 seconds.')
+                        plotJumpResult(tag, jumpResult)
                     if jumpResult.data is not None:
                         with st.expander('**Horizontal displacement** - optimal ≦ 500 m from exit', expanded=True):
                             colGroundTrack, colForwardDisplacement = st.columns(2)
@@ -204,8 +205,9 @@ def main():
                         legend='%s = %.2f' % (tag, jumpResult.score if jumpResult.score else -1.0),
                         showIt=False
                     )
-                    st.session_state.displayScorePoint = st.toggle('Display max score / max speed point', value=True, help='Show the fastest speed or score point along the flight path', key=tag)
-                    displayTrackOnMap(speedJumpTrajectory(jumpResult, st.session_state.displayScorePoint), st.session_state.displayScorePoint, showJumpRunLegend=True)
+                    with st.expander('Speed run / jump run', expanded=True):
+                        st.session_state.displayScorePoint = st.toggle('Display max score / max speed point', value=True, help='Show the fastest speed or score point along the flight path', key=tag)
+                        displayTrackOnMap(speedJumpTrajectory(jumpResult, st.session_state.displayScorePoint), st.session_state.displayScorePoint, showJumpRunLegend=True)
                     _displayAllJumpDataIn(jumpResult.data)
                     _displayScoresIn(jumpResult.scores)
                 elif jumpStatus == JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT:
