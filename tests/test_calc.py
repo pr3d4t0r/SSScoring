@@ -246,6 +246,27 @@ def test_forwardLateralDisplacement():
     assert float(result.forwardM.iloc[-1]) > 0.0
 
 
+def test_forwardLateralDisplacement_signConvention():
+    # Northbound jump run (bearing = 0°): west = left = positive lateralM,
+    # east = right = negative lateralM.  Synthetic rows by offset position:
+    # 0 = exit, 1 = ahead (north), 2 = behind (south), 3 = left (west), 4 = right (east)
+    exitLat = 37.0
+    exitLon = -122.0
+    bearing = 0.0
+    offset = 0.001
+    syntheticData = pd.DataFrame({
+        'latitude':  [exitLat, exitLat + offset, exitLat - offset, exitLat,        exitLat,       ],
+        'longitude': [exitLon, exitLon,           exitLon,          exitLon - offset, exitLon + offset],
+    })
+    result = forwardLateralDisplacement(syntheticData, exitLat, exitLon, bearing)
+    assert float(result.forwardM.iloc[0]) == pytest.approx(0.0, abs=1e-6)
+    assert float(result.lateralM.iloc[0]) == pytest.approx(0.0, abs=1e-6)
+    assert float(result.forwardM.iloc[1]) > 0.0
+    assert float(result.forwardM.iloc[2]) < 0.0
+    assert float(result.lateralM.iloc[3]) > 0.0   # left (west) → positive
+    assert float(result.lateralM.iloc[4]) < 0.0   # right (east) → negative
+
+
 def test_detectBackFall():
     rawData, _ = getFlySightDataFromCSVFileName(TEST_FLYSIGHT_DATA_V1)
     data = convertFlySight2SSScoring(rawData)

@@ -425,7 +425,7 @@ def initializeGroundTrackPlot(jumpTitle: str,
     axis scaling so that forward and lateral distances are not distorted.
 
     X axis: metres forward along the jump run from exit.
-    Y axis: metres lateral (right = positive, left = negative).
+    Y axis: metres lateral (left = positive, right = negative).
 
     Unlike initializePlot(), no extra Y ranges are added — this canvas is
     dedicated to spatial displacement only.
@@ -500,9 +500,9 @@ def graphGroundTrack(figure,
     vs. lateral displacement from exit, with markers coloured by vertical speed.
 
     X axis = metres forward along the jump run (negative = reversed, i.e. back-
-    fall).  Y axis = metres lateral (positive = right of jump run).  Marker
-    colour encodes vKMh so the speed progression is visible without a separate
-    time axis.
+    fall).  Y axis = metres lateral (positive = left of jump run, negative =
+    right).  Marker colour encodes vKMh so the speed progression is visible
+    without a separate time axis.
 
     A clean belly-to-earth run produces a smooth rightward curve staying close
     to the lateral zero line.  A back-fall reverses toward the origin; the
