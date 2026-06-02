@@ -551,7 +551,7 @@ def forwardLateralDisplacement(
     Adds `forwardM` and `lateralM` columns to `jumpData`: signed displacement
     in metres along and perpendicular to the jump run axis from the exit point.
     Positive `forwardM` = moving away from exit; negative = reversed.
-    Positive `lateralM` = right of jump run; negative = left.
+    Positive `lateralM` = left of jump run; negative = right.
 
     Arguments
     ---------
@@ -585,7 +585,7 @@ def forwardLateralDisplacement(
     deltas = ptBearings - bearingRad
     result = jumpData.copy()
     result['forwardM'] = np.round(distances * np.cos(deltas), decimals=2)
-    result['lateralM'] = np.round(distances * np.sin(deltas), decimals=2)
+    result['lateralM'] = np.round(-distances * np.sin(deltas), decimals=2)
     return result
 
 
