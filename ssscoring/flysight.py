@@ -15,6 +15,7 @@ from pathlib import Path
 from ssscoring.constants import FLYSIGHT_1_HEADER
 from ssscoring.constants import FLYSIGHT_2_HEADER
 from ssscoring.constants import FLYSIGHT_FILE_ENCODING
+from ssscoring.constants import INSIGHT_1_HEADER
 from ssscoring.constants import IGNORE_LIST
 from ssscoring.constants import MIN_JUMP_FILE_SIZE
 from ssscoring.datatypes import FlySightVersion
@@ -29,6 +30,10 @@ import pandas as pd
 
 
 # +++ functions +++
+
+def _isInsightHeader(header: list) -> bool:
+    return INSIGHT_1_HEADER.issubset(set(header)) and 'cAcc' not in header
+
 
 def isCRMangledCSV(fileThing) -> bool:
     """
@@ -138,7 +143,7 @@ def validFlySightHeaderIn(fileThingCSV) -> bool:
             header = next(csv.reader(stream))
         except StopIteration:
             return False
-    return header[0] == '$FLYS' or FLYSIGHT_1_HEADER.issubset(header)
+    return header[0] == '$FLYS' or FLYSIGHT_1_HEADER.issubset(header) or _isInsightHeader(header)
 
 
 def getAllSpeedJumpFilesFrom(dataLake: Path) -> dict:
@@ -174,8 +179,10 @@ def getAllSpeedJumpFilesFrom(dataLake: Path) -> dict:
                 jumpFileName = Path(root) / fileName
                 stat = os.stat(jumpFileName)
                 if all(x not in fileName for x in ('EVENT', 'SENSOR', 'TRACK')):
-                    # FlySight 1 track format
+                    # FlySight 1 or Insight track format
                     data = pd.read_csv(jumpFileName, skiprows = (1, 1), index_col = False)
+                    if data is not None and 'headAcc' in data.columns:
+                        version = 'i'
                 elif 'TRACK' in fileName:
                     # FlySight 2 track custom format
                     data = pd.read_csv(jumpFileName, names = FLYSIGHT_2_HEADER, skiprows = 6, index_col = False, na_values = ['NA', ])
@@ -248,6 +255,8 @@ def detectFlySightFileVersionOf(fileThing) -> FlySightVersion:
         return FlySightVersion.V2
     elif FLYSIGHT_1_HEADER.issubset(header):
         return FlySightVersion.V1
+    elif _isInsightHeader(header):
+        return FlySightVersion.INSIGHT
     else:
         raise SSScoringError('%s file is not a FlySight v1 or v2 file')
 
@@ -280,6 +289,18 @@ def _tagVersion2From(fileThing: str) -> str:
         return fileThing.split('/')[-2]+':v2'
     else:
         return fileThing.replace('.CSV', '').replace('.csv', '')+':v2'
+
+
+def _tagInsightFrom(rawData: pd.DataFrame) -> str:
+    firstTimestamp = str(rawData.iloc[0]['time'])
+    timePart = firstTimestamp.split('T')[1].split('.')[0]
+    return timePart.replace(':', '-')+':i'
+
+
+def readInsightCSV(fileThing: object) -> pd.DataFrame:
+    rawData = pd.read_csv(fileThing, skiprows=(1, 1), index_col=False)
+    rawData.drop('headAcc', inplace=True, axis=1)
+    return rawData
 
 
 def readVersion2CSV(jumpFile: str) -> pd.DataFrame:
@@ -351,6 +372,9 @@ def getFlySightDataFromCSVBuffer(buffer:bytes, bufferName:str) -> tuple:
         elif version == FlySightVersion.V2:
             rawData = readVersion2CSV(stringIO)
             tag = _tagVersion2From(bufferName)
+        elif version == FlySightVersion.INSIGHT:
+            rawData = readInsightCSV(stringIO)
+            tag = _tagInsightFrom(rawData)
     return (rawData, tag)
 
 
@@ -397,5 +421,8 @@ def getFlySightDataFromCSVFileName(jumpFile) -> tuple:
         elif version == FlySightVersion.V2:
             rawData = readVersion2CSV(jumpFile)
             tag = _tagVersion2From(jumpFile)
+        elif version == FlySightVersion.INSIGHT:
+            rawData = readInsightCSV(jumpFile)
+            tag = _tagInsightFrom(rawData)
     return (rawData, tag)
 

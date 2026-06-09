@@ -744,11 +744,10 @@ def processAllJumpFiles(jumpFiles: list, altitudeDZMeters = 0.0) -> dict:
     obj = objectsList[0]
     if not isinstance(obj, Path) and not isinstance(obj, str) and not isinstance(obj, BytesIO):
         raise SSScoringError('jumpFiles must contain file-like things or BytesIO objects')
-    _v1Pattern = re.compile(r'^\d{2}-\d{2}-\d{2}\.CSV$', re.IGNORECASE)
     for jumpFile in objectsList:
         if isinstance(jumpFile, BytesIO):
             fileName = jumpFile.name
-            if not _v1Pattern.match(fileName) and not fileName.upper().endswith('TRACK.CSV'):
+            if not fileName.upper().endswith('.CSV') or any(x in fileName.upper() for x in ('SENSOR', 'EVENT')):
                 continue
             rawData, tag = getFlySightDataFromCSVBuffer(jumpFile.getvalue(), jumpFile.name)
         elif isinstance(jumpFiles, dict) and isinstance(jumpFiles[jumpFile], pd.DataFrame):
@@ -756,6 +755,9 @@ def processAllJumpFiles(jumpFiles: list, altitudeDZMeters = 0.0) -> dict:
             tag = jumpFile
         else:
             rawData, tag = getFlySightDataFromCSVFileName(jumpFile)
+        if rawData is None:
+            jumpResults[tag] = JumpResults(None, 0.0, 0.0, None, None, None, JumpStatus.UNSUPPORTED_PLD_FORMAT)
+            continue
         try:
             jumpResult = processJump(convertFlySight2SSScoring(rawData, altitudeDZMeters = altitudeDZMeters))
         except Exception:

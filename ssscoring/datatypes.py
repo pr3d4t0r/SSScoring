@@ -16,6 +16,7 @@ class FlySightVersion(Enum):
     Symbols for handling device version.
     """
     V1 = 1000
+    INSIGHT = 1100
     V2 = 2000
 
 
@@ -26,6 +27,7 @@ class JumpStatus(Enum):
     INVALID_SPEED_FILE = 120
     SPEED_ACCURACY_EXCEEDS_LIMIT = 200
     WARM_UP_FILE = 300
+    UNSUPPORTED_PLD_FORMAT = 400
 
 
 JumpResults = namedtuple(
