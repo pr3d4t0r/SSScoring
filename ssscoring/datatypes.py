@@ -26,6 +26,7 @@ class JumpStatus(Enum):
     INVALID_SPEED_FILE = 120
     SPEED_ACCURACY_EXCEEDS_LIMIT = 200
     WARM_UP_FILE = 300
+    UNSUPPORTED_PLD_FORMAT = 400
 
 
 JumpResults = namedtuple(

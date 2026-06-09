@@ -143,6 +143,24 @@ def _displayAllTracksOnMap(jumpResults: dict):
         displayTrackOnMap(multipleSpeedJumpsTrajectories(jumpResults))
 
 
+_FILE_ERROR_LABELS = {
+    JumpStatus.UNSUPPORTED_PLD_FORMAT: 'Unsupported file format — not recorded by a FlySight v1 or v2 device',
+    JumpStatus.INVALID_SPEED_FILE: 'Invalid or corrupted file',
+    JumpStatus.WARM_UP_FILE: 'Warm-up file or SMD battery failure',
+    JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT: 'Speed accuracy exceeds ISC threshold — RE-JUMP required',
+}
+
+
+def _displayFileErrorsIn(jumpResults: dict, jumpResultsSubset: dict):
+    errorFiles = {tag: result for tag, result in jumpResults.items() if tag not in jumpResultsSubset}
+    if not errorFiles:
+        return
+    with st.expander('**Files not included in scoring**', expanded=True, icon=':material/warning:'):
+        for tag, result in errorFiles.items():
+            label = _FILE_ERROR_LABELS.get(result.status, 'Did not meet scoring criteria')
+            st.html('<p>⚠ <b>%s</b> — <span style="color: red">%s</span></p>' % (tag, label))
+
+
 def _maxSpeedScaleFrom(jumpResults: dict) -> float:
     maxScore = max(result.score if result.score != None else 0 for result in jumpResults.values())
     try:
@@ -178,11 +196,19 @@ def main():
                 jumpStatus = interpretJumpResult(tag, jumpResult, st.session_state.processBadJump)
                 if jumpStatus != JumpStatus.OK:
                     st.toast('#### %s - %s' % (tag, str(jumpStatus)), icon='⚠️')
-                if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
+                showJumpData = False
+                match jumpStatus:
+                    case JumpStatus.OK:
+                        showJumpData = True
+                    case JumpStatus.UNSUPPORTED_PLD_FORMAT:
+                        pass
+                    case _ if st.session_state.processBadJump:
+                        showJumpData = True
+                if showJumpData:
                     jumpResultsSubset[tag] = jumpResult
                 st.html('<h3>'+jumpStatusInfo+scoringInfo+(str(badJumpLegend) if badJumpLegend else ''))
                 st.html("<br>If this was NOT a warm-up file, it's probably an ISC altitude violation; please report to Eugene/pr3d4t0r and attach the TRACK.CSV file</h3>" if jumpStatus in [ JumpStatus.WARM_UP_FILE, ] else '</h3>')
-                if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
+                if showJumpData:
                     displayJumpDataIn(jumpResult.table)
                     with st.expander('Max score = crosshairs.  Max speed = diamond. V-accel = exponential mean average over 4 seconds.', expanded=True):
                         # st.write('Max score = crosshairs.  Max speed = diamond. V-accel = exponential mean average over 4 seconds.')
@@ -215,7 +241,8 @@ def main():
             index += 1
         with tabs[0]:
             if len(resultTags):
-                if (st.session_state.processBadJump and jumpStatus != JumpStatus.OK) or jumpStatus == JumpStatus.OK:
+                _displayFileErrorsIn(jumpResults, jumpResultsSubset)
+                if jumpResultsSubset:
                     aggregate = aggregateResults(jumpResultsSubset)
                     if len(aggregate) > 0:
                         _displayJumpsInSet(aggregate)
