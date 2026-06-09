@@ -16,6 +16,7 @@ class FlySightVersion(Enum):
     Symbols for handling device version.
     """
     V1 = 1000
+    INSIGHT = 1100
     V2 = 2000
 
 

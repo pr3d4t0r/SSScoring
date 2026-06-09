@@ -263,7 +263,7 @@ def interpretJumpResult(tag: str,
             badJumpLegend = '<span style="color: red">Invalid or corrupted FlySight file - it\'s neither version 1 nor version 2<br>'
             scoringInfo = ''
         case JumpStatus.UNSUPPORTED_PLD_FORMAT:
-            badJumpLegend = '<span style="color: red">Unsupported file format — this file was not recorded by a FlySight v1 or v2 device<br>'
+            badJumpLegend = '<span style="color: red">Unsupported file format — not a FlySight v1, v2, or Deep &amp; Steep Insight device<br>'
             scoringInfo = ''
         case _:
             scoringInfo = 'Max speed = {0:,.0f}; '.format(maxSpeed)+('exit at %d m (%d ft)<br>Validation window starts at %d m (%d ft)<br>End scoring window at %d m (%d ft)<br>' % \

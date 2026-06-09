@@ -71,6 +71,15 @@ of a `set` because the code manipulates the headers/columns during file ingress.
 """
 
 
+INSIGHT_1_HEADER = set([ 'time', 'lat', 'lon', 'hMSL', 'velN', 'velE', 'velD', 'hAcc', 'vAcc', 'sAcc', 'gpsFix', 'numSV', 'heading', 'headAcc', ])
+"""
+Deep & Steep Insight GPS altimeter CSV file headers.  The Insight format is
+FlySight v1-like but differs: `headAcc` replaces `cAcc`, and `gpsFix`/`numSV`
+precede `heading`.  The columns required by the SSScoring pipeline are identical
+in name; only `headAcc` is dropped on ingress.
+"""
+
+
 FLYSIGHT_FILE_ENCODING = 'utf-8'
 """
 File encoding as it comes raw from the FlySight device.

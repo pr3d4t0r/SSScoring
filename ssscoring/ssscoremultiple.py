@@ -144,7 +144,7 @@ def _displayAllTracksOnMap(jumpResults: dict):
 
 
 _FILE_ERROR_LABELS = {
-    JumpStatus.UNSUPPORTED_PLD_FORMAT: 'Unsupported file format — not recorded by a FlySight v1 or v2 device',
+    JumpStatus.UNSUPPORTED_PLD_FORMAT: 'Unsupported file format — not a FlySight v1, v2, or Deep & Steep Insight device',
     JumpStatus.INVALID_SPEED_FILE: 'Invalid or corrupted file',
     JumpStatus.WARM_UP_FILE: 'Warm-up file or SMD battery failure',
     JumpStatus.SPEED_ACCURACY_EXCEEDS_LIMIT: 'Speed accuracy exceeds ISC threshold — RE-JUMP required',

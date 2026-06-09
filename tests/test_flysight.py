@@ -6,6 +6,7 @@ from pathlib import Path
 
 from ssscoring.constants import BREAKOFF_ALTITUDE
 from ssscoring.constants import FLYSIGHT_2_HEADER
+from ssscoring.constants import INSIGHT_1_HEADER
 from ssscoring.errors import SSScoringError
 from ssscoring.flysight import FLYSIGHT_1_HEADER
 from ssscoring.flysight import FLYSIGHT_FILE_ENCODING
@@ -16,6 +17,7 @@ from ssscoring.flysight import getAllSpeedJumpFilesFrom
 from ssscoring.flysight import getFlySightDataFromCSVBuffer
 from ssscoring.flysight import getFlySightDataFromCSVFileName
 from ssscoring.flysight import isCRMangledCSV
+from ssscoring.flysight import readInsightCSV
 from ssscoring.flysight import readVersion1CSV
 from ssscoring.flysight import readVersion2CSV
 from ssscoring.flysight import skipOverFS2MetadataRowsIn
@@ -34,6 +36,7 @@ TEST_FLYSIGHT_DATA_LAKE = './resources/test-tracks'
 TEST_FLYSIGHT_1_DATA = Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-00.CSV'
 TEST_FLYSIGHT_2_DATA = Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS2' / '01-00-00' / 'TRACK.CSV'
 TEST_FLYSIGHT_4_DATA = Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-04-DOS-CRLF.CSV'
+TEST_INSIGHT_DATA = Path(TEST_FLYSIGHT_DATA_LAKE) / 'INSIGHT' / 'gps_00104.csv'
 
 
 # +++ tests +++
@@ -89,10 +92,14 @@ def test_skipOverFS2MetadataRowsIn():
 def test_validFlySightHeaderIn(_badDelimitersCSV, _missingColumnInCSV, _invalidMaxAltitude):
     assert validFlySightHeaderIn(TEST_FLYSIGHT_1_DATA)
     assert validFlySightHeaderIn(TEST_FLYSIGHT_2_DATA)
+    assert validFlySightHeaderIn(TEST_INSIGHT_DATA)
     assert not validFlySightHeaderIn(_badDelimitersCSV)
     assert not validFlySightHeaderIn(_missingColumnInCSV)
     assert validFlySightHeaderIn(_invalidMaxAltitude)
     with open(TEST_FLYSIGHT_1_DATA, 'rb') as inputFile:
+        buffer = inputFile.read()
+    assert validFlySightHeaderIn(buffer)
+    with open(TEST_INSIGHT_DATA, 'rb') as inputFile:
         buffer = inputFile.read()
     assert validFlySightHeaderIn(buffer)
 
@@ -102,7 +109,9 @@ def test_getAllSpeedJumpFilesFrom(_tooSmallCSV):
     assert len(files) >= 1
     assert TEST_FLYSIGHT_1_DATA in files.keys()
     assert TEST_FLYSIGHT_2_DATA in files.keys()
+    assert TEST_INSIGHT_DATA in files.keys()
     assert files[TEST_FLYSIGHT_2_DATA] == '2'
+    assert files[TEST_INSIGHT_DATA] == 'i'
     assert not any('SENSOR' in str(k) for k in files.keys())
     assert not any('EVENT' in str(k) for k in files.keys())
     assert not any('UBX' in str(k) for k in files.keys())
@@ -129,11 +138,15 @@ def test_detectFlySightFileVersionOf(_missingColumnInCSV):
 
     assert detectFlySightFileVersionOf(TEST_FLYSIGHT_1_DATA.as_posix()) == FlySightVersion.V1
     assert detectFlySightFileVersionOf(TEST_FLYSIGHT_2_DATA.as_posix()) == FlySightVersion.V2
+    assert detectFlySightFileVersionOf(TEST_INSIGHT_DATA.as_posix()) == FlySightVersion.INSIGHT
 
     with open(TEST_FLYSIGHT_1_DATA, 'rb') as inputFile:
         buffer = inputFile.read()
-
     _ = detectFlySightFileVersionOf(buffer)
+
+    with open(TEST_INSIGHT_DATA, 'rb') as inputFile:
+        buffer = inputFile.read()
+    assert detectFlySightFileVersionOf(buffer) == FlySightVersion.INSIGHT
 
 
 def test_isCRMangledCSV():
@@ -172,6 +185,27 @@ def test_readVersion1CSV():
     assert len(rawData) > 0
 
 
+def test_readInsightCSV():
+    insightRequiredColumns = INSIGHT_1_HEADER - {'headAcc'}
+
+    rawData = readInsightCSV(TEST_INSIGHT_DATA.as_posix())
+    assert isinstance(rawData, pd.DataFrame)
+    assert len(rawData) > 0
+    assert 'headAcc' not in rawData.columns
+    assert insightRequiredColumns.issubset(set(rawData.columns))
+
+    rawData = readInsightCSV(TEST_INSIGHT_DATA)
+    assert isinstance(rawData, pd.DataFrame)
+    assert len(rawData) > 0
+
+    with open(TEST_INSIGHT_DATA, 'rb') as inputFile:
+        buffer = inputFile.read()
+    rawData = readInsightCSV(StringIO(buffer.decode(FLYSIGHT_FILE_ENCODING)))
+    assert isinstance(rawData, pd.DataFrame)
+    assert len(rawData) > 0
+    assert 'headAcc' not in rawData.columns
+
+
 def test_readVersion2CSV():
     rawData = readVersion2CSV(TEST_FLYSIGHT_2_DATA.as_posix())
     assert isinstance(rawData, pd.DataFrame)
@@ -205,6 +239,13 @@ def test_getFlySightDataFromCSVBuffer():
     assert isinstance(rawData, pd.DataFrame)
     assert tag.endswith(':v2')
 
+    with open(TEST_INSIGHT_DATA, 'rb') as inputFile:
+        buffer = inputFile.read()
+    rawData, tag = getFlySightDataFromCSVBuffer(buffer, TEST_INSIGHT_DATA.name)
+    assert isinstance(rawData, pd.DataFrame)
+    assert tag.endswith(':i')
+    assert 'headAcc' not in rawData.columns
+
 
 def test_getFlySightDataFromCSVFileName(_missingColumnInCSV):
     with pytest.raises(SSScoringError):
@@ -228,4 +269,13 @@ def test_getFlySightDataFromCSVFileName(_missingColumnInCSV):
     rawData, tag = getFlySightDataFromCSVFileName(TEST_FLYSIGHT_2_DATA)
     assert isinstance(rawData, pd.DataFrame)
     assert tag.endswith(':v2')
+
+    rawData, tag = getFlySightDataFromCSVFileName(TEST_INSIGHT_DATA.as_posix())
+    assert isinstance(rawData, pd.DataFrame)
+    assert tag.endswith(':i')
+    assert 'headAcc' not in rawData.columns
+
+    rawData, tag = getFlySightDataFromCSVFileName(TEST_INSIGHT_DATA)
+    assert isinstance(rawData, pd.DataFrame)
+    assert tag.endswith(':i')
 
