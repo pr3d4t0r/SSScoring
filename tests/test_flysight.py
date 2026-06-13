@@ -35,6 +35,7 @@ import pandas as pd
 TEST_FLYSIGHT_DATA_LAKE = './resources/test-tracks'
 TEST_FLYSIGHT_1_DATA = Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-00.CSV'
 TEST_FLYSIGHT_2_DATA = Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS2' / '01-00-00' / 'TRACK.CSV'
+TEST_FLYSIGHT_2_DATA_ALT = Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS2' / '02-00-00-startosphere' / 'TRACK.CSV'
 TEST_FLYSIGHT_4_DATA = Path(TEST_FLYSIGHT_DATA_LAKE) / 'FS1' / 'test-data-04-DOS-CRLF.CSV'
 TEST_INSIGHT_DATA = Path(TEST_FLYSIGHT_DATA_LAKE) / 'INSIGHT' / 'gps_00104.csv'
 
@@ -237,7 +238,14 @@ def test_getFlySightDataFromCSVBuffer():
         buffer = inputFile.read()
     rawData, tag = getFlySightDataFromCSVBuffer(buffer, TEST_FLYSIGHT_2_DATA.name)
     assert isinstance(rawData, pd.DataFrame)
-    assert tag.endswith(':v2')
+    assert tag == '18-56-32:v2'
+
+    with open(TEST_FLYSIGHT_2_DATA_ALT, 'rb') as inputFile:
+        buffer = inputFile.read()
+    altRawData, altTag = getFlySightDataFromCSVBuffer(buffer, TEST_FLYSIGHT_2_DATA_ALT.name)
+    assert isinstance(altRawData, pd.DataFrame)
+    assert altTag == '18-18-27:v2'
+    assert altTag != tag
 
     with open(TEST_INSIGHT_DATA, 'rb') as inputFile:
         buffer = inputFile.read()
@@ -264,11 +272,11 @@ def test_getFlySightDataFromCSVFileName(_missingColumnInCSV):
 
     rawData, tag = getFlySightDataFromCSVFileName(TEST_FLYSIGHT_2_DATA.as_posix())
     assert isinstance(rawData, pd.DataFrame)
-    assert tag.endswith(':v2')
+    assert tag == '18-56-32:v2'
 
     rawData, tag = getFlySightDataFromCSVFileName(TEST_FLYSIGHT_2_DATA)
     assert isinstance(rawData, pd.DataFrame)
-    assert tag.endswith(':v2')
+    assert tag == '18-56-32:v2'
 
     rawData, tag = getFlySightDataFromCSVFileName(TEST_INSIGHT_DATA.as_posix())
     assert isinstance(rawData, pd.DataFrame)
