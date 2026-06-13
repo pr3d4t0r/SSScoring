@@ -338,7 +338,7 @@ def test_processAllJumpFiles():
     jumpFiles = getAllSpeedJumpFilesFrom(TEST_FLYSIGHT_DATA_LAKE)
     _jumpResults = processAllJumpFiles(jumpFiles)
     assert _jumpResults
-    assert '01-00-00:v2' in list(_jumpResults.keys())
+    assert '18-56-32:v2' in list(_jumpResults.keys())
 
     # TODO:  Implement this well - the file names should be part of an object
     #        passed to the processAllJumpFiles() function, when using bytes

@@ -1,4 +1,4 @@
-% ssscoring(3) Version 3.2.0 | Speed Skydiving Scoring API documentation
+% ssscoring(3) Version 3.2.1 | Speed Skydiving Scoring API documentation
 
 Name
 ====
@@ -44,7 +44,7 @@ Speed run summary example:
 https://raw.githubusercontent.com/pr3d4t0r/SSScoring/refs/heads/master/resources/SSScoring-speed-run-summary.png
 
 SSScoring processes all FlySight files (tagged as v1 or v2, depending on the
-device) and SkyTrax files.  It aggregates and summarizes the results.  Full
+device), Insight, and SkyTrax files.  It aggregates and summarizes the results.  Full
 API documentation is available at:
 
 https://pr3d4t0r.github.io/SSScoring/ssscoring.html
@@ -52,8 +52,8 @@ https://pr3d4t0r.github.io/SSScoring/ssscoring.html
 The SSScore apps are available from:
 
 - web app:  **[https://ssscore.streamlit.app](https://ssscore.streamlit.app)**
-- **[SSScore for Mac (universal .dmg)](https://github.com/pr3d4t0r/SSScoring/releases/latest/download/SSScore-3.2.0.dmg)**
-- **[SSScore for Windows (installer)](https://github.com/pr3d4t0r/SSScoring/releases/latest/download/SSScore-3.2.0-Setup.exe)**
+- **[SSScore for Mac (universal .dmg)](https://github.com/pr3d4t0r/SSScoring/releases/latest/download/SSScore-3.2.1.dmg)**
+- **[SSScore for Windows (installer)](https://github.com/pr3d4t0r/SSScoring/releases/latest/download/SSScore-3.2.1-Setup.exe)**
 
 ---
 
@@ -183,6 +183,7 @@ these devices:
 
 - FlySight 1
 - FlySight 2
+- Insight visual altimeter/GPS device
 - SkyTrax GPS and barometric device
 
 SSScoring leverages data manipulation tools in the pandas and NumPy data
@@ -194,7 +195,7 @@ chipset support like Nvidia and M-chipsets.
 ### Features
 
 - Pure Python
-- Supports output from FlySight versions v1 and v2, and SkyTrax devices
+- Supports output from FlySight versions v1 and v2, Insight, and SkyTrax devices
 - Automatic file version detection
 - Bulk file processing via data lake scanning
 - Automatic selection of FlySight-like files mixed among files of multiple types
@@ -233,11 +234,12 @@ files:
 
 - FlySight versions 1 or 2 files
 - SkyTrax files
+- Insight files
 - Video files (MP4 or MOV of whatever)
 - PDFs of meet bulletins and related event information
 - Miscellaneous other junk
 
-SSScoring identifies FlySight and SkyTrax files regardless of what other file
+SSScoring identifies FlySight, Insight, and SkyTrax files regardless of what other file
 types are available in the data lake.  SSScoring also identifies speed files
 from other types of tracks (e.g. wingsuit) based on the performance profile and
 scoring windows.  Tell the SSScoring tools where to get all the track files,
@@ -346,7 +348,7 @@ The disk image is generated to `./dist` as `SSScoring-3.0.0.dmg`, alongside the 
 
 ```
 drwxr-xr-x  3 ciurana  staff         96 May 23 09:01 DumbDriver.app
--rw-r--r--@ 1 ciurana  staff  190369691 May 23 09:06 SSScore-3.2.0.dmg
+-rw-r--r--@ 1 ciurana  staff  190369691 May 23 09:06 SSScore-3.2.1.dmg
 drwxr-xr-x  3 ciurana  staff         96 May 23 08:51 SSScore.app
 -rw-r--r--  1 ciurana  staff      55699 May 23 08:46 ssscoring-2.98.97-py3-none-any.whl
 drwxr-xr-x  3 ciurana  staff         96 May 23 09:01 umountFlySight.app
@@ -422,13 +424,13 @@ This produces a standar Windows installer wizard.  SSScore is installed as a fir
 
 ```
 drwxr-xr-x 1 crystal None        0 May 23 12:43 SSScore
--rwxr-xr-x 1 crystal None 79116394 May 23 12:44 SSScore-3.2.0-Setup.exe
+-rwxr-xr-x 1 crystal None 79116394 May 23 12:44 SSScore-3.2.1-Setup.exe
 -rw-r--r-- 1 crystal None    56233 May 23 12:42 ssscoring-2.98.97-py3-none-any.whl
 ```
 `./dist` ends up with three distributable packages, ready to go:
 
 - `SSScore` - `onedir` executable
-- `SSScore-3.2.0-Setup.exe` standard installer
+- `SSScore-3.2.1-Setup.exe` standard installer
 - Python wheel with the latest code (the same one you'll find in PyPI)
 
 ## Docker build

@@ -284,17 +284,17 @@ def _tagVersion1From(fileThing: str) -> str:
     return fileThing.replace('.CSV', '').replace('.csv', '').replace('/data', '').replace('/', ' ').strip()+':v1'
 
 
-def _tagVersion2From(fileThing: str) -> str:
-    if '/' in fileThing:
-        return fileThing.split('/')[-2]+':v2'
-    else:
-        return fileThing.replace('.CSV', '').replace('.csv', '')+':v2'
+def _tagFromFirstTimestampIn(rawData: pd.DataFrame, suffix: str) -> str:
+    firstTimestamp = str(rawData.iloc[0]['time'])
+    return firstTimestamp.split('T')[1].split('.')[0].replace(':', '-')+':'+suffix
+
+
+def _tagVersion2From(rawData: pd.DataFrame) -> str:
+    return _tagFromFirstTimestampIn(rawData, 'v2')
 
 
 def _tagInsightFrom(rawData: pd.DataFrame) -> str:
-    firstTimestamp = str(rawData.iloc[0]['time'])
-    timePart = firstTimestamp.split('T')[1].split('.')[0]
-    return timePart.replace(':', '-')+':i'
+    return _tagFromFirstTimestampIn(rawData, 'i')
 
 
 def readInsightCSV(fileThing: object) -> pd.DataFrame:
@@ -338,17 +338,22 @@ def getFlySightDataFromCSVBuffer(buffer:bytes, bufferName:str) -> tuple:
     A binary data buffer, bag of bytes, containing a known FlySight track file.
 
         bufferName
-    An arbitrary name for the buffer of type `str`.  It's used for constructing
-    the full buffer tag value for human identification.
+    An arbitrary name for the buffer of type `str`.  Used to construct the tag
+    for FlySight 1 buffers; ignored for FlySight 2 and Insight buffers, whose
+    tags are derived from the first row's timestamp.
 
     Returns
     -------
     A `tuple` with two items:
         - `rawData` - a dataframe representation of the CSV with the original
           headers but without the data type header
-        - `tag` - a string with an identifying tag derived from the path name
-          and file version in the form `some name:vX`.  It uses the current
-          path as metadata to infer the name.  There's no semantics enforcement.
+        - `tag` - an identifying string for the track.  Shape depends on the
+          device:
+            - FlySight 1: `<bufferName>:v1` - derived from `bufferName`
+            - FlySight 2: `HH-MM-ss:v2` - derived from the first GNSS row's
+              timestamp
+            - Insight: `HH-MM-ss:i` - derived from the first row's timestamp
+          Invalid files produce `<bufferName>:INVALID`.
 
     Raises
     ------
@@ -371,7 +376,7 @@ def getFlySightDataFromCSVBuffer(buffer:bytes, bufferName:str) -> tuple:
             tag = _tagVersion1From(bufferName)
         elif version == FlySightVersion.V2:
             rawData = readVersion2CSV(stringIO)
-            tag = _tagVersion2From(bufferName)
+            tag = _tagVersion2From(rawData)
         elif version == FlySightVersion.INSIGHT:
             rawData = readInsightCSV(stringIO)
             tag = _tagInsightFrom(rawData)
@@ -393,9 +398,13 @@ def getFlySightDataFromCSVFileName(jumpFile) -> tuple:
     A `tuple` with two items:
         - `rawData` - a dataframe representation of the CSV with the original
           headers but without the data type header
-        - `tag` - a string with an identifying tag derived from the path name
-          and file version in the form `some name:vX`.  It uses the current
-          path as metadata to infer the name.  There's no semantics enforcement.
+        - `tag` - an identifying string for the track.  Shape depends on the
+          device:
+            - FlySight 1: `<path slug>:v1` - derived from the file path
+            - FlySight 2: `HH-MM-ss:v2` - derived from the first GNSS row's
+              timestamp
+            - Insight: `HH-MM-ss:i` - derived from the first row's timestamp
+          `'NA'` if version detection fails.
 
     Raises
     ------
@@ -420,7 +429,7 @@ def getFlySightDataFromCSVFileName(jumpFile) -> tuple:
             tag = _tagVersion1From(jumpFile)
         elif version == FlySightVersion.V2:
             rawData = readVersion2CSV(jumpFile)
-            tag = _tagVersion2From(jumpFile)
+            tag = _tagVersion2From(rawData)
         elif version == FlySightVersion.INSIGHT:
             rawData = readInsightCSV(jumpFile)
             tag = _tagInsightFrom(rawData)
