@@ -1,4 +1,4 @@
-% ssscoring(3) Version 3.2.1 | Speed Skydiving Scoring API documentation
+% ssscoring(3) Version 3.3.0 | Speed Skydiving Scoring API documentation
 
 Name
 ====
@@ -52,8 +52,8 @@ https://pr3d4t0r.github.io/SSScoring/ssscoring.html
 The SSScore apps are available from:
 
 - web app:  **[https://ssscore.streamlit.app](https://ssscore.streamlit.app)**
-- **[SSScore for Mac (universal .dmg)](https://github.com/pr3d4t0r/SSScoring/releases/latest/download/SSScore-3.2.1.dmg)**
-- **[SSScore for Windows (installer)](https://github.com/pr3d4t0r/SSScoring/releases/latest/download/SSScore-3.2.1-Setup.exe)**
+- **[SSScore for Mac (universal .dmg)](https://github.com/pr3d4t0r/SSScoring/releases/latest/download/SSScore-3.3.0.dmg)**
+- **[SSScore for Windows (installer)](https://github.com/pr3d4t0r/SSScoring/releases/latest/download/SSScore-3.3.0-Setup.exe)**
 
 ---
 
@@ -348,7 +348,7 @@ The disk image is generated to `./dist` as `SSScoring-3.0.0.dmg`, alongside the 
 
 ```
 drwxr-xr-x  3 ciurana  staff         96 May 23 09:01 DumbDriver.app
--rw-r--r--@ 1 ciurana  staff  190369691 May 23 09:06 SSScore-3.2.1.dmg
+-rw-r--r--@ 1 ciurana  staff  190369691 May 23 09:06 SSScore-3.3.0.dmg
 drwxr-xr-x  3 ciurana  staff         96 May 23 08:51 SSScore.app
 -rw-r--r--  1 ciurana  staff      55699 May 23 08:46 ssscoring-2.98.97-py3-none-any.whl
 drwxr-xr-x  3 ciurana  staff         96 May 23 09:01 umountFlySight.app
@@ -424,13 +424,13 @@ This produces a standar Windows installer wizard.  SSScore is installed as a fir
 
 ```
 drwxr-xr-x 1 crystal None        0 May 23 12:43 SSScore
--rwxr-xr-x 1 crystal None 79116394 May 23 12:44 SSScore-3.2.1-Setup.exe
+-rwxr-xr-x 1 crystal None 79116394 May 23 12:44 SSScore-3.3.0-Setup.exe
 -rw-r--r-- 1 crystal None    56233 May 23 12:42 ssscoring-2.98.97-py3-none-any.whl
 ```
 `./dist` ends up with three distributable packages, ready to go:
 
 - `SSScore` - `onedir` executable
-- `SSScore-3.2.1-Setup.exe` standard installer
+- `SSScore-3.3.0-Setup.exe` standard installer
 - Python wheel with the latest code (the same one you'll find in PyPI)
 
 ## Docker build

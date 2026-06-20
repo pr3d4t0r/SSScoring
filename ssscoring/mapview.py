@@ -5,7 +5,6 @@ from ssscoring.calc import jumpRunBearing
 from ssscoring.constants import SAMPLE_RATE
 from ssscoring.constants import SCORING_INTERVAL
 from ssscoring.datatypes import JumpResults
-from ssscoring.notebook import SPEED_COLORS
 from ssscoring.notebook import convertHexColorToRGB
 
 import pandas as pd
@@ -182,7 +181,7 @@ def speedJumpTrajectory(jumpResult: JumpResults,
         return deck
 
 
-def multipleSpeedJumpsTrajectories(jumpResults):
+def multipleSpeedJumpsTrajectories(jumpResults, tagColors: dict):
     """
     Build all the layers for a PyDeck map showing the trajectories of every jump
     in the results set.
@@ -191,6 +190,10 @@ def multipleSpeedJumpsTrajectories(jumpResults):
     ---------
         jumpResults
     A dictionary of all the jump results after processing.
+
+        tagColors
+    A tag→hex-color mapping produced by `resolveJumpColors`; fastest jump is
+    green, slowest red, others in blue shades.
 
     Returns
     -------
@@ -203,7 +206,6 @@ def multipleSpeedJumpsTrajectories(jumpResults):
     `st.map`
     """
     mapLayers = list()
-    mixColor = 0
     resultTags = sorted(list(jumpResults.keys()), reverse=True)
     for tag in resultTags:
         result = jumpResults[tag]
@@ -212,7 +214,7 @@ def multipleSpeedJumpsTrajectories(jumpResults):
             exitPointData = workData.head(1)
             exitPointData['label'] = tag
             maxScoreTime = _resolveMaxScoreTimeFrom(result)
-            mixColor = (mixColor+1)%len(SPEED_COLORS)
+            trackColor = convertHexColorToRGB(tagColors[tag])
             layers = [
                 pdk.Layer(
                     'ScatterplotLayer',
@@ -226,8 +228,7 @@ def multipleSpeedJumpsTrajectories(jumpResults):
                     data=exitPointData,
                     get_position=[ 'longitude', 'latitude', ],
                     get_text='label',
-                    # get_color=convertHexColorToRGB(SPEED_COLORS[mixColor]),
-                    get_color=[ 255, 255, 255, 255, ],
+                    get_color=trackColor+[255],
                     get_background_color=[ 0, 0, 0, 255, ],
                     background=True,
                     get_size=12,
@@ -247,7 +248,7 @@ def multipleSpeedJumpsTrajectories(jumpResults):
                 pdk.Layer(
                     'ScatterplotLayer',
                     data=workData,
-                    get_color = convertHexColorToRGB(SPEED_COLORS[mixColor]),
+                    get_color=trackColor,
                     get_position=[ 'longitude', 'latitude', ],
                     get_radius=2),
                 pdk.Layer(
