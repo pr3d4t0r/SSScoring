@@ -28,12 +28,12 @@ from ssscoring.datatypes import JumpStatus
 from ssscoring.datatypes import PerformanceWindow
 from ssscoring.mapview import multipleSpeedJumpsTrajectories
 from ssscoring.mapview import speedJumpTrajectory
-from ssscoring.notebook import SPEED_COLORS
 from ssscoring.notebook import graphForwardDisplacement
 from ssscoring.notebook import graphGroundTrack
 from ssscoring.notebook import graphJumpResult
 from ssscoring.notebook import initializeGroundTrackPlot
 from ssscoring.notebook import initializePlot
+from ssscoring.notebook import resolveJumpColors
 # TODO: Remove this if present after 20260531
 # from streamlit_bokeh import streamlit_bokeh
 
@@ -138,9 +138,9 @@ def _displaySpeedAngles(jumpResults: dict):
         st.dataframe(angles)
 
 
-def _displayAllTracksOnMap(jumpResults: dict):
+def _displayAllTracksOnMap(jumpResults: dict, tagColors: dict):
     with st.expander('**All jumps trajectories**', expanded=True):
-        displayTrackOnMap(multipleSpeedJumpsTrajectories(jumpResults))
+        displayTrackOnMap(multipleSpeedJumpsTrajectories(jumpResults, tagColors))
 
 
 _FILE_ERROR_LABELS = {
@@ -180,7 +180,6 @@ def main():
     if st.session_state.trackFiles:
         jumpResults = processAllJumpFiles(st.session_state.trackFiles, altitudeDZMeters=st.session_state.elevation)
         allJumpsPlot = initializePlot('All jumps', backgroundColorName='#2c2c2c', yMax=_maxSpeedScaleFrom(jumpResults))
-        mixColor = 0
         jumpResultsSubset = dict()
         resultTags = sorted(list(jumpResults.keys()), reverse=True)
         tabs = st.tabs(['Totals']+resultTags)
@@ -188,7 +187,6 @@ def main():
         jumpStatus = JumpStatus.OK
         for tag in resultTags:
             jumpResult = jumpResults[tag]
-            mixColor = (mixColor+1)%len(SPEED_COLORS)
             with tabs[index]:
                 jumpStatusInfo,\
                 scoringInfo,\
@@ -211,7 +209,6 @@ def main():
                 if showJumpData:
                     displayJumpDataIn(jumpResult.table)
                     with st.expander('Max score = crosshairs.  Max speed = diamond. V-accel = exponential mean average over 4 seconds.', expanded=True):
-                        # st.write('Max score = crosshairs.  Max speed = diamond. V-accel = exponential mean average over 4 seconds.')
                         plotJumpResult(tag, jumpResult)
                     if jumpResult.data is not None:
                         with st.expander('**Horizontal displacement** - optimal ≦ 500 m from exit', expanded=True):
@@ -224,13 +221,6 @@ def main():
                                 displacementFigure = initializePlot(tag, yLabel='forward (m)', backgroundColorName='#2c2c2c', height=450)
                                 graphForwardDisplacement(displacementFigure, jumpResult)
                                 st.plotly_chart(displacementFigure, width='stretch')
-                    graphJumpResult(
-                        allJumpsPlot,
-                        jumpResult,
-                        lineColor=SPEED_COLORS[mixColor],
-                        legend='%s = %.2f' % (tag, jumpResult.score if jumpResult.score else -1.0),
-                        showIt=False
-                    )
                     with st.expander('Speed run / jump run', expanded=True):
                         st.session_state.displayScorePoint = st.toggle('Display max score / max speed point', value=True, help='Show the fastest speed or score point along the flight path', key=tag)
                         displayTrackOnMap(speedJumpTrajectory(jumpResult, st.session_state.displayScorePoint), st.session_state.displayScorePoint, showJumpRunLegend=True)
@@ -243,12 +233,22 @@ def main():
             if len(resultTags):
                 _displayFileErrorsIn(jumpResults, jumpResultsSubset)
                 if jumpResultsSubset:
+                    tagColors = resolveJumpColors(jumpResultsSubset)
+                    for tag in sorted(jumpResultsSubset.keys(), reverse=True):
+                        jumpResult = jumpResultsSubset[tag]
+                        graphJumpResult(
+                            allJumpsPlot,
+                            jumpResult,
+                            lineColor=tagColors[tag],
+                            legend='%s = %.2f' % (tag, jumpResult.score if jumpResult.score else -1.0),
+                            showIt=False
+                        )
                     aggregate = aggregateResults(jumpResultsSubset)
                     if len(aggregate) > 0:
                         _displayJumpsInSet(aggregate)
                         _displaySpeedAngles(jumpResults)
                         _displaySpeedSummary(aggregate, allJumpsPlot)
-                        _displayAllTracksOnMap(jumpResults)
+                        _displayAllTracksOnMap(jumpResults, tagColors)
     else:
         st.write(fetchInstructionsHTML(), unsafe_allow_html=True)
 

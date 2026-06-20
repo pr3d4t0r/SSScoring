@@ -187,10 +187,9 @@ targets:
 
 test: ALWAYS
 	@echo "Version = $(VERSION)"
-	cp $(APP_CONFIG_FILE) ~/.streamlit
-	pytest
-	rm -Rfv $$(find $(PACKAGE)/ | awk '/__pycache__$$/')
-	rm -Rfv $$(find tests | awk '/__pycache__$$/')
+	pytest --tb=short
+	rm -Rfv $$(find $(PACKAGE)/ | awk '/__pycache__$$/') 2> /dev/null 1> /dev/null
+	rm -Rfv $$(find tests | awk '/__pycache__$$/') 2> /dev/null 1> /dev/null
 
 
 tools:

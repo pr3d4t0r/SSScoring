@@ -37,6 +37,22 @@ associated with a different color and easier to visualize.  8 distinct colors,
 corresponding to each jump in a competition.
 """
 
+COLOR_FASTEST = '#32cd32'
+"""Limegreen — fastest jump track color in aggregate displays; matches the table's max-score highlight."""
+
+COLOR_SLOWEST = '#ff4500'
+"""Orangered — slowest jump track color in aggregate displays; matches the table's min-score highlight."""
+
+COLORS_OTHERS = (
+    '#1e90ff',
+    '#4169e1',
+    '#0000cd',
+    '#00bfff',
+    '#6495ed',
+    '#4682b4',
+)
+"""Six distinct blue shades for all non-fastest, non-slowest jumps in aggregate displays."""
+
 
 # Map Bokeh-era named ranges to Plotly y-axis IDs.  Preserves the rangeName
 # kwarg API on graphAltitude/graphAngle/graphAcceleration callers.
@@ -689,6 +705,38 @@ def graphForwardDisplacement(figure,
         showlegend=False,
         hoverinfo='skip',
     ))
+
+
+def resolveJumpColors(jumpResults: dict) -> dict:
+    """
+    Build a tag→hex-color mapping for a set of jump results.
+
+    The fastest jump (highest score) gets `COLOR_FASTEST`, the slowest gets
+    `COLOR_SLOWEST`, and all remaining valid jumps cycle through `COLORS_OTHERS`.
+    """
+    validScores = {
+        tag: result.score
+        for tag, result in jumpResults.items()
+        if result.score is not None
+    }
+    if not validScores:
+        return {
+            tag: COLORS_OTHERS[i % len(COLORS_OTHERS)]
+            for i, tag in enumerate(jumpResults)
+        }
+    fastestTag = max(validScores, key=validScores.get)
+    slowestTag = min(validScores, key=validScores.get)
+    tagColors = {}
+    blueIndex = 0
+    for tag in jumpResults:
+        if tag == fastestTag:
+            tagColors[tag] = COLOR_FASTEST
+        elif tag == slowestTag:
+            tagColors[tag] = COLOR_SLOWEST
+        else:
+            tagColors[tag] = COLORS_OTHERS[blueIndex % len(COLORS_OTHERS)]
+            blueIndex += 1
+    return tagColors
 
 
 def convertHexColorToRGB(color: str) -> list:

@@ -125,6 +125,7 @@ venv.bak/
 **/.bash_rc
 **/.bashrc
 **/.buildout
+**/.claude/*
 **/.config
 **/.devpi/*
 **/.gitconfig*
