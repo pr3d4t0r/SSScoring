@@ -85,8 +85,8 @@ def initializePlot(jumpTitle: str,
     -------
     A `plotly.graph_objects.Figure`.
     """
-    fig = go.Figure()
-    fig.update_layout(
+    figure = go.Figure()
+    figure.update_layout(
         title=dict(text=jumpTitle, font=dict(color=colorName)),
         height=height,
         autosize=True,
@@ -121,10 +121,10 @@ def initializePlot(jumpTitle: str,
             zeroline=False,
         ),
     )
-    return fig
+    return figure
 
 
-def _graphSegment(fig,
+def _graphSegment(figure,
                   x0=0.0,
                   y0=0.0,
                   x1=0.0,
@@ -135,7 +135,7 @@ def _graphSegment(fig,
     Draw a line segment annotation on the plot's main axes.  Plotly equivalent
     of Bokeh's plot.segment().
     """
-    fig.add_shape(
+    figure.add_shape(
         type='line',
         x0=x0, y0=y0,
         x1=x1, y1=y1,
@@ -144,7 +144,7 @@ def _graphSegment(fig,
     )
 
 
-def initializeExtraYRanges(fig,
+def initializeExtraYRanges(figure,
                            startY: float = 0.0,
                            endY: float = MAX_ALTITUDE_FT,
                            maxSpeedAccuracy: float | None = None):
@@ -163,12 +163,12 @@ def initializeExtraYRanges(fig,
 
     color = DEFAULT_AXIS_COLOR
 
-    fig.update_xaxes(domain=(LEFT_MARGIN, 1.0))
+    figure.update_xaxes(domain=(LEFT_MARGIN, 1.0))
 
-    mainYTitle = (fig.layout.yaxis.title.text or 'km/h')
-    fig.update_yaxes(title=None)
+    mainYTitle = (figure.layout.yaxis.title.text or 'km/h')
+    figure.update_yaxes(title=None)
 
-    fig.update_layout(
+    figure.update_layout(
         yaxis2=dict(
             autorange=True,
             anchor='free', overlaying='y', side='left', position=POSITIONS[0],
@@ -207,7 +207,7 @@ def initializeExtraYRanges(fig,
         (LEFT_MARGIN,  mainYTitle),
     ]
     for pos, text in titles:
-        fig.add_annotation(
+        figure.add_annotation(
             xref='paper', yref='paper',
             x=pos + 0.012, y=0.5,
             text=text,
@@ -217,7 +217,7 @@ def initializeExtraYRanges(fig,
             xanchor='center', yanchor='middle',
         )
 
-    return fig
+    return figure
 
 
 def validationWindowDataFrom(data: pd.DataFrame, window: PerformanceWindow) -> pd.DataFrame:
@@ -236,9 +236,9 @@ def validationWindowDataFrom(data: pd.DataFrame, window: PerformanceWindow) -> p
     })
 
 
-def _plotSpeedAccuracy(fig, data, window):
+def _plotSpeedAccuracy(figure, data, window):
     accuracyData = validationWindowDataFrom(data, window)
-    fig.add_trace(go.Scatter(
+    figure.add_trace(go.Scatter(
         x=accuracyData['x'],
         y=accuracyData['y'],
         mode='lines',
@@ -248,7 +248,7 @@ def _plotSpeedAccuracy(fig, data, window):
         hovertemplate='accuracy: %{y:.2f}<extra></extra>',
     ))
     validationData = data[data.altitudeAGL <= window.validationStart]
-    fig.add_trace(go.Scatter(
+    figure.add_trace(go.Scatter(
         x=validationData.plotTime,
         y=[SPEED_ACCURACY_THRESHOLD] * len(validationData),
         mode='lines',
@@ -259,7 +259,7 @@ def _plotSpeedAccuracy(fig, data, window):
     ))
 
 
-def graphJumpResult(fig,
+def graphJumpResult(figure,
                     jumpResult,
                     lineColor='green',
                     legend='speed',
@@ -270,7 +270,7 @@ def graphJumpResult(fig,
 
     Arguments
     ---------
-        fig
+        figure
     A Plotly Figure where to render the plot.
 
         jumpResult: ssscoring.JumpResults
@@ -291,8 +291,8 @@ def graphJumpResult(fig,
     Streamlit usage:
 
 ```python
-    graphJumpResult(fig, result)
-    st.plotly_chart(fig, width='stretch')
+    graphJumpResult(figure, jumpResult)
+    st.plotly_chart(figure, width='stretch')
 ```
     """
     if jumpResult.data is not None:
@@ -301,7 +301,7 @@ def graphJumpResult(fig,
         score = jumpResult.score
 
         # Main speed line
-        fig.add_trace(go.Scatter(
+        figure.add_trace(go.Scatter(
             x=data.plotTime,
             y=data.vKMh,
             mode='lines',
@@ -313,10 +313,10 @@ def graphJumpResult(fig,
 
         if showIt:
             maxSpeed = data.vKMh.max()
-            t = data[data.vKMh == maxSpeed].iloc[0].plotTime
+            peakSpeedTime = data[data.vKMh == maxSpeed].iloc[0].plotTime
 
             # Horizontal speed
-            fig.add_trace(go.Scatter(
+            figure.add_trace(go.Scatter(
                 x=data.plotTime,
                 y=data.hKMh,
                 mode='lines',
@@ -326,14 +326,14 @@ def graphJumpResult(fig,
                 hovertemplate='h: %{y:.2f} km/h<extra></extra>',
             ))
 
-            _plotSpeedAccuracy(fig, data, jumpResult.window)
+            _plotSpeedAccuracy(figure, data, jumpResult.window)
 
             if scores is not None:
                 # Score window brackets
-                _graphSegment(fig, scores[score]+3.0, 0.0, scores[score]+3.0, score, 1, 'darkseagreen')
-                _graphSegment(fig, scores[score],     0.0, scores[score],     score, 1, 'darkseagreen')
+                _graphSegment(figure, scores[score]+3.0, 0.0, scores[score]+3.0, score, 1, 'darkseagreen')
+                _graphSegment(figure, scores[score],     0.0, scores[score],     score, 1, 'darkseagreen')
                 # Score marker
-                fig.add_trace(go.Scatter(
+                figure.add_trace(go.Scatter(
                     x=[scores[score]+1.5],
                     y=[score],
                     mode='markers',
@@ -345,8 +345,8 @@ def graphJumpResult(fig,
                     hovertemplate='score: %{y:.2f} km/h<extra></extra>',
                 ))
                 # Max-speed marker
-                fig.add_trace(go.Scatter(
-                    x=[t],
+                figure.add_trace(go.Scatter(
+                    x=[peakSpeedTime],
                     y=[maxSpeed],
                     mode='markers',
                     marker=dict(symbol='diamond-dot', size=20,
@@ -358,7 +358,7 @@ def graphJumpResult(fig,
                 ))
 
 
-def graphAltitude(fig,
+def graphAltitude(figure,
                   jumpResult,
                   label='Alt (ft)',
                   lineColor='palegoldenrod',
@@ -368,7 +368,7 @@ def graphAltitude(fig,
     """
     data = jumpResult.data
     yaxis = _Y_AXIS_MAP[rangeName]
-    fig.add_trace(go.Scatter(
+    figure.add_trace(go.Scatter(
         x=data.plotTime,
         y=data.altitudeAGLFt,
         mode='lines',
@@ -379,7 +379,7 @@ def graphAltitude(fig,
     ))
 
 
-def graphAngle(fig,
+def graphAngle(figure,
                jumpResult,
                label='angle',
                lineColor='deepskyblue',
@@ -389,7 +389,7 @@ def graphAngle(fig,
     """
     data = jumpResult.data
     yaxis = _Y_AXIS_MAP[rangeName]
-    fig.add_trace(go.Scatter(
+    figure.add_trace(go.Scatter(
         x=data.plotTime,
         y=data.speedAngle,
         mode='lines',
@@ -400,7 +400,7 @@ def graphAngle(fig,
     ))
 
 
-def graphAcceleration(fig,
+def graphAcceleration(figure,
                       jumpResult,
                       label='V-accel m/s²',
                       lineColor='magenta',
@@ -412,7 +412,7 @@ def graphAcceleration(fig,
     data = jumpResult.data
     data['vAccelEMA'] = data.vAccelMS2.ewm(span=20, adjust=False).mean()
     yaxis = _Y_AXIS_MAP[rangeName]
-    fig.add_trace(go.Scatter(
+    figure.add_trace(go.Scatter(
         x=data.plotTime,
         y=data.vAccelMS2,
         mode='lines',
@@ -421,7 +421,7 @@ def graphAcceleration(fig,
         yaxis=yaxis,
         hovertemplate='a: %{y:.2f} m/s²<extra></extra>',
     ))
-    fig.add_trace(go.Scatter(
+    figure.add_trace(go.Scatter(
         x=data.plotTime,
         y=data.vAccelEMA,
         mode='lines',
@@ -715,9 +715,9 @@ def resolveJumpColors(jumpResults: dict) -> dict:
     `COLOR_SLOWEST`, and all remaining valid jumps cycle through `COLORS_OTHERS`.
     """
     validScores = {
-        tag: result.score
-        for tag, result in jumpResults.items()
-        if result.score is not None
+        tag: jumpResult.score
+        for tag, jumpResult in jumpResults.items()
+        if jumpResult.score is not None
     }
     if not validScores:
         return {
@@ -749,6 +749,6 @@ def convertHexColorToRGB(color: str) -> list:
     color = color.replace('#', '')
     if len(color) != 6:
         raise SSScoringError('Invalid hex value length')
-    result = [int(color[x:x+2], 16) for x in range(0, len(color), 2)]
-    return result
+    rgbValues = [int(color[byteOffset:byteOffset+2], 16) for byteOffset in range(0, len(color), 2)]
+    return rgbValues
 

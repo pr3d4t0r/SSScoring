@@ -521,32 +521,30 @@ def jumpRunBearing(jumpData: pd.DataFrame, nSamples: int = JUMP_RUN_SAMPLES) -> 
     Mean bearing in degrees [0, 360).
     """
     samples = jumpData.head(nSamples)
-    lats = samples.latitude.to_numpy(dtype=float)
-    lons = samples.longitude.to_numpy(dtype=float)
+    latitudes = samples.latitude.to_numpy(dtype=float)
+    longitudes = samples.longitude.to_numpy(dtype=float)
     sinSum = 0.0
     cosSum = 0.0
     count = 0
-    for i in range(len(lats) - 1):
-        lat1, lon1, lat2, lon2 = map(math.radians, [lats[i], lons[i], lats[i + 1], lons[i + 1]])
-        dLon = lon2 - lon1
-        x = math.sin(dLon) * math.cos(lat2)
-        y = math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(lat2) * math.cos(dLon)
-        if x != 0.0 or y != 0.0:
-            b = math.atan2(x, y)
-            sinSum += math.sin(b)
-            cosSum += math.cos(b)
+    for i in range(len(latitudes) - 1):
+        startLatitude, startLongitude, endLatitude, endLongitude = map(math.radians, [latitudes[i], longitudes[i], latitudes[i + 1], longitudes[i + 1]])
+        longitudeDelta = endLongitude - startLongitude
+        eastComponent = math.sin(longitudeDelta) * math.cos(endLatitude)
+        northComponent = math.cos(startLatitude) * math.sin(endLatitude) - math.sin(startLatitude) * math.cos(endLatitude) * math.cos(longitudeDelta)
+        if eastComponent != 0.0 or northComponent != 0.0:
+            segmentBearing = math.atan2(eastComponent, northComponent)
+            sinSum += math.sin(segmentBearing)
+            cosSum += math.cos(segmentBearing)
             count += 1
     if count == 0:
         return 0.0
     return (math.degrees(math.atan2(sinSum / count, cosSum / count)) + 360.0) % 360.0
 
 
-def forwardLateralDisplacement(
-    jumpData: pd.DataFrame,
-    exitLat: float,
-    exitLon: float,
-    bearing: float,
-) -> pd.DataFrame:
+def forwardLateralDisplacement(jumpData: pd.DataFrame,
+                               exitLat: float,
+                               exitLon: float,
+                               bearing: float) -> pd.DataFrame:
     """
     Adds `forwardM` and `lateralM` columns to `jumpData`: signed displacement
     in metres along and perpendicular to the jump run axis from the exit point.
@@ -569,24 +567,24 @@ def forwardLateralDisplacement(
     Copy of `jumpData` with `forwardM` and `lateralM` columns appended.
     """
     bearingRad = math.radians(bearing)
-    lats = jumpData.latitude.to_numpy(dtype=float)
-    lons = jumpData.longitude.to_numpy(dtype=float)
+    latitudes = jumpData.latitude.to_numpy(dtype=float)
+    longitudes = jumpData.longitude.to_numpy(dtype=float)
     distances = np.array([
-        calculateDistance((exitLat, exitLon), (lat, lon))
-        for lat, lon in zip(lats, lons)
+        calculateDistance((exitLat, exitLon), (latitude, longitude))
+        for latitude, longitude in zip(latitudes, longitudes)
     ])
-    lat1Rad = math.radians(exitLat)
-    lon1Rad = math.radians(exitLon)
-    lat2Rad = np.radians(lats)
-    dLon = np.radians(lons) - lon1Rad
-    x = np.sin(dLon) * np.cos(lat2Rad)
-    y = math.cos(lat1Rad) * np.sin(lat2Rad) - math.sin(lat1Rad) * np.cos(lat2Rad) * np.cos(dLon)
-    ptBearings = np.arctan2(x, y)
-    deltas = ptBearings - bearingRad
-    result = jumpData.copy()
-    result['forwardM'] = np.round(distances * np.cos(deltas), decimals=2)
-    result['lateralM'] = np.round(-distances * np.sin(deltas), decimals=2)
-    return result
+    exitLatitudeRad = math.radians(exitLat)
+    exitLongitudeRad = math.radians(exitLon)
+    pointLatitudesRad = np.radians(latitudes)
+    longitudeDeltas = np.radians(longitudes) - exitLongitudeRad
+    eastComponents = np.sin(longitudeDeltas) * np.cos(pointLatitudesRad)
+    northComponents = math.cos(exitLatitudeRad) * np.sin(pointLatitudesRad) - math.sin(exitLatitudeRad) * np.cos(pointLatitudesRad) * np.cos(longitudeDeltas)
+    pointBearings = np.arctan2(eastComponents, northComponents)
+    bearingDeltas = pointBearings - bearingRad
+    jumpCopy = jumpData.copy()
+    jumpCopy['forwardM'] = np.round(distances * np.cos(bearingDeltas), decimals=2)
+    jumpCopy['lateralM'] = np.round(-distances * np.sin(bearingDeltas), decimals=2)
+    return jumpCopy
 
 
 def detectBackFall(jumpData: pd.DataFrame) -> dict:
@@ -617,13 +615,13 @@ def detectBackFall(jumpData: pd.DataFrame) -> dict:
     exitLat = float(jumpData.latitude.iloc[0])
     exitLon = float(jumpData.longitude.iloc[0])
     bearing = jumpRunBearing(jumpData)
-    df = forwardLateralDisplacement(jumpData, exitLat, exitLon, bearing)
-    forwardMax = float(df.forwardM.max())
-    onsetIdx = df.forwardM.idxmax()
-    onsetTime = float(df.loc[onsetIdx].plotTime)
-    forwardReversalM = round(max(0.0, forwardMax - float(df.forwardM.iloc[-1])), 2)
-    lateralAbsMax = float(df.lateralM.abs().max())
-    lateralReversalM = round(max(0.0, lateralAbsMax - float(df.lateralM.abs().iloc[-1])), 2)
+    jumpDisplacement = forwardLateralDisplacement(jumpData, exitLat, exitLon, bearing)
+    forwardMax = float(jumpDisplacement.forwardM.max())
+    onsetIdx = jumpDisplacement.forwardM.idxmax()
+    onsetTime = float(jumpDisplacement.loc[onsetIdx].plotTime)
+    forwardReversalM = round(max(0.0, forwardMax - float(jumpDisplacement.forwardM.iloc[-1])), 2)
+    lateralAbsMax = float(jumpDisplacement.lateralM.abs().max())
+    lateralReversalM = round(max(0.0, lateralAbsMax - float(jumpDisplacement.lateralM.abs().iloc[-1])), 2)
     backFall = forwardReversalM > 0.0 or lateralReversalM > 0.0
     return {
         'backFall': backFall,
@@ -799,37 +797,37 @@ def aggregateResults(jumpResults: dict) -> pd.DataFrame:
     for jumpResultIndex in sorted(list(jumpResults.keys())):
         jumpResult = jumpResults[jumpResultIndex]
         if jumpResult.status == JumpStatus.OK:
-            t = jumpResult.table.copy()
-            finalTime = t.iloc[-1].time
+            jumpTable = jumpResult.table.copy()
+            finalTime = jumpTable.iloc[-1].time
 
             if finalTime > 20.1:
-                finalSpeed = t.iloc[-1].vKMh
-                t.iloc[-1].time = LAST_TIME_TRANCHE   # keep LAST_TIME_TRANCHE for pivoting
+                finalSpeed = jumpTable.iloc[-1].vKMh
+                jumpTable.iloc[-1].time = LAST_TIME_TRANCHE   # keep LAST_TIME_TRANCHE for pivoting
             else:
                 finalSpeed = None
 
-            t = pd.pivot_table(t, columns=t.time)
-            t.columns = [str(c) for c in t.columns]
-            d = pd.DataFrame([jumpResult.score], index=[jumpResultIndex], columns=['score'])
+            jumpTable = pd.pivot_table(jumpTable, columns=jumpTable.time)
+            jumpTable.columns = [str(columnName) for columnName in jumpTable.columns]
+            scoreRow = pd.DataFrame([jumpResult.score], index=[jumpResultIndex], columns=['score'])
 
-            for column in t.columns:
-                d[column] = t[column].vKMh
+            for column in jumpTable.columns:
+                scoreRow[column] = jumpTable[column].vKMh
 
-            d['finalTime'] = [finalTime]
-            d['maxSpeed'] = jumpResult.maxSpeed
+            scoreRow['finalTime'] = [finalTime]
+            scoreRow['maxSpeed'] = jumpResult.maxSpeed
 
             if finalSpeed is not None:
-                d['finalSpeed'] = [finalSpeed]
+                scoreRow['finalSpeed'] = [finalSpeed]
             else:
-                d['finalSpeed'] = [d.get('25.0', [0.0])[0]]
+                scoreRow['finalSpeed'] = [scoreRow.get('25.0', [0.0])[0]]
 
             if speeds.empty:
-                speeds = d.copy()
+                speeds = scoreRow.copy()
             else:
-                speeds = pd.concat([speeds, d])
+                speeds = pd.concat([speeds, scoreRow])
 
     cols = ['score', '5.0', '10.0', '15.0', '20.0', 'finalSpeed', 'finalTime', 'maxSpeed']
-    speeds = speeds[[c for c in cols if c in speeds.columns]]
+    speeds = speeds[[columnName for columnName in cols if columnName in speeds.columns]]
     speeds = speeds.replace(np.nan, 0.0)
     return speeds.sort_index()
 
@@ -865,7 +863,7 @@ def roundedAggregateResults(aggregate: pd.DataFrame) -> pd.DataFrame:
     ------
     `SSSCoringError` if the `jumpResults` object is empty.
     """
-    for column in [col for col in aggregate.columns if 'Time' not in str(col)]:
+    for column in [columnName for columnName in aggregate.columns if 'Time' not in str(columnName)]:
         aggregate[column] = aggregate[column].apply(round)
 
     return aggregate
@@ -902,30 +900,30 @@ def collateAnglesByTimeFromExit(jumpResults: dict) -> pd.DataFrame:
     for jumpResultIndex in sorted(list(jumpResults.keys())):
         jumpResult = jumpResults[jumpResultIndex]
         if jumpResult.status == JumpStatus.OK:
-            t = jumpResult.table.copy()                    # ← critical: avoid mutation
+            jumpTable = jumpResult.table.copy()                    # ← critical: avoid mutation
 
-            finalTime = t.iloc[-1].time
-            finalAngle = t.iloc[-1].speedAngle
+            finalTime = jumpTable.iloc[-1].time
+            finalAngle = jumpTable.iloc[-1].speedAngle
 
-            t.iloc[-1].time = LAST_TIME_TRANCHE
+            jumpTable.iloc[-1].time = LAST_TIME_TRANCHE
 
-            t = pd.pivot_table(t, columns=t.time)
-            t.columns = [str(c) for c in t.columns]
-            d = pd.DataFrame([jumpResult.score], index=[jumpResultIndex], columns=['score'])
+            jumpTable = pd.pivot_table(jumpTable, columns=jumpTable.time)
+            jumpTable.columns = [str(columnName) for columnName in jumpTable.columns]
+            scoreRow = pd.DataFrame([jumpResult.score], index=[jumpResultIndex], columns=['score'])
 
-            for column in t.columns:
-                d[column] = t[column].speedAngle
+            for column in jumpTable.columns:
+                scoreRow[column] = jumpTable[column].speedAngle
 
-            d['finalTime'] = [finalTime]
-            d['finalAngle'] = [finalAngle]                 # ← new clean column
+            scoreRow['finalTime'] = [finalTime]
+            scoreRow['finalAngle'] = [finalAngle]                 # ← new clean column
 
             if angles.empty:
-                angles = d.copy()
+                angles = scoreRow.copy()
             else:
-                angles = pd.concat([angles, d])
+                angles = pd.concat([angles, scoreRow])
 
     cols = ['score', '5.0', '10.0', '15.0', '20.0', 'finalAngle', 'finalTime']
-    angles = angles[[c for c in cols if c in angles.columns]]
+    angles = angles[[columnName for columnName in cols if columnName in angles.columns]]
     angles = angles.replace(np.nan, 0.0)
 
     return angles.sort_index()

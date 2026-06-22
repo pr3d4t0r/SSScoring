@@ -438,6 +438,6 @@ def convertHexColorToRGB(color: str) -> list:
     color = color.replace('#', '')
     if len(color) != 6:
         raise SSScoringError('Invalid hex value length')
-    result = [ int(color[x:x+2], 16) for x in range(0, len(color), 2) ]
-    return result
+    rgbValues = [ int(color[byteOffset:byteOffset+2], 16) for byteOffset in range(0, len(color), 2) ]
+    return rgbValues
 
