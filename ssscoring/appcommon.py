@@ -189,10 +189,10 @@ def displayJumpDataIn(resultsTable: pd.DataFrame):
 
     table = resultsTable.copy()
 
-    for col in ['vKMh', 'deltaV', 'vAccel m/s²', 'speedAngle',
-                'angularVel º/s', 'deltaAngle', 'hKMh', 'distanceFromExit (m)']:
-        if col in table.columns:
-            table[col] = table[col].round(2)
+    for columnName in ['vKMh', 'deltaV', 'vAccel m/s²', 'speedAngle',
+                       'angularVel º/s', 'deltaAngle', 'hKMh', 'distanceFromExit (m)']:
+        if columnName in table.columns:
+            table[columnName] = table[columnName].round(2)
 
     if 'altitude (ft)' in table.columns:
         table['altitude (ft)'] = table['altitude (ft)'].round(1)
@@ -203,9 +203,9 @@ def displayJumpDataIn(resultsTable: pd.DataFrame):
         table,
         hide_index=True,
         column_config={
-            col: st.column_config.NumberColumn(format="%.2f")
-            for col in table.columns
-            if table[col].dtype.kind in 'fi' and col != 'altitude (ft)'
+            columnName: st.column_config.NumberColumn(format="%.2f")
+            for columnName in table.columns
+            if table[columnName].dtype.kind in 'fi' and columnName != 'altitude (ft)'
         }
     )
 
@@ -296,13 +296,13 @@ def plotJumpResult(tag: str, jumpResult: JumpResults):
             yMax = DEFAULT_PLOT_MAX_V_SCALE if jumpResult.score <= DEFAULT_PLOT_MAX_V_SCALE else jumpResult.score + DEFAULT_PLOT_INCREMENT
         except TypeError:
             yMax = DEFAULT_PLOT_MAX_V_SCALE
-        fig = initializePlot(tag, backgroundColorName='#2c2c2c', yMax=yMax)
-        fig = initializeExtraYRanges(fig, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
-        graphAltitude(fig, jumpResult)
-        graphAngle(fig, jumpResult)
-        graphAcceleration(fig, jumpResult)
-        graphJumpResult(fig, jumpResult, lineColor=SPEED_COLORS[0])
-        st.plotly_chart(fig, width='stretch')
+        figure = initializePlot(tag, backgroundColorName='#2c2c2c', yMax=yMax)
+        figure = initializeExtraYRanges(figure, startY=min(jumpResult.data.altitudeAGLFt)-500.0, endY=max(jumpResult.data.altitudeAGLFt)+500.0)
+        graphAltitude(figure, jumpResult)
+        graphAngle(figure, jumpResult)
+        graphAcceleration(figure, jumpResult)
+        graphJumpResult(figure, jumpResult, lineColor=SPEED_COLORS[0])
+        st.plotly_chart(figure, width='stretch')
 
 
 def initFileUploaderState(filesObject:str, uploaderKey:str ='uploaderKey'):

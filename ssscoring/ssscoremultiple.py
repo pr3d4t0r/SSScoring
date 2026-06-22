@@ -152,17 +152,17 @@ _FILE_ERROR_LABELS = {
 
 
 def _displayFileErrorsIn(jumpResults: dict, jumpResultsSubset: dict):
-    errorFiles = {tag: result for tag, result in jumpResults.items() if tag not in jumpResultsSubset}
+    errorFiles = {tag: jumpResult for tag, jumpResult in jumpResults.items() if tag not in jumpResultsSubset}
     if not errorFiles:
         return
     with st.expander('**Files not included in scoring**', expanded=True, icon=':material/warning:'):
-        for tag, result in errorFiles.items():
-            label = _FILE_ERROR_LABELS.get(result.status, 'Did not meet scoring criteria')
+        for tag, jumpResult in errorFiles.items():
+            label = _FILE_ERROR_LABELS.get(jumpResult.status, 'Did not meet scoring criteria')
             st.html('<p>⚠ <b>%s</b> — <span style="color: red">%s</span></p>' % (tag, label))
 
 
 def _maxSpeedScaleFrom(jumpResults: dict) -> float:
-    maxScore = max(result.score if result.score != None else 0 for result in jumpResults.values())
+    maxScore = max(jumpResult.score if jumpResult.score != None else 0 for jumpResult in jumpResults.values())
     try:
         return DEFAULT_PLOT_MAX_V_SCALE if maxScore <= DEFAULT_PLOT_MAX_V_SCALE else maxScore + DEFAULT_PLOT_INCREMENT
     except TypeError:
@@ -212,12 +212,12 @@ def main():
                         plotJumpResult(tag, jumpResult)
                     if jumpResult.data is not None:
                         with st.expander('**Horizontal displacement** - optimal ≦ 500 m from exit', expanded=True):
-                            colGroundTrack, colForwardDisplacement = st.columns(2)
-                            with colGroundTrack:
+                            groundTrackColumn, forwardDisplacementColumn = st.columns(2)
+                            with groundTrackColumn:
                                 groundTrackFigure = initializeGroundTrackPlot(tag, backgroundColorName='#2c2c2c')
                                 graphGroundTrack(groundTrackFigure, jumpResult)
                                 st.plotly_chart(groundTrackFigure, width='stretch')
-                            with colForwardDisplacement:
+                            with forwardDisplacementColumn:
                                 displacementFigure = initializePlot(tag, yLabel='forward (m)', backgroundColorName='#2c2c2c', height=450)
                                 graphForwardDisplacement(displacementFigure, jumpResult)
                                 st.plotly_chart(displacementFigure, width='stretch')

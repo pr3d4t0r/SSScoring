@@ -61,8 +61,8 @@ def viewPointBox(data: pd.DataFrame) -> pd.DataFrame:
     pointNW = distance.distance(meters=DISTANCE_FROM_MIDDLE).destination(origin, bearing=315)
     pointSE = distance.distance(meters=DISTANCE_FROM_MIDDLE).destination(origin, bearing=135)
     data = list(zip([ pointNW[0], pointSE[0], ], [ pointNW[1], pointSE[1], ]))
-    result = pd.DataFrame(data, columns=[ 'latitude', 'longitude', ])
-    return result
+    boundaryBox = pd.DataFrame(data, columns=[ 'latitude', 'longitude', ])
+    return boundaryBox
 
 
 def _resolveMaxScoreTimeFrom(jumpResult: JumpResults) -> float:
@@ -208,12 +208,12 @@ def multipleSpeedJumpsTrajectories(jumpResults, tagColors: dict):
     mapLayers = list()
     resultTags = sorted(list(jumpResults.keys()), reverse=True)
     for tag in resultTags:
-        result = jumpResults[tag]
-        if result.scores != None:
-            workData = result.data.copy()
+        jumpResult = jumpResults[tag]
+        if jumpResult.scores != None:
+            workData = jumpResult.data.copy()
             exitPointData = workData.head(1)
             exitPointData['label'] = tag
-            maxScoreTime = _resolveMaxScoreTimeFrom(result)
+            maxScoreTime = _resolveMaxScoreTimeFrom(jumpResult)
             trackColor = convertHexColorToRGB(tagColors[tag])
             layers = [
                 pdk.Layer(

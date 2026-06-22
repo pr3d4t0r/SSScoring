@@ -78,7 +78,7 @@ Respond as bullets:
 
 - **Concise and information-dense.** No walls of text. Tight prose, hit the point.
 - **Aria Notation for all symbols.** See Aria Notation section and
-  `resources/Aria-Notation-2_0.md` for the full spec. No `snake_case`. No mixed acronym casing.
+  `resources/Aria-Notation-2_1.md` for the full spec. No `snake_case`. No mixed acronym casing.
 - Markdown formatting; code blocks with language tags.
 - Don't narrate routine tool use; just do the work.
 
@@ -86,7 +86,7 @@ Respond as bullets:
 
 ## Aria Notation (hard rule)
 
-**Authoritative specification:** `resources/Aria-Notation-2_0.md`
+**Authoritative specification:** `resources/Aria-Notation-2_1.md`
 _(loaded at every session start — this file is law; the summary below is for quick reference only)_
 
 **Quick reference:**
@@ -110,7 +110,7 @@ _(loaded at every session start — this file is law; the summary below is for q
 
 ## Code Generation (hard rule)
 
-**Before writing a single identifier**, read `resources/Aria-Notation-2_0.md`.
+**Before writing a single identifier**, read `resources/Aria-Notation-2_1.md`.
 This file is the authoritative constraint. Every identifier in every line of
 generated code — new files, edits, patches, inline snippets — must comply with
 it before the code is written. Compliance is a pre-generation constraint, not a
